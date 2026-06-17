@@ -1,67 +1,43 @@
-import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCoffee } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faUser } from "@fortawesome/free-solid-svg-icons";
+import Image from "next/image";
+import { FcGoogle } from "react-icons/fc";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file. <FontAwesomeIcon icon={faCoffee} />
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="min-h-screen bg-[#f8f9fA] px-5 py-6 sm:grid sm:place-items-center dark:bg-black">
+      <Image
+        src="" // Adauga file path-ul catre logo color
+        alt={"LOGO"}
+      />
+
+      <h1 className="mb-4 text-center text-[36px] leading-none tracking-normal text-[#1A2B23] dark:text-green-200">
+        SEB: Brașov Eco Assistant
+      </h1>
+      <div className="mb-8 text-center text-[24px] leading-[1.18] text-[#1A2B23] dark:text-green-200">
+        <p>Your smart path to a cleaner Brașov.</p>
+        <p>Scan. Sort. Share.</p>
+      </div>
+      <div className="flex w-md flex-col gap-3">
+        <button className="h-14 rounded-lg bg-[#17692f] text-[18px] text-white shadow-[inset_0_2px_6px_rgba(255,255,255,0.14),0_3px_7px_rgba(18,84,39,0.25)] transition hover:bg-[#125826] focus:outline-none focus:ring-4 focus:ring-[#17692f]/25">
+          LOGIN{" "}
+          <FontAwesomeIcon
+            icon={faArrowRight}
+            className="ml-1 text-white/50"
+          />
+        </button>
+        <button className="flex h-14 items-center justify-center rounded-lg border-2 border-[#17692f] bg-white text-[17px] text-[#17692f] transition hover:bg-[#f3faf5] focus:outline-none focus:ring-4 focus:ring-[#17692f]/20">
+          <FontAwesomeIcon icon={faUser} className="mr-3 text-[18px]" />
+          CREATE FREE ACCOUNT
+        </button>
+        <button className="flex h-12 items-center justify-center rounded-lg border-2 border-[#17692f] bg-white text-[16px] text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] transition hover:bg-[#e8ecee] focus:outline-none focus:ring-4 focus:ring-slate-300">
+          <FcGoogle className="mr-2 text-[22px]" />
+          Sign in with Google
+        </button>
+      </div>
+      <a href="" className="mt-4 text-center text-[14px] text-[#1A2B23] hover:underline dark:text-green-200">
+        Forgot password? Contact support.
+      </a>
+    </main>
   );
 }
