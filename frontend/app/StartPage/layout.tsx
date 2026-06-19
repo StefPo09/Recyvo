@@ -6,7 +6,7 @@ import React from "react";
 config.autoAddCss = false;
 
 export const metadata: Metadata = {
-  title: "Start Page"
+  title: "Start Page | Recyvo"
 };
 
 export default function RootLayout({
