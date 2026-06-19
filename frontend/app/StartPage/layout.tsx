@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
-import "../globals.css";
-import { config } from "@fortawesome/fontawesome-svg-core";
-import "@fortawesome/fontawesome-svg-core/styles.css";
-import React from "react";
-config.autoAddCss = false;
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Start Page | Recyvo"
@@ -12,14 +8,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
-  return (
-    <html
-      lang="en"
-      className={`h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
-    </html>
-  );
+  return children;
 }
