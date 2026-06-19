@@ -5,7 +5,7 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 config.autoAddCss = false;
 
 export const metadata: Metadata = {
-  title: "Start Page"
+  title: "Start Page | Recyvo"
 };
 
 export default function RootLayout({

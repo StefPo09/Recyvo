@@ -21,7 +21,7 @@ export default function Home() {
       </div>
       <div className="flex w-md flex-col gap-3">
         <Link
-          href={"../LoginPage"}
+          href={"../LogInPage"}
           className="h-14 rounded-lg bg-[#17692f] text-[18px] text-white shadow-[inset_0_2px_6px_rgba(255,255,255,0.14),0_3px_7px_rgba(18,84,39,0.25)] transition hover:bg-[#125826] focus:outline-none focus:ring-4 focus:ring-[#17692f]/25">
           LOGIN{" "}
           <FontAwesomeIcon
