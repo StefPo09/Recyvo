@@ -1,28 +1,43 @@
 "use client";
 
 import Image from "next/image";
-import {useState} from "react";
+import {useState, useEffect} from "react";
+import logo from '../../Logo/Transparent/color.png';
 import { FiUser, FiMail, FiUserPlus, FiLock } from 'react-icons/fi';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
+import { useRouter } from 'next/navigation';
 
-function Input({ name, value, setValue, hasError }: { name: string, value: any, setValue: any, hasError: boolean }){
+function Input({ name, value, setValue, hasError, errorMessage }: { name: string, value: any, setValue: any, hasError: boolean, errorMessage?: string }){
   const [visible, setVisible] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   function toggleVisibility(){
     setVisible(!visible);
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto mt-10 p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
-      <div className={`flex items-center border rounded-lg p-2 bg-white transition shadow-sm hover:shadow-md 
-        ${hasError ? 'focus-within:ring-2 focus-within:ring-red-500 border-red-500' : 'focus-within:ring-2 focus-within:ring-blue-400 border-gray-300'}`}
+    <div className="w-full max-w-sm mx-auto mt-5">
+      <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition duration-300 backdrop-blur-sm
+        ${hasError 
+          ? 'bg-red-50 dark:bg-red-950/20 border-red-400 dark:border-red-600' 
+          : focused 
+          ? 'bg-white dark:bg-gray-900 border-emerald-500 dark:border-emerald-400 shadow-md shadow-emerald-200/50 dark:shadow-emerald-900/50' 
+          : 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700'}`}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
       >
         {name === 'Username' ? (
-          <FiUser className="text-gray-400 mr-2" size={20} />
+          <FiUser className={`shrink-0 transition duration-300 ${
+            hasError ? 'text-red-500' : focused ? 'text-emerald-500' : 'text-gray-500 dark:text-gray-400'
+          }`} size={20} />
         ) : name === 'Email Address' ? (
-          <FiMail className="text-gray-400 mr-2" size={20} />
+          <FiMail className={`shrink-0 transition duration-300 ${
+            hasError ? 'text-red-500' : focused ? 'text-emerald-500' : 'text-gray-500 dark:text-gray-400'
+          }`} size={20} />
         ) : (
-          <FiLock className="text-gray-400 mr-2" size={20} />
+          <FiLock className={`shrink-0 transition duration-300 ${
+            hasError ? 'text-red-500' : focused ? 'text-emerald-500' : 'text-gray-500 dark:text-gray-400'
+          }`} size={20} />
         )}
 
         <input
@@ -30,19 +45,24 @@ function Input({ name, value, setValue, hasError }: { name: string, value: any, 
           placeholder={name}
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          className="w-full outline-none text-gray-700 placeholder-gray-400"
+          className="w-full bg-transparent outline-none text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 text-base font-medium"
         />
 
         {name === 'Password' || name === 'Confirm Password' ? (
           <button
             type="button"
             onClick={toggleVisibility}
-            className="text-gray-400 hover:text-green-500 focus:outline-none transition"
+            className={`shrink-0 transition duration-300 focus:outline-none ${
+              hasError ? 'text-red-500' : focused ? 'text-emerald-500' : 'text-gray-500 dark:text-gray-400'
+            } hover:text-emerald-500 dark:hover:text-emerald-400 cursor-pointer`}
           >
             {visible ? <IoMdEyeOff size={20} /> : <IoMdEye size={20} />}
           </button>
         ) : null}
       </div>
+      {errorMessage ? (
+        <p className="mt-2 text-sm text-red-500 max-w-sm mx-auto">{errorMessage}</p>
+      ) : null}
     </div>
   )
 }
@@ -61,145 +81,183 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
   const [uppercaseError, setUppercaseError] = useState(false);
   const [numberError, setNumberError] = useState(false);
   const [specialCharacterError, setSpecialCharacterError] = useState(false);
+  const router = useRouter();
 
-  function handleError() {
-    if (username.length === 0 || emailAddress.length === 0 || password.length === 0 || confirmPassword.length === 0) {
-      setError("All fields are required!");
-      if (username.length === 0) {
-        setUsernameError(true);
-      } else {
-        setUsernameError(false);
-      }
-      if (emailAddress.length === 0) {
-        setEmailAddressError(true);
-      } else {
-        setEmailAddressError(false);
-      }
-      if (password.length === 0) {
-        setPasswordError(true);
-      } else {
-        setPasswordError(false);
-      }
-      if (confirmPassword.length === 0) {
-        setConfirmPasswordError(true);
-      } else {
-        setConfirmPasswordError(false);
-      }
-      return true;
-    } else {
-      setUsernameError(false);
-      setEmailAddressError(false);
-      setPasswordError(false);
-      setConfirmPasswordError(false);
+  // Derived checks (live)
+  const hasLower = /[a-z]/.test(password);
+  const hasUpper = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[!?&#@$*]/.test(password);
+
+  // Live validation: update error flags as the user types
+  useEffect(() => {
+    const usernameEmpty = username.length === 0;
+    const usernameHasAt = username.includes('@');
+    setUsernameError(usernameEmpty || usernameHasAt);
+
+    const emailEmpty = emailAddress.length === 0;
+    const emailInvalid = !emailAddress.includes('@');
+    setEmailAddressError(emailEmpty || emailInvalid);
+
+    setLowercaseError(!hasLower);
+    setUppercaseError(!hasUpper);
+    setNumberError(!hasNumber);
+    setSpecialCharacterError(!hasSpecial);
+
+    const pwdMissing = !(hasLower && hasUpper && hasNumber && hasSpecial);
+    setPasswordError(password.length === 0 || pwdMissing);
+
+    const confirmErr = confirmPassword.length === 0 || password !== confirmPassword;
+    setConfirmPasswordError(confirmErr);
+
+    if (!usernameEmpty && !emailInvalid && !pwdMissing && password === confirmPassword && !usernameHasAt) {
+      setError('');
     }
-    if (!emailAddress.includes('@')) {
-      setError("Email address is not valid!");
-      setEmailAddressError(true);
-      return true;
-    } else {
-      setEmailAddressError(false);
-    }
-    if (!(/[a-z]/.test(password) && /[A-Z]/.test(password) && /[0-9]/.test(password) && /[!?&#@$*]/.test(password))) {
-      setError("Password does not match the requirement!");
-      setPasswordError(true);
-      if (!/[a-z]/.test(password)) {
-        setLowercaseError(true);
-      } else {
-        setLowercaseError(false);
-      }
-      if (!/[A-Z]/.test(password)) {
-        setUppercaseError(true);
-      } else {
-        setUppercaseError(false);
-      }
-      if (!/[0-9]/.test(password)) {
-        setNumberError(true);
-      } else {
-        setNumberError(false);
-      }
-      if (!/[!?&#@$*]/.test(password)) {
-        setSpecialCharacterError(true);
-      } else {
-        setSpecialCharacterError(false);
-      }
-      return true;
-    } else {
-      setPasswordError(false);
-      setLowercaseError(false);
-      setUppercaseError(false);
-      setNumberError(false);
-      setSpecialCharacterError(false);
-    }
-    if (password !== confirmPassword) {
-      setError("Passwords do not match!");
-      setPasswordError(true);
-      setConfirmPasswordError(true);
-      return true;
-    } else {
-      setPasswordError(false);
-      setConfirmPasswordError(false);
-    }
-    setError("");
-    return false;
-  }
+  }, [username, emailAddress, password, confirmPassword, hasLower, hasUpper, hasNumber, hasSpecial]);
+
+  // Live validation is handled with useEffect; the previous handleError helper was removed.
 
   function handleSignUp() {
-    if (!handleError()) {
-      setUser ([
-        ...user,
-        {
-          username,
-          emailAddress,
-          password,
-          id: crypto.randomUUID()
-        }]);
+    // Final validation before submit
+    const isFormValid = username.length > 0 && !username.includes('@') && emailAddress.includes('@') && hasLower && hasUpper && hasNumber && hasSpecial && password === confirmPassword;
+    if (!isFormValid) {
+      setError('Please fix the highlighted fields before continuing.');
+      return;
+    }
+
+    setUser([
+      ...user,
+      {
+        username,
+        emailAddress,
+        password,
+        id: crypto.randomUUID()
+      }
+    ]);
+
+    // navigate to home page after successful sign up
+    try {
+      router.push('../HomePage');
+    } catch (e) {
+      // ignore navigation errors during dev
     }
   }
 
   return (
     <>
-      <h1 className="mt-4 mb-4 text-center text-[36px] leading-none tracking-normal text-[#1A2B23] dark:text-green-200">
-        SIGN UP
+      <h1 className="mt-6 mb-2 text-center text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        Create Account
       </h1>
-      <p className="mb-4 text-center text-red-500">{error}</p>
+      <p className="mb-8 text-center text-gray-600 dark:text-gray-400 text-sm">Join our eco-friendly community</p>
+
+      <div className={`mb-3 px-4 py-3 rounded-lg text-center text-sm font-medium transition duration-300 ${
+        error 
+          ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-800' 
+          : 'hidden'
+      }`}>
+        {error}
+      </div>
+
+      {/* Username */}
       <Input
         name="Username"
         value={username}
         setValue={setUsername}
         hasError={usernameError}
+        errorMessage={username.length === 0 ? 'Username is required' : username.includes('@') ? "Username cannot contain '@'" : ''}
       />
       <Input
         name="Email Address"
         value={emailAddress}
         setValue={setEmailAddress}
-        hasError={emailAddressError
-      }
+        hasError={emailAddressError}
+        errorMessage={emailAddress.length === 0 ? 'Email is required' : !emailAddress.includes('@') ? "Email must contain '@'" : ''}
       />
       <Input
         name="Password"
         value={password}
         setValue={setPassword}
         hasError={passwordError}
+        errorMessage={(() => {
+          if (password.length === 0) return 'Password is required';
+          const missing: string[] = [];
+          if (!hasLower) missing.push('one lowercase letter');
+          if (!hasUpper) missing.push('one uppercase letter');
+          if (!hasNumber) missing.push('one number');
+          if (!hasSpecial) missing.push('one special character');
+          return missing.length ? `Missing: ${missing.join(', ')}` : '';
+        })()}
       />
-      <div className="pl-10 items-center justify-center text-[24px]">
-        <p className={"text-white"}>Must contain at least:</p>
-        <ul className={"list-disc"}>
-          <li className={`${lowercaseError ? 'text-red-500' : 'text-white'}`}>one lowercase letter</li>
-          <li className={`${uppercaseError ? 'text-red-500' : 'text-white'}`}>one uppercase letter</li>
-          <li className={`${numberError ? 'text-red-500' : 'text-white'}`}>one number</li>
-          <li className={`${specialCharacterError ? 'text-red-500' : 'text-white'}`}>one special character(!?&#@$*)</li>
+
+      <div className="mt-6 max-w-sm mx-auto px-4 py-4 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700">
+        <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3">Password Requirements</p>
+        <ul className="space-y-2">
+          <li className={`flex items-center gap-2 text-sm transition duration-300 ${
+            lowercaseError ? 'text-red-500 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'
+          }`}>
+            <span className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+              lowercaseError ? 'bg-red-200 dark:bg-red-900' : 'bg-emerald-200 dark:bg-emerald-900'
+            }`}>
+              {lowercaseError ? '✕' : '✓'}
+            </span>
+            <span>One lowercase letter</span>
+          </li>
+          <li className={`flex items-center gap-2 text-sm transition duration-300 ${
+            uppercaseError ? 'text-red-500 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'
+          }`}>
+            <span className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+              uppercaseError ? 'bg-red-200 dark:bg-red-900' : 'bg-emerald-200 dark:bg-emerald-900'
+            }`}>
+              {uppercaseError ? '✕' : '✓'}
+            </span>
+            <span>One uppercase letter</span>
+          </li>
+          <li className={`flex items-center gap-2 text-sm transition duration-300 ${
+            numberError ? 'text-red-500 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'
+          }`}>
+            <span className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+              numberError ? 'bg-red-200 dark:bg-red-900' : 'bg-emerald-200 dark:bg-emerald-900'
+            }`}>
+              {numberError ? '✕' : '✓'}
+            </span>
+            <span>One number</span>
+          </li>
+          <li className={`flex items-center gap-2 text-sm transition duration-300 ${
+            specialCharacterError ? 'text-red-500 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'
+          }`}>
+            <span className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+              specialCharacterError ? 'bg-red-200 dark:bg-red-900' : 'bg-emerald-200 dark:bg-emerald-900'
+            }`}>
+              {specialCharacterError ? '✕' : '✓'}
+            </span>
+            <span>One special character (!?&#@$*)</span>
+          </li>
         </ul>
       </div>
+
       <Input
         name="Confirm Password"
         value={confirmPassword}
         setValue={setConfirmPassword}
         hasError={confirmPasswordError}
+        errorMessage={confirmPassword.length === 0 ? 'Please confirm your password' : password !== confirmPassword ? 'Passwords do not match' : ''}
       />
-      <button
-        onClick={handleSignUp}
-        className="flex mt-5 mb-5 w-full justify-center text-white"
-      >Create Account<FiUserPlus className="text-gray-400 mr-2" size={20} /></button>
+
+      {/* Submit button: disabled until form is valid */}
+      {(() => {
+        const isFormValid = username.length > 0 && !username.includes('@') && emailAddress.includes('@') && hasLower && hasUpper && hasNumber && hasSpecial && password === confirmPassword;
+        return (
+          <button
+            type="button"
+            onClick={handleSignUp}
+            disabled={!isFormValid}
+            className={`mt-8 mb-4 mx-auto max-w-sm w-full px-4 py-3 ${isFormValid ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600' : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'} text-white font-semibold rounded-lg transition duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 transform`}
+          >
+            <FiUserPlus size={20} />
+            Create Account
+          </button>
+        );
+      })()}
     </>
   )
 }
@@ -207,21 +265,40 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
 export default function Home() {
   const [user, setUser] = useState([])
   return (
-    <main className="min-h-screen bg-[#f8f9fA] px-5 py-6 sm:grid sm:place-items-center dark:bg-black">
-      <Image
-        src="" // Adauga file path-ul catre logo color
-        alt="LOGO"
-      />
+    <main className="min-h-screen bg-[#2D8A56] dark:bg-[#1A2B23] px-4 py-8 sm:py-12">
+      <div className="max-w-md mx-auto">
+        <div className="text-center mb-8">
+          <div className="inline-block">
+            <Image
+              src={logo}
+              alt="LOGO"
+              width={150}
+              height={150}
+              className="object-contain"
+            />
+          </div>
+        </div>
 
-      <h1 className="mb-4 text-center text-[36px] leading-none tracking-normal text-[#1A2B23] dark:text-green-200">
-        SEB: Brașov Eco Assistant
-      </h1>
+        <div className="bg-white dark:bg-gray-950 rounded-2xl shadow-xl dark:shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+          <div className="bg-linear-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-widest">Quick Setup</h2>
+          </div>
 
-      <div className={"w-md bg-[#FFFFFF] dark:bg-gray-950"}>
-        <SignUp
-          user={user}
-          setUser={setUser}
-        />
+          <div className="px-6 py-8">
+            <SignUp
+              user={user}
+              setUser={setUser}
+            />
+          </div>
+
+          <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-600 dark:text-gray-400">
+            <p>Already have an account? <a href="../LogInPage" className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold transition">Log in</a></p>
+          </div>
+        </div>
+
+        <div className="mt-8 text-center text-xs text-gray-600 dark:text-gray-400">
+          <p>Join our community to help protect<br />our environment together</p>
+        </div>
       </div>
     </main>
   );
