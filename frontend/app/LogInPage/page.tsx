@@ -1,27 +1,39 @@
 "use client";
 
 import Image from "next/image";
-import {useState} from "react";
+import {useState, useEffect} from "react";
+import logo from '../../Logo/Transparent/color.png';
 import { FiUser, FiLock } from 'react-icons/fi';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
-import Link from "next/link";
+import { useRouter } from 'next/navigation';
 
-function Input({ name, value, setValue, hasError }: { name: string, value: any, setValue: any, hasError: boolean }){
+function Input({ name, value, setValue, hasError, errorMessage }: { name: string, value: any, setValue: any, hasError: boolean, errorMessage?: string }){
   const [visible, setVisible] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   function toggleVisibility(){
     setVisible(!visible);
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto mt-10 p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
-      <div className={`flex items-center border rounded-lg p-2 bg-white transition shadow-sm hover:shadow-md 
-        ${hasError ? 'focus-within:ring-2 focus-within:ring-red-500 border-red-500' : 'focus-within:ring-2 focus-within:ring-blue-400 border-gray-300'}`}
+    <div className="w-full max-w-sm mx-auto mt-5">
+      <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition duration-300 backdrop-blur-sm
+        ${hasError 
+          ? 'bg-red-50 dark:bg-red-950/20 border-red-400 dark:border-red-600' 
+          : focused 
+          ? 'bg-white dark:bg-gray-900 border-emerald-500 dark:border-emerald-400 shadow-md shadow-emerald-200/50 dark:shadow-emerald-900/50' 
+          : 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700'}`}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
       >
         {name === 'Username or Email' ? (
-          <FiUser className="text-gray-400 mr-2" size={20} />
+          <FiUser className={`shrink-0 transition duration-300 ${
+            hasError ? 'text-red-500' : focused ? 'text-emerald-500' : 'text-gray-500 dark:text-gray-400'
+          }`} size={20} />
         ) : (
-          <FiLock className="text-gray-400 mr-2" size={20} />
+          <FiLock className={`shrink-0 transition duration-300 ${
+            hasError ? 'text-red-500' : focused ? 'text-emerald-500' : 'text-gray-500 dark:text-gray-400'
+          }`} size={20} />
         )}
 
         <input
@@ -29,19 +41,24 @@ function Input({ name, value, setValue, hasError }: { name: string, value: any, 
           placeholder={name}
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          className="w-full outline-none text-gray-700 placeholder-gray-400"
+          className="w-full bg-transparent outline-none text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 text-base font-medium"
         />
 
         {name === 'Password' ? (
           <button
             type="button"
             onClick={toggleVisibility}
-            className="text-gray-400 hover:text-green-500 focus:outline-none transition"
+            className={`shrink-0 transition duration-300 focus:outline-none ${
+              hasError ? 'text-red-500' : focused ? 'text-emerald-500' : 'text-gray-500 dark:text-gray-400'
+            } hover:text-emerald-500 dark:hover:text-emerald-400 cursor-pointer`}
           >
             {visible ? <IoMdEyeOff size={20} /> : <IoMdEye size={20} />}
           </button>
         ) : null}
       </div>
+      {errorMessage ? (
+        <p className="mt-2 text-sm text-red-500 max-w-sm mx-auto">{errorMessage}</p>
+      ) : null}
     </div>
   )
 }
@@ -52,84 +69,128 @@ function LogIn() {
   const [error, setError] = useState("");
   const [usernameEmailError, setUsernameEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const router = useRouter();
 
-  function handleError() {
-    if (usernameEmail.length === 0 || password.length === 0) {
-      setError("All fields are required!");
-      if (usernameEmail.length === 0) {
-        setUsernameEmailError(true);
-      } else {
-        setUsernameEmailError(false);
-      }
-      if (password.length === 0) {
-        setPasswordError(true);
-      } else {
-        setPasswordError(false);
-      }
-      return true;
-    } else {
-      setUsernameEmailError(false);
-      setPasswordError(false);
+  // Live validation: update error flags as the user types
+  useEffect(() => {
+    const usernameEmailEmpty = usernameEmail.length === 0;
+    setUsernameEmailError(usernameEmailEmpty);
+
+    const passwordEmpty = password.length === 0;
+    setPasswordError(passwordEmpty);
+
+    if (!usernameEmailEmpty && !passwordEmpty) {
+      setError('');
     }
-    setError("");
-    return false;
-  }
+  }, [usernameEmail, password]);
 
   function handleSubmit() {
-    if (!handleError()) {
-      if (usernameEmail.includes('@')) {
-        // Cauta folosind mail
-      } else {
-        //Cauta folosind username
-      }
+    // Final validation before submit
+    const isFormValid = usernameEmail.length > 0 && password.length > 0;
+    if (!isFormValid) {
+      setError('Please fill in all fields.');
+      return;
+    }
+
+    // TODO: Add authentication logic here (check with database)
+    try {
+      router.push('../HomePage');
+    } catch (e) {
+      // ignore navigation errors during dev
     }
   }
 
   return (
     <>
-      <h1 className="mt-4 mb-4 text-center text-[36px] leading-none tracking-normal text-[#1A2B23] dark:text-green-200">
-        LOGIN
+      <h1 className="mt-6 mb-2 text-center text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        Welcome Back
       </h1>
-      <p className="mb-4 text-center text-red-500">{error}</p>
+      <p className="mb-8 text-center text-gray-600 dark:text-gray-400 text-sm">Log in to your account</p>
+
+      <div className={`mb-3 px-4 py-3 rounded-lg text-center text-sm font-medium transition duration-300 ${
+        error 
+          ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-800' 
+          : 'hidden'
+      }`}>
+        {error}
+      </div>
+
       <Input
         name="Username or Email"
         value={usernameEmail}
         setValue={setUsernameEmail}
         hasError={usernameEmailError}
+        errorMessage={usernameEmail.length === 0 ? 'Username or email is required' : ''}
       />
       <Input
         name="Password"
         value={password}
         setValue={setPassword}
         hasError={passwordError}
+        errorMessage={password.length === 0 ? 'Password is required' : ''}
       />
-      <button
-        onClick={handleSubmit} // Cauta user in baza de date
-        className="flex mt-5 mb-5 w-full justify-center text-white"
-      >Log In<FiUser className="text-gray-400 mr-2" size={20} /></button>
-      <Link
-        href={"../SignUpPage"}
-        className="text-white">
-        Don't have an account?
-      </Link>
+
+      {/* Submit button: disabled until form is valid */}
+      {(() => {
+        const isFormValid = usernameEmail.length > 0 && password.length > 0;
+        return (
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!isFormValid}
+            className={`mt-8 mb-4 mx-auto max-w-sm w-full px-4 py-3 ${isFormValid ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 cursor-pointer' : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'} text-white font-semibold rounded-lg transition duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 transform`}
+          >
+            <FiUser size={20} />
+            Log In
+          </button>
+        );
+      })()}
+
+      <div className="mt-6 text-center">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Don't have an account?
+          <a href="../SignUpPage" className="ml-2 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold transition">
+            Sign up
+          </a>
+        </p>
+      </div>
     </>
   )
 }
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#f8f9fA] px-5 py-6 sm:grid sm:place-items-center dark:bg-black">
-      <Image
-        src="" // Adauga file path-ul catre logo color
-        alt="LOGO"
-      />
+    <main className="min-h-screen bg-[#2D8A56] dark:bg-[#1A2B23] px-4 py-8 sm:py-12">
+      <div className="max-w-md mx-auto">
+        <div className="text-center mb-8">
+          <div className="inline-block">
+            <Image
+              src={logo}
+              alt="LOGO"
+              width={150}
+              height={150}
+              className="object-contain"
+            />
+          </div>
+        </div>
 
-      <h1 className="mb-4 text-center text-[36px] leading-none tracking-normal text-[#1A2B23] dark:text-green-200">
-        SEB: Brașov Eco Assistant
-      </h1>
+        <div className="bg-white dark:bg-gray-950 rounded-2xl shadow-xl dark:shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+          <div className="bg-linear-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-widest">Log In</h2>
+          </div>
 
-      <div className={"w-md bg-[#FFFFFF] dark:bg-gray-950"}>
-        <LogIn />
+          <div className="px-6 py-8">
+            <LogIn />
+          </div>
+
+          <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-600 dark:text-gray-400">
+            <p>Don't have an account? <a href="../SignUpPage" className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold transition">Sign up</a></p>
+          </div>
+        </div>
+
+        <div className="mt-8 text-center text-xs text-gray-600 dark:text-gray-400">
+          <p>Welcome back to our eco-friendly<br />community</p>
+        </div>
       </div>
     </main>
   );

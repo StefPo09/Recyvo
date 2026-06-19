@@ -281,7 +281,7 @@ export default function Home() {
 
         <div className="bg-white dark:bg-gray-950 rounded-2xl shadow-xl dark:shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
           <div className="bg-linear-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-widest">Quick Setup</h2>
+            <h2 className="text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-widest">Sign Up</h2>
           </div>
 
           <div className="px-6 py-8">
