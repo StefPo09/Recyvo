@@ -1,7 +1,16 @@
 "use client";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMap, faClock, faHome, faUser, faComments, faTrash, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import {
+  faMap,
+  faClock,
+  faHome,
+  faUser,
+  faComments,
+  faTrash,
+  faTrashCan,
+  faUserGear
+} from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { FiGrid } from 'react-icons/fi';
 import { useState, useEffect } from "react";
@@ -233,11 +242,21 @@ export default function Home() {
   return (
       <main className="flex min-h-screen flex-col bg-white dark:bg-black">
         <div className="bg-linear-to-r from-green-700 to-green-600 text-white px-6 pt-6 pb-8 rounded-b-3xl dark:from-green-900 dark:to-green-800">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-green-700 font-bold text-sm">
-              🤖
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-green-700 font-bold text-sm">
+                🤖
+              </div>
+              <h1 className="text-lg font-semibold">SEB: Eco Assistant</h1>
             </div>
-            <h1 className="text-lg font-semibold">SEB: Eco Assistant</h1>
+            <Link
+              href="./" // Add settingsPage
+              className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium hover:bg-white/20 transition-colors"
+              aria-label="Settings"
+            >
+              <FontAwesomeIcon icon={faUserGear} className="text-sm text-emerald-200" />
+              <span className="text-emerald-100">Settings</span>
+            </Link>
           </div>
 
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm dark:shadow-none">
