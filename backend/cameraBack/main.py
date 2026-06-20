@@ -82,6 +82,11 @@ class UserResponse(BaseModel):
     nr_puncte: int
 
 
+class UserLogin(BaseModel):
+    username_or_email: str
+    parola: str
+
+
 class UserPointsUpdate(BaseModel):
     puncte_adaugate: int
 
@@ -618,6 +623,27 @@ def add_points(username: str, data: UserPointsUpdate):
     conn.close()
 
     return {"success": True, "username": username, "puncte_totale": nou_total}
+
+
+@app.post("/users/login")
+def login(user: UserLogin):
+    conn = get_db()
+    row = conn.execute(
+        "SELECT * FROM users WHERE (username = ? OR email = ?) AND parola = ?",
+        (user.username_or_email, user.username_or_email, user.parola)
+    ).fetchone()
+    conn.close()
+
+    if not row:
+        raise HTTPException(status_code=401, detail="Autentificare eșuată. Verificați username-ul/emailul și parola.")
+
+    return {
+        "id": row["id"],
+        "username": row["username"],
+        "nume": row["nume"],
+        "email": row["email"],
+        "nr_puncte": row["nr_puncte"]
+    }
 
 
 # ---------------------------------------------------------------------------
