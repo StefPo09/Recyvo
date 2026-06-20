@@ -260,11 +260,14 @@ async def lifespan(app: FastAPI):
 
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
-        raise RuntimeError(
-            "GOOGLE_API_KEY lipsește din variabilele de mediu. "
-            "Creați un fișier .env cu: GOOGLE_API_KEY=AIza..."
-        )
-    app.state.client = genai.Client(api_key=api_key)
+        # For local development we allow running without a Google API key so
+        # features that don't require Gemini/Places (like adding/listing bins)
+        # still work. If you need image analysis or places, set GOOGLE_API_KEY
+        # in a .env file or the environment.
+        print("WARNING: GOOGLE_API_KEY not set. Gemini/Places features will be disabled.")
+        app.state.client = None
+    else:
+        app.state.client = genai.Client(api_key=api_key)
 
     places_key = os.getenv("GOOGLE_PLACES_API_KEY", api_key)
     app.state.places_api_key = places_key
@@ -379,6 +382,23 @@ async def find_recycling_points(
 
     points.sort(key=lambda p: p.distance_km if p.distance_km is not None else float("inf"))
     return points
+
+
+@app.get("/places/nearby/", response_model=List[RecyclingPoint])
+async def get_recycling_places(waste_category: str, lat: float, lng: float, max_results: int = 5):
+    """Return nearby recycling places for a given waste category and location."""
+    try:
+        places = await find_recycling_points(
+            http_client=app.state.http_client,
+            api_key=app.state.places_api_key,
+            waste_category=waste_category,
+            latitude=lat,
+            longitude=lng,
+            max_results=max_results,
+        )
+        return places
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching places: {e}")
 
 
 def get_local_nearest_bins(user_lat: float, user_lng: float, bin_type: str, max_results: int = 5) -> List[dict]:

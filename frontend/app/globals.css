@@ -1,1 +1,5 @@
+/* Leaflet CSS (loaded from CDN to avoid requiring node_modules at build time)
+   This import must come before other rules so PostCSS doesn't error. */
+@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+
 @import "tailwindcss";

@@ -4,7 +4,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMap, faClock, faHome, faUser, faComments, faTrash, faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { FiGrid } from 'react-icons/fi';
-import {useState} from "react";
+import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+import { listBins, findNearest, fetchRecyclingPlaces } from "@/lib/api";
+
+// dynamic import of client-side MapView; typed as any to avoid SSR/type checks
+// @ts-ignore
+const MapViewAny: any = dynamic(() => import("../../components/MapView"), { ssr: false });
 
 function BinSelect({
                      name,
@@ -49,22 +55,95 @@ function BinSelect({
 function BinMap() {
   const [bin, setBin] = useState("All");
   const [isAddingBin, setIsAddingBin] = useState(false);
+  const [bins, setBins] = useState<any[]>([]);
+  const [places, setPlaces] = useState<any[]>([]);
+  const [nearest, setNearest] = useState<any | null>(null);
 
-  function ShowTrashBins(selectedBin: string) {
-    if (selectedBin === "All") {
-      // show all bins
-    } else if (selectedBin === "Plastic and Metal") {
-      // show only plastic and metal bins
-    } else if (selectedBin === "Paper") {
-      // show only paper bins
-    } else if (selectedBin === "Glass") {
-      // show only glass bins
-    } else if (selectedBin === "Household") {
-      // show only household bins
+  async function ShowTrashBins(selectedBin: string) {
+    // map UI category to backend bin_type and place category
+    const map = (name: string) => {
+      if (name === "Plastic and Metal") return { binType: "plastic", placeCat: "plastic" };
+      if (name === "Paper") return { binType: "hartie", placeCat: "hartie_carton" };
+      if (name === "Glass") return { binType: "sticla", placeCat: "sticla" };
+      if (name === "Household") return { binType: "general", placeCat: "altele" };
+      return { binType: undefined, placeCat: "altele" };
+    };
+
+    const mapping = map(selectedBin);
+
+    try {
+      const b = await listBins(mapping.binType);
+      setBins(b || []);
+    } catch (e) {
+      // ignore
+    }
+
+    // update places for current location if available
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        try {
+          const p = await fetchRecyclingPlaces(pos.coords.latitude, pos.coords.longitude, mapping.placeCat, 8);
+          setPlaces(p || []);
+        } catch (err) {
+          // ignore
+        }
+      });
     }
   }
 
   const binOptions = ["All", "Plastic and Metal", "Paper", "Glass", "Household"];
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function load() {
+      try {
+        const all = await listBins();
+        if (!mounted) return;
+        setBins(all || []);
+      } catch (e) {
+        // ignore
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+          try {
+            const catToBin = (name: string) => {
+              if (name === "Plastic and Metal") return { binType: "plastic", placeCat: "plastic" };
+              if (name === "Paper") return { binType: "hartie", placeCat: "hartie_carton" };
+              if (name === "Glass") return { binType: "sticla", placeCat: "sticla" };
+              if (name === "Household") return { binType: "general", placeCat: "altele" };
+              return { binType: "general", placeCat: "altele" };
+            };
+
+            const mapping = catToBin(bin);
+
+            try {
+              const near = await findNearest(pos.coords.latitude, pos.coords.longitude, mapping.binType, 5);
+              if (mounted) setNearest(near);
+            } catch (e) {
+              // ignore
+            }
+
+            try {
+              const p = await fetchRecyclingPlaces(pos.coords.latitude, pos.coords.longitude, mapping.placeCat, 8);
+              if (!mounted) return;
+              setPlaces(p || []);
+            } catch (e) {
+              // ignore
+            }
+          } catch (e) {
+            // ignore
+          }
+        });
+      }
+    }
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [bin]);
 
   return (
       <div className="space-y-5">
@@ -101,13 +180,11 @@ function BinMap() {
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">Live map preview</h3>
             </div>
             <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-green-700 shadow-sm dark:bg-gray-800 dark:text-green-300">
-            4 bins found
-          </span>
+              {bins.length + places.length} points found
+            </span>
           </div>
 
-          <div className="relative mx-5 mt-5 h-80 overflow-hidden rounded-3xl border border-white/70 bg-[radial-gradient(circle_at_20%_20%,rgba(34,197,94,0.14)_0,transparent_28%),radial-gradient(circle_at_80%_20%,rgba(16,185,129,0.18)_0,transparent_30%),linear-gradient(135deg,#e5e7eb_0%,#f8fafc_48%,#d1fae5_100%)] shadow-inner dark:border-gray-700 dark:bg-[linear-gradient(135deg,#0f172a_0%,#111827_55%,#052e16_100%)]">
-            <div className="absolute inset-0 opacity-35 bg-[linear-gradient(to_right,rgba(255,255,255,0.35)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.35)_1px,transparent_1px)] bg-size-[48px_48px] dark:opacity-20" />
-
+          <div className="mx-5 mt-5">
             <button
                 type="button"
                 onClick={() => setIsAddingBin((value) => !value)}
@@ -121,23 +198,8 @@ function BinMap() {
               {isAddingBin ? "Adding bin" : "Add bin"}
             </button>
 
-            <div className="absolute left-6 top-8 flex flex-col items-center gap-1">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-600 text-white shadow-lg shadow-green-600/25">♻️</div>
-              <span className="rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold text-gray-700 shadow-sm dark:bg-gray-900/90 dark:text-gray-200">Recycling</span>
-            </div>
-
-            <div className="absolute right-8 top-16 flex flex-col items-center gap-1">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/25">🧴</div>
-              <span className="rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold text-gray-700 shadow-sm dark:bg-gray-900/90 dark:text-gray-200">Plastic</span>
-            </div>
-
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border-4 border-white bg-green-700 text-2xl text-white shadow-lg shadow-green-700/30 dark:border-gray-900">
-                📍
-              </div>
-              <div className="mt-2 rounded-full bg-white/90 px-4 py-1 text-xs font-semibold text-green-700 shadow-sm dark:bg-gray-900/90 dark:text-green-300">
-                Your location
-              </div>
+            <div className="mt-4">
+              <MapViewAny bins={bins} places={places} enableAdd={isAddingBin} />
             </div>
           </div>
 
@@ -150,8 +212,8 @@ function BinMap() {
           <div className="grid gap-3 px-5 pb-5 pt-5 sm:grid-cols-2">
             <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800">
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Nearest bin</p>
-              <p className="mt-1 text-base font-bold text-gray-900 dark:text-white">Paper collection point</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">2 min walk • 180m away</p>
+              <p className="mt-1 text-base font-bold text-gray-900 dark:text-white">{nearest?.nearest_bins?.[0]?.address || '—'}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{nearest?.nearest_bins?.[0]?.distance_label || ''}</p>
             </div>
             <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800">
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Category</p>
