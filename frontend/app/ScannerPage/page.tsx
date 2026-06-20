@@ -13,7 +13,7 @@ import {
   faTrashCan,
   faUser,
   faTriangleExclamation,
-  faRecycle,
+  faRecycle, faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 
@@ -91,13 +91,23 @@ function fileToBase64(file: File): Promise<string> {
 
 function ScannerHeader() {
   return (
-      <div className="bg-linear-to-r from-green-700 to-green-600 px-6 pb-8 pt-6 text-white dark:from-green-900 dark:to-green-800 rounded-b-3xl">
-        <div className="mb-4 flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-green-700">
+    <div className="bg-linear-to-r from-green-700 to-green-600 text-white px-6 pt-6 pb-8 rounded-b-3xl dark:from-green-900 dark:to-green-800">
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-green-700 font-bold text-sm">
             🤖
           </div>
           <h1 className="text-lg font-semibold">SEB: Eco Assistant</h1>
         </div>
+        <Link
+          href="./" // Add settingsPage
+          className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium hover:bg-white/20 transition-colors"
+          aria-label="Settings"
+        >
+          <FontAwesomeIcon icon={faUserGear} className="text-sm text-emerald-200" />
+          <span className="text-emerald-100">Settings</span>
+        </Link>
+      </div>
 
         <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800 dark:shadow-none">
           <div className="mb-3 flex items-start justify-between">
@@ -662,7 +672,8 @@ export default function ScannerPage() {
       if (!response.ok) {
         const errorBody = await response.json().catch(() => null);
         const detail = errorBody?.detail ?? `Eroare server (${response.status}).`;
-        throw new Error(detail);
+        setScanError(detail);
+        return;
       }
 
       const data: WasteResult = await response.json();
