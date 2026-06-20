@@ -12,8 +12,50 @@ import {
   faXmark,
   faTrashCan,
   faUser,
+  faTriangleExclamation,
+  faRecycle,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+
+const API_BASE_URL = "http://localhost:8000";
+
+// ---------------------------------------------------------------------------
+// Tipuri care reflectă WasteResult din backend (main.py)
+// ---------------------------------------------------------------------------
+
+type RecyclingPoint = {
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  distance_km?: number | null;
+  maps_url: string;
+  open_now?: boolean | null;
+  rating?: number | null;
+};
+
+type WasteResult = {
+  item_name: string;
+  waste_category: string;
+  description: string;
+  disposal_instructions: string[];
+  warnings: string[];
+  is_recyclable: boolean;
+  recycling_points: RecyclingPoint[];
+  local_bins: Record<string, unknown>[];
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
+  sticla: "Sticlă",
+  plastic: "Plastic",
+  baterii: "Baterii",
+  electronice: "Electronice",
+  hartie_carton: "Hârtie / Carton",
+  metal: "Metal",
+  organic: "Organic",
+  periculos: "Periculos",
+  altele: "Altele",
+};
 
 function useObjectUrl(file: File | null) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -31,6 +73,20 @@ function useObjectUrl(file: File | null) {
   }, [file]);
 
   return previewUrl;
+}
+
+// Citește un File și îl transformă în base64 (fără prefixul data:...;base64,)
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      const base64 = result.split(",")[1] ?? "";
+      resolve(base64);
+    };
+    reader.onerror = () => reject(new Error("Nu am putut citi fișierul imagine."));
+    reader.readAsDataURL(file);
+  });
 }
 
 function ScannerHeader() {
@@ -323,8 +379,8 @@ function PreviewCard({
   file: File | null;
   previewUrl: string | null;
   onClear: () => void;
-  isScanning: any;
-  onScan: any;
+  isScanning: boolean;
+  onScan: () => void;
 }) {
   return (
       <div className="mt-5 overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-100 dark:bg-gray-950 dark:ring-gray-800">
@@ -381,11 +437,74 @@ function PreviewCard({
   );
 }
 
+function ScanResultCard({ result }: { result: WasteResult }) {
+  const categoryLabel = CATEGORY_LABELS[result.waste_category] ?? result.waste_category;
+
+  return (
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-200">
+          <FontAwesomeIcon icon={faRecycle} />
+        </div>
+        <div className="min-w-0 flex-1 space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">{result.item_name}</p>
+            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-900/60 dark:text-green-200">
+              {categoryLabel}
+            </span>
+            <span
+                className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    result.is_recyclable
+                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-200"
+                        : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200"
+                }`}
+            >
+              {result.is_recyclable ? "Reciclabil" : "Nereciclabil"}
+            </span>
+          </div>
+
+          {result.description && (
+              <p className="text-sm leading-6 text-gray-700 dark:text-gray-200">{result.description}</p>
+          )}
+
+          {result.disposal_instructions.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Instrucțiuni
+                </p>
+                <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-gray-700 dark:text-gray-200">
+                  {result.disposal_instructions.map((step, idx) => (
+                      <li key={idx}>{step}</li>
+                  ))}
+                </ul>
+              </div>
+          )}
+
+          {result.warnings.length > 0 && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/30">
+                <div className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faTriangleExclamation} className="text-amber-600 dark:text-amber-300" />
+                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">
+                    Avertismente
+                  </p>
+                </div>
+                <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-amber-800 dark:text-amber-100">
+                  {result.warnings.map((warning, idx) => (
+                      <li key={idx}>{warning}</li>
+                  ))}
+                </ul>
+              </div>
+          )}
+        </div>
+      </div>
+  );
+}
+
 function ScannerBody({
                        file,
                        previewUrl,
                        scanResult,
                        isScanning,
+                       scanError,
                        onOpenCamera,
                        onOpenGallery,
                        onClear,
@@ -393,8 +512,9 @@ function ScannerBody({
                      }: {
   file: File | null;
   previewUrl: string | null;
-  scanResult: string | null;
+  scanResult: WasteResult | null;
   isScanning: boolean;
+  scanError: string | null;
   onOpenCamera: () => void;
   onOpenGallery: () => void;
   onClear: () => void;
@@ -449,20 +569,22 @@ function ScannerBody({
                       <div>
                         <p className="font-semibold text-gray-900 dark:text-white">Scanning in progress</p>
                         <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                          Please wait while the example result is being prepared.
+                          Imaginea este analizată de AI, te rugăm să aștepți.
                         </p>
                       </div>
                     </div>
-                ) : scanResult ? (
+                ) : scanError ? (
                     <div className="flex items-start gap-3">
-                      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-200">
-                        <FontAwesomeIcon icon={faImage} />
+                      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-200">
+                        <FontAwesomeIcon icon={faTriangleExclamation} />
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">Scan result</p>
-                        <p className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-200">{scanResult}</p>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">Scanarea a eșuat</p>
+                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{scanError}</p>
                       </div>
                     </div>
+                ) : scanResult ? (
+                    <ScanResultCard result={scanResult} />
                 ) : (
                     <div className="flex items-start gap-3">
                       <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-300">
@@ -471,7 +593,7 @@ function ScannerBody({
                       <div>
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">No result yet</p>
                         <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                          Choose a photo and press <span className="font-semibold text-green-700 dark:text-green-300">Scan</span> to see a preview result.
+                          Choose a photo and press <span className="font-semibold text-green-700 dark:text-green-300">Scan</span> to see the result.
                         </p>
                       </div>
                     </div>
@@ -489,12 +611,15 @@ export default function ScannerPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
-  const [scanResult, setScanResult] = useState<string | null>(null);
+  const [scanResult, setScanResult] = useState<WasteResult | null>(null);
+  const [scanError, setScanError] = useState<string | null>(null);
   const previewUrl = useObjectUrl(selectedFile);
 
   function handleGalleryChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
     setSelectedFile(file);
+    setScanResult(null);
+    setScanError(null);
   }
 
   function openCamera() {
@@ -509,24 +634,48 @@ export default function ScannerPage() {
     setSelectedFile(null);
     if (galleryInputRef.current) galleryInputRef.current.value = "";
     setScanResult(null);
+    setScanError(null);
   }
 
   async function handleScan() {
-    setIsScanning(true);
-
-    // EXAMPLE SCAN START
-    await new Promise((resolve) => setTimeout(resolve, 900));
-
     if (!selectedFile) {
-      setScanResult("Demo scan: no image selected yet. Add a photo first, then connect the backend here.");
-    } else {
-      setScanResult(
-          `Demo scan result for ${selectedFile.name}: likely recyclable plastic/metal packaging. Replace this with your backend response.`
-      );
+      return;
     }
-    // EXAMPLE SCAN END
 
-    setIsScanning(false);
+    setIsScanning(true);
+    setScanError(null);
+    setScanResult(null);
+
+    try {
+      const base64Image = await fileToBase64(selectedFile);
+      const mimeType = selectedFile.type || "image/jpeg";
+
+      const response = await fetch(`${API_BASE_URL}/analyze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          image: base64Image,
+          mime_type: mimeType,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => null);
+        const detail = errorBody?.detail ?? `Eroare server (${response.status}).`;
+        throw new Error(detail);
+      }
+
+      const data: WasteResult = await response.json();
+      setScanResult(data);
+    } catch (error) {
+      const message =
+          error instanceof Error
+              ? error.message
+              : "A apărut o eroare necunoscută la analizarea imaginii.";
+      setScanError(message);
+    } finally {
+      setIsScanning(false);
+    }
   }
 
   return (
@@ -538,6 +687,7 @@ export default function ScannerPage() {
             previewUrl={previewUrl}
             scanResult={scanResult}
             isScanning={isScanning}
+            scanError={scanError}
             onOpenCamera={openCamera}
             onOpenGallery={openGallery}
             onClear={clearSelection}
@@ -556,7 +706,11 @@ export default function ScannerPage() {
 
         {isCameraOpen && (
             <CameraCaptureModal
-                onCapture={(file) => setSelectedFile(file)}
+                onCapture={(file) => {
+                  setSelectedFile(file);
+                  setScanResult(null);
+                  setScanError(null);
+                }}
                 onClose={() => setIsCameraOpen(false)}
             />
         )}
