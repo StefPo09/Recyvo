@@ -6,7 +6,7 @@ import logo from '../../Logo/Transparent/color.png';
 import { FiUser, FiLock } from 'react-icons/fi';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
-import { loginUser } from '../../lib/api';
+import { loginUser } from '@/lib/api';
 
 function Input({ name, value, setValue, hasError, errorMessage }: { name: string, value: any, setValue: any, hasError: boolean, errorMessage?: string }){
   const [visible, setVisible] = useState(false);
@@ -177,7 +177,7 @@ function LogIn() {
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col bg-[var(--color-bg-main)] text-[var(--color-text-primary)] px-4 py-8 sm:py-12">
+    <main className="flex min-h-screen flex-col bg-(--color-bg-main) text-(--color-text-primary) px-4 py-8 sm:py-12">
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
           <div className="inline-block">
@@ -191,17 +191,17 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="bg-[var(--color-bg-card)] dark:bg-gray-950 rounded-2xl shadow-xl border border-[var(--color-bg-card)] overflow-hidden text-[var(--color-text-primary)]">
-          <div className="bg-linear-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50 px-6 py-4 border-b border-[var(--color-green-accent)]">
-            <h2 className="text-[var(--color-text-secondary)] text-xs font-semibold uppercase tracking-widest font-[family-name:var(--font-body)]">Log In</h2>
+        <div className="bg-(--color-bg-card) dark:bg-gray-950 rounded-2xl shadow-xl border border-(--color-bg-card) overflow-hidden text-(--color-text-primary)">
+          <div className="bg-linear-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50 px-6 py-4 border-b border-(--color-green-accent)">
+            <h2 className="text-(--color-text-secondary)] text-xs font-semibold uppercase tracking-widest font-(family-name:--font-body)">Log In</h2>
           </div>
 
           <div className="px-6 py-8">
             <LogIn />
           </div>
 
-          <div className="px-6 py-4 bg-[var(--color-bg-card)] border-t border-[var(--color-green-accent)] text-center text-xs text-[var(--color-text-secondary)]">
-            <p>Don't have an account? <a href="../SignUpPage" className="text-[var(--color-green-primary)] hover:opacity-90 font-semibold transition">Sign up</a></p>
+          <div className="px-6 py-4 bg-(--color-bg-card) border-t border-(--color-green-accent) text-center text-xs text-(--color-text-secondary)">
+            <p>Don't have an account? <a href="../SignUpPage" className="text-(--color-green-primary) hover:opacity-90 font-semibold transition">Sign up</a></p>
           </div>
         </div>
       </div>
