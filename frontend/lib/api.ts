@@ -10,11 +10,17 @@ type AnalyzeRequest = {
 };
 
 export async function analyzeImage(req: AnalyzeRequest) {
-  const res = await fetch(`${API_URL}/analyze`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(req),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/analyze`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req),
+    });
+  } catch (err: any) {
+    const msg = String(err?.message || err);
+    throw new Error(`Network error when calling ${API_URL}/analyze: ${msg}. Is the backend running and reachable?`);
+  }
 
   if (!res.ok) {
     const text = await res.text();
@@ -122,16 +128,22 @@ export async function signupUser({
   email: string;
   parola: string;
 }) {
-  const res = await fetch(`${API_URL}/users/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      username,
-      nume,
-      email,
-      parola,
-    }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/users/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username,
+        nume,
+        email,
+        parola,
+      }),
+    });
+  } catch (err: any) {
+    const msg = String(err?.message || err);
+    throw new Error(`Network error when calling ${API_URL}/users/: ${msg}. Is the backend running and reachable?`);
+  }
 
   if (!res.ok) {
     const text = await res.text();
@@ -148,14 +160,20 @@ export async function loginUser({
   username_or_email: string;
   parola: string;
 }) {
-  const res = await fetch(`${API_URL}/users/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      username_or_email,
-      parola,
-    }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/users/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username_or_email,
+        parola,
+      }),
+    });
+  } catch (err: any) {
+    const msg = String(err?.message || err);
+    throw new Error(`Network error when calling ${API_URL}/users/login: ${msg}. Is the backend running and reachable?`);
+  }
 
   if (!res.ok) {
     const text = await res.text();
@@ -164,3 +182,41 @@ export async function loginUser({
 
   return res.json();
 }
+
+export async function getUserById(userId: string) {
+  const res = await fetch(`${API_URL}/users/${encodeURIComponent(userId)}`);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Get user failed: ${res.status} ${text}`);
+  }
+  return res.json();
+}
+
+export async function updateUser(userId: string, data: { username?: string; nume?: string; email?: string; parola?: string }) {
+  const res = await fetch(`${API_URL}/users/${encodeURIComponent(userId)}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Update user failed: ${res.status} ${text}`);
+  }
+  return res.json();
+}
+
+export async function uploadProfileImage(userId: string, imageFile: File) {
+  const form = new FormData();
+  form.append("image", imageFile, imageFile.name);
+
+  const res = await fetch(`${API_URL}/users/${encodeURIComponent(userId)}/profile-image`, {
+    method: "POST",
+    body: form,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Upload profile image failed: ${res.status} ${text}`);
+  }
+  return res.json();
+}
+

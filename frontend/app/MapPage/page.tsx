@@ -45,21 +45,21 @@ function BinSelect({
       );
 
   return (
-      <button
-          onClick={() => onSelect(name)}
-          className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-colors ${
-              active
-                  ? "border-green-600 bg-green-50 text-green-900 shadow-sm dark:border-green-500 dark:bg-green-950/40 dark:text-green-100"
-                  : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
-          }`}
-      >
-      <span className={`flex h-10 w-10 items-center justify-center rounded-full ${active ? "bg-green-100 dark:bg-green-900/60" : "bg-gray-100 dark:bg-gray-800"}`}>
-        {icon}
-      </span>
-        <span className="flex-1 font-medium">{name}</span>
-        {active && <span className="text-xs font-semibold text-green-600 dark:text-green-300">Selected</span>}
-      </button>
-  );
+       <button
+           onClick={() => onSelect(name)}
+           className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-colors ${
+               active
+                   ? "border-[var(--color-green-primary)] bg-[var(--color-green-accent)] text-[var(--color-text-primary)] shadow-sm"
+                   : "border-[var(--color-text-secondary)] bg-[var(--color-bg-card)] text-[var(--color-text-primary)] hover:bg-[var(--color-green-accent)]"
+           }`}
+       >
+       <span className={`flex h-10 w-10 items-center justify-center rounded-full ${active ? "bg-[var(--color-green-accent)]" : "bg-[var(--color-bg-main)]"}`}>
+         {icon}
+       </span>
+         <span className="flex-1 font-medium font-[family-name:var(--font-header)]">{name}</span>
+         {active && <span className="text-xs font-semibold text-[var(--color-green-primary)] font-[family-name:var(--font-body)]">Selected</span>}
+       </button>
+   );
 }
 
 function BinMap() {
@@ -240,39 +240,39 @@ export default function Home() {
     setIsLoading(false);
   }, [router]);
   return (
-      <main className="flex min-h-screen flex-col bg-white dark:bg-black">
-        <div className="bg-linear-to-r from-green-700 to-green-600 text-white px-6 pt-6 pb-8 rounded-b-3xl dark:from-green-900 dark:to-green-800">
+      <main className="flex min-h-screen flex-col bg-[var(--color-bg-main)]">
+        <div className="bg-gradient-to-r from-[var(--color-green-primary)] to-[var(--color-green-primary)] text-[var(--color-text-on-green)] px-6 pt-6 pb-8 rounded-b-3xl">
           <div className="flex items-center justify-between gap-2 mb-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-green-700 font-bold text-sm">
+              <div className="w-8 h-8 bg-[var(--color-text-on-green)] rounded-full flex items-center justify-center text-[var(--color-green-primary)] font-bold text-sm">
                 🤖
               </div>
-              <h1 className="text-lg font-semibold">SEB: Eco Assistant</h1>
+              <h1 className="text-lg font-semibold font-[family-name:var(--font-header)]">SEB: Eco Assistant</h1>
             </div>
             <Link
-              href="./" // Add settingsPage
+              href="../SettingsPage"
               className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium hover:bg-white/20 transition-colors"
               aria-label="Settings"
             >
-              <FontAwesomeIcon icon={faUserGear} className="text-sm text-emerald-200" />
-              <span className="text-emerald-100">Settings</span>
+              <FontAwesomeIcon icon={faUserGear} className="text-sm" />
+              <span>Settings</span>
             </Link>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm dark:shadow-none">
+          <div className="bg-[var(--color-bg-card)] rounded-xl p-4 shadow-sm">
             <div className="flex justify-between items-start mb-3">
               <div>
-                <p className="text-gray-600 dark:text-gray-300 text-sm font-medium">Eco Legend in Training</p>
-                <p className="text-2xl font-bold text-black dark:text-white mt-1">Points: <span className="text-green-700">12,450</span></p>
+                <p className="text-[var(--color-text-secondary)] text-sm font-medium font-[family-name:var(--font-body)]">Eco Legend in Training</p>
+                <p className="text-2xl font-bold text-[var(--color-text-primary)] mt-1 font-[family-name:var(--font-header)]">Points: <span className="text-[var(--color-green-primary)]">12,450</span></p>
               </div>
               <div className="flex flex-col items-center">
                 <span className="text-2xl">🏅</span>
-                <span className="text-xs text-gray-500 mt-1">Level 7</span>
+                <span className="text-xs text-[var(--color-text-secondary)] mt-1">Level 7</span>
               </div>
             </div>
 
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div className="bg-green-600 h-2 rounded-full" style={{ width: "70%" }}></div>
+            <div className="w-full bg-[var(--color-green-accent)] rounded-full h-2">
+              <div className="bg-[var(--color-green-primary)] h-2 rounded-full" style={{ width: "70%" }}></div>
             </div>
           </div>
         </div>
@@ -280,36 +280,36 @@ export default function Home() {
         <div className="flex-1 px-6 py-6 overflow-y-auto">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-green-700 dark:text-green-300">Map</p>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Recycling bins</h1>
+              <p className="text-sm font-medium text-[var(--color-green-primary)] font-[family-name:var(--font-body)]">Map</p>
+              <h1 className="text-2xl font-bold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">Recycling bins</h1>
             </div>
-            <div className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700 dark:bg-green-950/50 dark:text-green-200">
+            <div className="rounded-full bg-[var(--color-green-accent)] px-3 py-1 text-xs font-semibold text-[var(--color-green-primary)] font-[family-name:var(--font-body)]">
               Nearby bins
             </div>
           </div>
           <BinMap />
         </div>
 
-        <div className="mt-auto border-t border-gray-200 bg-white px-6 py-4 flex justify-around dark:border-gray-700 dark:bg-black">
-          <Link href="../HomePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <div className="mt-auto border-t border-[var(--color-green-accent)] bg-[var(--color-bg-card)] px-6 py-4 flex justify-around">
+          <Link href="../HomePage" className="flex flex-col items-center gap-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
             <FontAwesomeIcon icon={faHome} className="text-xl" />
-            <span className="text-xs font-medium">Home</span>
+            <span className="text-xs font-medium font-[family-name:var(--font-body)]">Home</span>
           </Link>
-          <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+          <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
             <FontAwesomeIcon icon={faClock} className="text-xl" />
-            <span className="text-xs font-medium">Scanner</span>
+            <span className="text-xs font-medium font-[family-name:var(--font-body)]">Scanner</span>
           </Link>
-          <button className="flex flex-col items-center gap-1 text-green-700">
+          <button className="flex flex-col items-center gap-1 text-[var(--color-green-primary)]">
             <FontAwesomeIcon icon={faMap} className="text-xl" />
-            <span className="text-xs font-medium">Map</span>
+            <span className="text-xs font-medium font-[family-name:var(--font-body)]">Map</span>
           </button>
-          <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+          <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
             <FontAwesomeIcon icon={faComments} className="text-xl" />
-            <span className="text-xs font-medium">SEB</span>
+            <span className="text-xs font-medium font-[family-name:var(--font-body)]">SEB</span>
           </Link>
-          <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+          <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
             <FontAwesomeIcon icon={faUser} className="text-xl" />
-            <span className="text-xs font-medium">Profile</span>
+            <span className="text-xs font-medium font-[family-name:var(--font-body)]">Profile</span>
           </Link>
         </div>
       </main>

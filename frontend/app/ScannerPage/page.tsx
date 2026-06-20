@@ -92,40 +92,40 @@ function fileToBase64(file: File): Promise<string> {
 
 function ScannerHeader() {
   return (
-    <div className="bg-linear-to-r from-green-700 to-green-600 text-white px-6 pt-6 pb-8 rounded-b-3xl dark:from-green-900 dark:to-green-800">
+    <div className="bg-gradient-to-r from-[var(--color-green-primary)] to-[var(--color-green-primary)] text-[var(--color-text-on-green)] px-6 pt-6 pb-8 rounded-b-3xl">
       <div className="flex items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-green-700 font-bold text-sm">
+          <div className="w-8 h-8 bg-[var(--color-text-on-green)] rounded-full flex items-center justify-center text-[var(--color-green-primary)] font-bold text-sm">
             🤖
           </div>
-          <h1 className="text-lg font-semibold">SEB: Eco Assistant</h1>
+          <h1 className="text-lg font-semibold font-[family-name:var(--font-header)]">SEB: Eco Assistant</h1>
         </div>
         <Link
-          href="./" // Add settingsPage
+          href="../SettingsPage"
           className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium hover:bg-white/20 transition-colors"
           aria-label="Settings"
         >
-          <FontAwesomeIcon icon={faUserGear} className="text-sm text-emerald-200" />
-          <span className="text-emerald-100">Settings</span>
+          <FontAwesomeIcon icon={faUserGear} className="text-sm" />
+          <span>Settings</span>
         </Link>
       </div>
 
-        <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800 dark:shadow-none">
+        <div className="rounded-xl bg-[var(--color-bg-card)] p-4 shadow-sm">
           <div className="mb-3 flex items-start justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Eco Legend in Training</p>
-              <p className="mt-1 text-2xl font-bold text-black dark:text-white">
-                Points: <span className="text-green-700">12,450</span>
+              <p className="text-sm font-medium text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">Eco Legend in Training</p>
+              <p className="mt-1 text-2xl font-bold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">
+                Points: <span className="text-[var(--color-green-primary)]">12,450</span>
               </p>
             </div>
             <div className="flex flex-col items-center">
               <span className="text-2xl">🏅</span>
-              <span className="mt-1 text-xs text-gray-500">Level 7</span>
+              <span className="mt-1 text-xs text-[var(--color-text-secondary)]">Level 7</span>
             </div>
           </div>
 
-          <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-            <div className="h-2 rounded-full bg-green-600" style={{ width: "70%" }} />
+          <div className="h-2 w-full rounded-full bg-[var(--color-green-accent)]">
+            <div className="h-2 rounded-full bg-[var(--color-green-primary)]" style={{ width: "70%" }} />
           </div>
         </div>
       </div>
@@ -134,26 +134,26 @@ function ScannerHeader() {
 
 function ScannerFooter() {
   return (
-      <div className="border-t border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-black flex justify-around">
-        <Link href="../HomePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+      <div className="border-t border-[var(--color-green-accent)] bg-[var(--color-bg-card)] px-6 py-4 flex justify-around">
+        <Link href="../HomePage" className="flex flex-col items-center gap-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
           <FontAwesomeIcon icon={faHome} className="text-xl" />
-          <span className="text-xs font-medium">Home</span>
+          <span className="text-xs font-medium font-[family-name:var(--font-body)]">Home</span>
         </Link>
-        <button className="flex flex-col items-center gap-1 text-green-700">
+        <button className="flex flex-col items-center gap-1 text-[var(--color-green-primary)]">
           <FontAwesomeIcon icon={faClock} className="text-xl" />
-          <span className="text-xs font-medium">Scanner</span>
+          <span className="text-xs font-medium font-[family-name:var(--font-body)]">Scanner</span>
         </button>
-        <Link href="../MapPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <Link href="../MapPage" className="flex flex-col items-center gap-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
           <FontAwesomeIcon icon={faMap} className="text-xl" />
-          <span className="text-xs font-medium">Map</span>
+          <span className="text-xs font-medium font-[family-name:var(--font-body)]">Map</span>
         </Link>
-        <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
           <FontAwesomeIcon icon={faComments} className="text-xl" />
-          <span className="text-xs font-medium">SEB</span>
+          <span className="text-xs font-medium font-[family-name:var(--font-body)]">SEB</span>
         </Link>
-        <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
           <FontAwesomeIcon icon={faUser} className="text-xl" />
-          <span className="text-xs font-medium">Profile</span>
+          <span className="text-xs font-medium font-[family-name:var(--font-body)]">Profile</span>
         </Link>
       </div>
   );
@@ -162,17 +162,17 @@ function ScannerFooter() {
 function ScannerTips() {
   return (
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Tip 1</p>
-          <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">Fill the frame with the item</p>
+        <div className="rounded-2xl bg-[var(--color-bg-card)] p-4 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">Tip 1</p>
+          <p className="mt-1 text-sm font-medium text-[var(--color-text-primary)] font-[family-name:var(--font-body)]">Fill the frame with the item</p>
         </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Tip 2</p>
-          <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">Use good lighting for better results</p>
+        <div className="rounded-2xl bg-[var(--color-bg-card)] p-4 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">Tip 2</p>
+          <p className="mt-1 text-sm font-medium text-[var(--color-text-primary)] font-[family-name:var(--font-body)]">Use good lighting for better results</p>
         </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Tip 3</p>
-          <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">Keep labels and materials visible</p>
+        <div className="rounded-2xl bg-[var(--color-bg-card)] p-4 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">Tip 3</p>
+          <p className="mt-1 text-sm font-medium text-[var(--color-text-primary)] font-[family-name:var(--font-body)]">Keep labels and materials visible</p>
         </div>
       </div>
   );
@@ -275,25 +275,25 @@ function CameraCaptureModal({
 
   return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm">
-        <div className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-gray-950">
-          <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 dark:border-gray-800">
+        <div className="w-full max-w-2xl overflow-hidden rounded-3xl bg-[var(--color-bg-card)] shadow-2xl">
+          <div className="flex items-center justify-between border-b border-[var(--color-green-accent)] px-5 py-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-green-700 dark:text-green-300">Camera mode</p>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Take a picture</h3>
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-green-primary)] font-[family-name:var(--font-body)]">Camera mode</p>
+              <h3 className="text-lg font-bold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">Take a picture</h3>
             </div>
             <button
                 type="button"
                 onClick={handleClose}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-bg-main)] text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-green-accent)]"
                 aria-label="Close camera"
             >
               <FontAwesomeIcon icon={faXmark} />
             </button>
           </div>
 
-          <div className="space-y-4 bg-linear-to-br from-green-50 via-white to-emerald-50 p-5 dark:from-gray-900 dark:via-gray-950 dark:to-green-950/20">
+          <div className="space-y-4 bg-gradient-to-br from-[var(--color-green-accent)] via-[var(--color-bg-card)] to-[var(--color-green-accent)] p-5">
             {errorMessage ? (
-                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-200">
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                   {errorMessage}
                 </div>
             ) : (
@@ -311,7 +311,7 @@ function CameraCaptureModal({
             <canvas ref={canvasRef} className="hidden" />
 
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm text-gray-600 dark:text-gray-300">
+              <p className="text-sm text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">
                 {isStarting ? "Starting camera..." : "Frame the waste item, then tap capture."}
               </p>
 
@@ -319,7 +319,7 @@ function CameraCaptureModal({
                 <button
                     type="button"
                     onClick={handleClose}
-                    className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+                    className="rounded-full border border-[var(--color-text-secondary)] bg-[var(--color-bg-card)] px-4 py-2 text-sm font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-bg-main)] font-[family-name:var(--font-body)]"
                 >
                   Cancel
                 </button>
@@ -327,7 +327,7 @@ function CameraCaptureModal({
                     type="button"
                     onClick={handleCapture}
                     disabled={isStarting || !!errorMessage}
-                    className="inline-flex items-center gap-2 rounded-full bg-green-600 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-green-600/30 transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-300 disabled:shadow-none"
+                    className="inline-flex items-center gap-2 rounded-full bg-[var(--color-green-primary)] px-5 py-2 text-sm font-semibold text-[var(--color-text-on-green)] shadow-lg transition-colors hover:bg-[var(--color-green-primary)] disabled:cursor-not-allowed disabled:bg-[var(--color-green-accent)] disabled:shadow-none font-[family-name:var(--font-header)]"
                 >
                   <FontAwesomeIcon icon={faCamera} />
                   Capture
@@ -352,28 +352,28 @@ function ScannerControls({
         <button
             type="button"
             onClick={onOpenCamera}
-            className="cursor-pointer flex items-center gap-3 rounded-2xl border border-green-200 bg-white px-4 py-4 text-left shadow-sm transition-colors hover:bg-green-50 dark:border-green-900/50 dark:bg-gray-900 dark:hover:bg-gray-800"
+            className="cursor-pointer flex items-center gap-3 rounded-2xl border border-[var(--color-green-accent)] bg-[var(--color-bg-card)] px-4 py-4 text-left shadow-sm transition-colors hover:bg-[var(--color-green-accent)]"
         >
-        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-green-100 text-green-700 dark:bg-green-900/60 dark:text-green-200">
+        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-green-accent)] text-[var(--color-green-primary)]">
           <FontAwesomeIcon icon={faCamera} className="text-lg" />
         </span>
           <span>
-          <span className="block font-semibold text-gray-900 dark:text-white">Take a picture</span>
-          <span className="block text-sm text-gray-600 dark:text-gray-300">Open the camera on your device</span>
+          <span className="block font-semibold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">Take a picture</span>
+          <span className="block text-sm text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">Open the camera on your device</span>
         </span>
         </button>
 
         <button
             type="button"
             onClick={onOpenGallery}
-            className="cursor-pointer flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-4 text-left shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800"
+            className="cursor-pointer flex items-center gap-3 rounded-2xl border border-[var(--color-text-secondary)] bg-[var(--color-bg-card)] px-4 py-4 text-left shadow-sm transition-colors hover:bg-[var(--color-bg-main)]"
         >
-        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200">
+        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-bg-main)] text-[var(--color-text-secondary)]">
           <FontAwesomeIcon icon={faImage} className="text-lg" />
         </span>
           <span>
-          <span className="block font-semibold text-gray-900 dark:text-white">Choose from storage</span>
-          <span className="block text-sm text-gray-600 dark:text-gray-300">Pick an existing image file</span>
+          <span className="block font-semibold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">Choose from storage</span>
+          <span className="block text-sm text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">Pick an existing image file</span>
         </span>
         </button>
       </div>
@@ -394,11 +394,11 @@ function PreviewCard({
   onScan: () => void;
 }) {
   return (
-      <div className="mt-5 overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-100 dark:bg-gray-950 dark:ring-gray-800">
-        <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 dark:border-gray-800">
+      <div className="mt-5 overflow-hidden rounded-3xl bg-[var(--color-bg-card)] shadow-sm ring-1 ring-[var(--color-green-accent)]">
+        <div className="flex items-center justify-between border-b border-[var(--color-green-accent)] px-4 py-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Preview</p>
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">Preview</p>
+            <p className="text-sm font-medium text-[var(--color-text-primary)] font-[family-name:var(--font-body)]">
               {file ? file.name : "No image selected yet"}
             </p>
           </div>
@@ -407,7 +407,7 @@ function PreviewCard({
                 <button
                     type="button"
                     onClick={onClear}
-                    className="inline-flex items-center gap-2 rounded-full bg-gray-100 px-5 py-2 text-l font-semibold text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                    className="inline-flex items-center gap-2 rounded-full bg-[var(--color-bg-main)] px-5 py-2 text-l font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-green-accent)] font-[family-name:var(--font-header)]"
                 >
                   <FontAwesomeIcon icon={faTrashCan} className="text-xs" />
                   Clear
@@ -416,7 +416,7 @@ function PreviewCard({
                     type="button"
                     onClick={onScan}
                     disabled={isScanning}
-                    className="ml-4 inline-flex items-center gap-2 rounded-full bg-green-600 px-5 py-2 text-l font-semibold text-white shadow-lg shadow-green-600/30 transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-300 disabled:shadow-none"
+                    className="ml-4 inline-flex items-center gap-2 rounded-full bg-[var(--color-green-primary)] px-5 py-2 text-l font-semibold text-[var(--color-text-on-green)] shadow-lg transition-colors hover:bg-[var(--color-green-primary)] disabled:cursor-not-allowed disabled:bg-[var(--color-green-accent)] disabled:shadow-none font-[family-name:var(--font-header)]"
                 >
                   <FontAwesomeIcon icon={faCamera} />
                   {isScanning ? "Scanning..." : "Scan"}
@@ -425,7 +425,7 @@ function PreviewCard({
           )}
         </div>
 
-        <div className="flex min-h-72 flex-col items-center justify-center bg-linear-to-br from-green-50 via-white to-emerald-50 p-4 dark:from-gray-900 dark:via-gray-900 dark:to-green-950/20">
+        <div className="flex min-h-72 flex-col items-center justify-center bg-gradient-to-br from-[var(--color-green-accent)] via-[var(--color-bg-card)] to-[var(--color-green-accent)] p-4">
           {previewUrl ? (
               <img
                   src={previewUrl}
@@ -433,12 +433,12 @@ function PreviewCard({
                   className="h-auto w-auto rounded-2xl object-cover shadow-sm"
               />
           ) : (
-              <div className="flex h-72 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-green-200 bg-white/80 px-6 text-center dark:border-green-900/60 dark:bg-gray-900/80">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-700 dark:bg-green-900/60 dark:text-green-200">
+              <div className="flex h-72 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[var(--color-green-accent)] bg-[var(--color-bg-card)] px-6 text-center">
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-green-accent)] text-[var(--color-green-primary)]">
                   <FontAwesomeIcon icon={faCamera} className="text-2xl" />
                 </div>
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white">Your photo will appear here</h4>
-                <p className="mt-2 max-w-md text-sm text-gray-600 dark:text-gray-300">
+                <h4 className="text-lg font-semibold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">Your photo will appear here</h4>
+                <p className="mt-2 max-w-md text-sm text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">
                   Use the camera button to capture new waste or the storage button to select an existing image.
                 </p>
               </div>
@@ -453,20 +453,20 @@ function ScanResultCard({ result }: { result: WasteResult }) {
 
   return (
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-200">
+        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-green-accent)] text-[var(--color-green-primary)]">
           <FontAwesomeIcon icon={faRecycle} />
         </div>
         <div className="min-w-0 flex-1 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">{result.item_name}</p>
-            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-900/60 dark:text-green-200">
+            <p className="text-sm font-semibold text-[var(--color-text-primary)] font-[family-name:var(--font-body)]">{result.item_name}</p>
+            <span className="rounded-full bg-[var(--color-green-accent)] px-2 py-0.5 text-xs font-semibold text-[var(--color-green-primary)]">
               {categoryLabel}
             </span>
             <span
                 className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
                     result.is_recyclable
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-200"
-                        : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200"
+                        ? "bg-[var(--color-green-accent)] text-[var(--color-green-primary)]"
+                        : "bg-[var(--color-bg-main)] text-[var(--color-text-secondary)]"
                 }`}
             >
               {result.is_recyclable ? "Reciclabil" : "Nereciclabil"}
@@ -474,15 +474,15 @@ function ScanResultCard({ result }: { result: WasteResult }) {
           </div>
 
           {result.description && (
-              <p className="text-sm leading-6 text-gray-700 dark:text-gray-200">{result.description}</p>
+              <p className="text-sm leading-6 text-[var(--color-text-primary)] font-[family-name:var(--font-body)]">{result.description}</p>
           )}
 
           {result.disposal_instructions.length > 0 && (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">
                   Instrucțiuni
                 </p>
-                <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-gray-700 dark:text-gray-200">
+                <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-[var(--color-text-primary)] font-[family-name:var(--font-body)]">
                   {result.disposal_instructions.map((step, idx) => (
                       <li key={idx}>{step}</li>
                   ))}
@@ -491,14 +491,14 @@ function ScanResultCard({ result }: { result: WasteResult }) {
           )}
 
           {result.warnings.length > 0 && (
-              <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/30">
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
                 <div className="flex items-center gap-2">
-                  <FontAwesomeIcon icon={faTriangleExclamation} className="text-amber-600 dark:text-amber-300" />
-                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">
+                  <FontAwesomeIcon icon={faTriangleExclamation} className="text-amber-600" />
+                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 font-[family-name:var(--font-body)]">
                     Avertismente
                   </p>
                 </div>
-                <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-amber-800 dark:text-amber-100">
+                <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-amber-800 font-[family-name:var(--font-body)]">
                   {result.warnings.map((warning, idx) => (
                       <li key={idx}>{warning}</li>
                   ))}
@@ -532,25 +532,25 @@ function ScannerBody({
   onScan: () => void;
 }) {
   return (
-      <main className="flex-1 overflow-y-auto px-6 py-6">
+      <main className="flex-1 overflow-y-auto px-6 py-6 bg-[var(--color-bg-main)]">
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-green-700 dark:text-green-300">Scanner</p>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Take or upload a photo</h2>
+            <p className="text-sm font-medium text-[var(--color-green-primary)] font-[family-name:var(--font-body)]">Scanner</p>
+            <h2 className="text-2xl font-bold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">Take or upload a photo</h2>
           </div>
-          <div className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700 dark:bg-green-950/50 dark:text-green-200">
+          <div className="rounded-full bg-[var(--color-green-accent)] px-3 py-1 text-xs font-semibold text-[var(--color-green-primary)] font-[family-name:var(--font-body)]">
             Image input
           </div>
         </div>
 
         <section className="space-y-5">
-          <div className="rounded-3xl bg-linear-to-br from-green-50 via-white to-emerald-50 p-5 shadow-sm ring-1 ring-green-100 dark:from-gray-900 dark:via-gray-900 dark:to-green-950/30 dark:ring-gray-800">
+          <div className="rounded-3xl bg-gradient-to-br from-[var(--color-green-accent)] via-[var(--color-bg-card)] to-[var(--color-green-accent)] p-5 shadow-sm ring-1 ring-[var(--color-green-accent)]">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Scan your waste</p>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Choose how to add an image</h3>
+                <p className="text-sm font-medium text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">Scan your waste</p>
+                <h3 className="text-xl font-bold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">Choose how to add an image</h3>
               </div>
-              <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-green-700 shadow-sm dark:bg-gray-800 dark:text-green-300">
+              <span className="rounded-full bg-[var(--color-bg-card)] px-3 py-1 text-xs font-semibold text-[var(--color-green-primary)] shadow-sm font-[family-name:var(--font-body)]">
               Ready
             </span>
             </div>
@@ -559,52 +559,52 @@ function ScannerBody({
             <PreviewCard file={file} previewUrl={previewUrl} onClear={onClear} isScanning={isScanning} onScan={onScan} />
             <ScannerTips />
 
-            <div className="mt-5 rounded-3xl border border-dashed border-green-200 bg-white p-5 shadow-sm dark:border-green-900/60 dark:bg-gray-950">
+            <div className="mt-5 rounded-3xl border border-dashed border-[var(--color-green-accent)] bg-[var(--color-bg-card)] p-5 shadow-sm">
               <div className="mb-4 flex items-start justify-between gap-4">
                 <div>
-                  <h4 className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
+                  <h4 className="mt-1 text-lg font-semibold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">
                     Scan summary
                   </h4>
                 </div>
-                <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700 dark:bg-green-950/50 dark:text-green-200">
+                <span className="rounded-full bg-[var(--color-green-accent)] px-3 py-1 text-xs font-semibold text-[var(--color-green-primary)] font-[family-name:var(--font-body)]">
                 Ready to scan
               </span>
               </div>
 
-              <div className="rounded-2xl border border-gray-100 bg-green-50/70 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+              <div className="rounded-2xl border border-[var(--color-green-accent)] bg-[var(--color-green-accent)] p-4 shadow-sm">
                 {isScanning ? (
                     <div className="flex items-start gap-3">
-                      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-700 dark:bg-green-900/60 dark:text-green-200">
+                      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-card)] text-[var(--color-green-primary)]">
                         <FontAwesomeIcon icon={faCamera} />
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900 dark:text-white">Scanning in progress</p>
-                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                        <p className="font-semibold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">Scanning in progress</p>
+                        <p className="mt-1 text-sm text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">
                           Imaginea este analizată de AI, te rugăm să aștepți.
                         </p>
                       </div>
                     </div>
                 ) : scanError ? (
                     <div className="flex items-start gap-3">
-                      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-200">
+                      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-700">
                         <FontAwesomeIcon icon={faTriangleExclamation} />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">Scanarea a eșuat</p>
-                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{scanError}</p>
+                        <p className="text-sm font-semibold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">Scanarea a eșuat</p>
+                        <p className="mt-1 text-sm text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">{scanError}</p>
                       </div>
                     </div>
                 ) : scanResult ? (
                     <ScanResultCard result={scanResult} />
                 ) : (
                     <div className="flex items-start gap-3">
-                      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-300">
+                      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-main)] text-[var(--color-text-secondary)]">
                         <FontAwesomeIcon icon={faCamera} />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">No result yet</p>
-                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                          Choose a photo and press <span className="font-semibold text-green-700 dark:text-green-300">Scan</span> to see the result.
+                        <p className="text-sm font-semibold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">No result yet</p>
+                        <p className="mt-1 text-sm text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">
+                          Choose a photo and press <span className="font-semibold text-[var(--color-green-primary)]">Scan</span> to see the result.
                         </p>
                       </div>
                     </div>
@@ -715,7 +715,7 @@ export default function ScannerPage() {
   }
 
   return (
-      <div className="flex min-h-screen flex-col bg-white font-sans dark:bg-black">
+      <div className="flex min-h-screen flex-col bg-[var(--color-bg-main)] font-[family-name:var(--font-body)]">
         <ScannerHeader />
 
         <ScannerBody

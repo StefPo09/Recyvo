@@ -19,6 +19,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Absolute path to the SQLite DB file (located next to this file)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "trash_bins.db")
+
 # ---------------------------------------------------------------------------
 # Configurare Foldere și Mediu
 # ---------------------------------------------------------------------------
@@ -79,6 +83,7 @@ class UserResponse(BaseModel):
     username: str
     nume: str
     email: str
+    profile_image: Optional[str] = None
     nr_puncte: int
 
 
@@ -89,6 +94,13 @@ class UserLogin(BaseModel):
 
 class UserPointsUpdate(BaseModel):
     puncte_adaugate: int
+
+
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    nume: Optional[str] = None
+    email: Optional[str] = None
+    parola: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------
@@ -114,7 +126,8 @@ GEMINI_TO_LOCAL_BIN_MAP = {"plastic": "plastic", "glass": "glass", "paper_cardbo
 # ---------------------------------------------------------------------------
 
 def get_db():
-    conn = sqlite3.connect("trash_bins.db")
+    # Use the absolute DB path so the app always opens the same database
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -162,43 +175,28 @@ def init_db():
     conn.execute("""
                  CREATE TABLE IF NOT EXISTS users
                  (
-                     id
-                     TEXT
-                     PRIMARY
-                     KEY,
-                     username
-                     TEXT
-                     UNIQUE
-                     NOT
-                     NULL,
-                     nume
-                     TEXT
-                     NOT
-                     NULL,
-                     email
-                     TEXT
-                     UNIQUE
-                     NOT
-                     NULL,
-                     parola
-                     TEXT
-                     NOT
-                     NULL,
-                     nr_puncte
-                     INTEGER
-                     DEFAULT
-                     0,
-                     created_at
-                     TEXT
-                     DEFAULT (
-                     datetime
-                 (
-                     'now'
-                 ))
-                     )
+                     id TEXT PRIMARY KEY,
+                     username TEXT UNIQUE NOT NULL,
+                     nume TEXT NOT NULL,
+                     email TEXT UNIQUE NOT NULL,
+                     parola TEXT NOT NULL,
+                     profile_image TEXT,
+                     nr_puncte INTEGER DEFAULT 0,
+                     created_at TEXT DEFAULT (datetime('now'))
+                 )
                  """)
 
     conn.commit()
+    # If the users table was created previously without profile_image, add the column.
+    try:
+        cols = [r[1] for r in conn.execute("PRAGMA table_info(users)").fetchall()]
+        if "profile_image" not in cols:
+            conn.execute("ALTER TABLE users ADD COLUMN profile_image TEXT")
+            conn.commit()
+    except Exception:
+        # If the users table does not exist yet or PRAGMA fails, ignore — create above will handle it.
+        pass
+
     conn.close()
 
 
@@ -580,8 +578,8 @@ def create_user(user: UserCreate):
 
     try:
         conn.execute(
-            "INSERT INTO users (id, username, nume, email, parola, nr_puncte) VALUES (?, ?, ?, ?, ?, ?)",
-            (user_id, user.username, user.nume, user.email, user.parola, 0)
+            "INSERT INTO users (id, username, nume, email, parola, profile_image, nr_puncte) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (user_id, user.username, user.nume, user.email, user.parola, None, 0)
         )
         conn.commit()
     except sqlite3.IntegrityError:
@@ -595,6 +593,7 @@ def create_user(user: UserCreate):
         "username": user.username,
         "nume": user.nume,
         "email": user.email,
+        "profile_image": None,
         "nr_puncte": 0
     }
 
@@ -644,6 +643,74 @@ def login(user: UserLogin):
         "email": row["email"],
         "nr_puncte": row["nr_puncte"]
     }
+
+
+@app.get("/users/{user_id}", response_model=UserResponse, summary="Obține un utilizator după id")
+def get_user(user_id: str):
+    conn = get_db()
+    row = conn.execute("SELECT id, username, nume, email, profile_image, nr_puncte FROM users WHERE id = ?", (user_id,)).fetchone()
+    conn.close()
+    if not row:
+        raise HTTPException(status_code=404, detail="Utilizatorul nu a fost găsit.")
+    return dict(row)
+
+
+@app.put("/users/{user_id}", response_model=UserResponse, summary="Actualizează profilul unui utilizator")
+def update_user(user_id: str, data: UserUpdate):
+    conn = get_db()
+
+    fields = []
+    params: List = []
+    if data.username is not None:
+        fields.append("username = ?")
+        params.append(data.username)
+    if data.nume is not None:
+        fields.append("nume = ?")
+        params.append(data.nume)
+    if data.email is not None:
+        fields.append("email = ?")
+        params.append(data.email)
+    if data.parola is not None:
+        fields.append("parola = ?")
+        params.append(data.parola)
+
+    if fields:
+        params.append(user_id)
+        try:
+            conn.execute(f"UPDATE users SET {', '.join(fields)} WHERE id = ?", tuple(params))
+            conn.commit()
+        except sqlite3.IntegrityError:
+            conn.close()
+            raise HTTPException(status_code=400, detail="Username-ul sau email-ul există deja.")
+
+    row = conn.execute("SELECT id, username, nume, email, profile_image, nr_puncte FROM users WHERE id = ?", (user_id,)).fetchone()
+    conn.close()
+    if not row:
+        raise HTTPException(status_code=404, detail="Utilizatorul nu a fost găsit.")
+    return dict(row)
+
+
+@app.post("/users/{user_id}/profile-image")
+def upload_profile_image(user_id: str, image: UploadFile = File(...)):
+    if not image or not image.filename:
+        raise HTTPException(status_code=400, detail="Nu a fost încărcată nicio imagine.")
+
+    ext = image.filename.rsplit('.', 1)[-1].lower()
+    filename = f"user_{user_id}.{ext}"
+    filepath = os.path.join(UPLOAD_DIR, filename)
+    with open(filepath, 'wb') as f:
+        shutil.copyfileobj(image.file, f)
+
+    image_url = f"/uploads/{filename}"
+
+    conn = get_db()
+    conn.execute("UPDATE users SET profile_image = ? WHERE id = ?", (image_url, user_id))
+    conn.commit()
+    row = conn.execute("SELECT id, username, nume, email, profile_image, nr_puncte FROM users WHERE id = ?", (user_id,)).fetchone()
+    conn.close()
+    if not row:
+        raise HTTPException(status_code=404, detail="Utilizatorul nu a fost găsit.")
+    return dict(row)
 
 
 # ---------------------------------------------------------------------------

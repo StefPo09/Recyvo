@@ -54,11 +54,11 @@ export default function Root() {
   // Show a loading state while redirecting. Provide a visible fallback link
   // so the user can continue if programmatic navigation fails.
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white dark:bg-black">
+    <div className="flex min-h-screen items-center justify-center bg-[var(--color-bg-card)]">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
-        <p className="text-gray-600 dark:text-gray-400">Loading your account...</p>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">If this takes too long, <a href="/StartPage" className="text-green-600 underline">open the Start page</a>.</p>
+        <div className="w-12 h-12 border-4 border-[var(--color-green-accent)] border-t-[var(--color-green-primary)] rounded-full animate-spin"></div>
+        <p className="text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">Loading your account...</p>
+        <p className="text-sm text-[var(--color-text-secondary)] mt-2 font-[family-name:var(--font-body)]">If this takes too long, <a href="/StartPage" className="text-[var(--color-green-primary)] underline">open the Start page</a>.</p>
       </div>
     </div>
   );

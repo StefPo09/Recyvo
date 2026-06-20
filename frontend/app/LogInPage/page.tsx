@@ -177,7 +177,7 @@ function LogIn() {
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#2D8A56] dark:bg-[#1A2B23] px-4 py-8 sm:py-12">
+    <main className="flex min-h-screen flex-col bg-[var(--color-bg-main)] text-[var(--color-text-primary)] px-4 py-8 sm:py-12">
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
           <div className="inline-block">
@@ -191,17 +191,17 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-950 rounded-2xl shadow-xl dark:shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <div className="bg-linear-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-gray-500 dark:text-gray-400 text-xs font-semibold uppercase tracking-widest">Log In</h2>
+        <div className="bg-[var(--color-bg-card)] dark:bg-gray-950 rounded-2xl shadow-xl border border-[var(--color-bg-card)] overflow-hidden text-[var(--color-text-primary)]">
+          <div className="bg-linear-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50 px-6 py-4 border-b border-[var(--color-green-accent)]">
+            <h2 className="text-[var(--color-text-secondary)] text-xs font-semibold uppercase tracking-widest font-[family-name:var(--font-body)]">Log In</h2>
           </div>
 
           <div className="px-6 py-8">
             <LogIn />
           </div>
 
-          <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-600 dark:text-gray-400">
-            <p>Don't have an account? <a href="../SignUpPage" className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold transition">Sign up</a></p>
+          <div className="px-6 py-4 bg-[var(--color-bg-card)] border-t border-[var(--color-green-accent)] text-center text-xs text-[var(--color-text-secondary)]">
+            <p>Don't have an account? <a href="../SignUpPage" className="text-[var(--color-green-primary)] hover:opacity-90 font-semibold transition">Sign up</a></p>
           </div>
         </div>
       </div>

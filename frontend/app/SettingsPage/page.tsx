@@ -114,11 +114,11 @@ function SettingsCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="bg-zinc-800 rounded-xl p-4 shadow border border-white/5">
+    <section className="bg-[var(--color-bg-card)] rounded-xl p-4 shadow border border-[var(--color-green-accent)]">
       <div className="mb-4">
-        <h2 className="text-lg font-semibold">{title}</h2>
+        <h2 className="text-lg font-semibold font-[family-name:var(--font-header)] text-[var(--color-text-primary)]">{title}</h2>
         {description ? (
-          <p className="text-sm text-zinc-400 mt-1">{description}</p>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1 font-[family-name:var(--font-body)]">{description}</p>
         ) : null}
       </div>
       {children}
@@ -138,22 +138,22 @@ function ToggleRow({
   icon?: IconDefinition;
 }) {
   return (
-    <label className="flex items-center justify-between gap-4 rounded-lg bg-zinc-700/60 px-3 py-3 hover:bg-zinc-700 transition-colors cursor-pointer">
+    <label className="flex items-center justify-between gap-4 rounded-lg bg-[var(--color-bg-main)] px-3 py-3 hover:bg-[var(--color-green-accent)] transition-colors cursor-pointer">
       <span className="flex min-w-0 gap-3">
         {icon ? (
-          <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-green-500">
+          <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-bg-card)] text-[var(--color-green-primary)]">
             <FontAwesomeIcon icon={icon} className="w-4" />
           </span>
         ) : null}
         <span>
-          <span className="block font-medium">{label}</span>
-          <span className="block text-sm text-zinc-400 mt-0.5">{description}</span>
+          <span className="block font-medium font-[family-name:var(--font-header)] text-[var(--color-text-primary)]">{label}</span>
+          <span className="block text-sm text-[var(--color-text-secondary)] mt-0.5 font-[family-name:var(--font-body)]">{description}</span>
         </span>
       </span>
       <input
         type="checkbox"
         defaultChecked={checked}
-        className="h-5 w-5 shrink-0 accent-green-600"
+        className="h-5 w-5 shrink-0 accent-[var(--color-green-primary)]"
       />
     </label>
   );
@@ -170,30 +170,30 @@ function ActionButton({
 }) {
   return (
     <button
-      className={`flex min-h-12 w-full items-center justify-between rounded-lg border px-3 py-2 text-left transition-colors ${
+      className={`flex min-h-12 w-full items-center justify-between rounded-lg border px-3 py-2 text-left transition-colors font-[family-name:var(--font-header)] ${
         danger
-          ? "border-red-900/70 text-red-200 hover:bg-red-950/40"
-          : "border-zinc-600 hover:bg-zinc-700"
+          ? "border-red-600/70 text-red-600 hover:bg-red-600/10"
+          : "border-[var(--color-green-primary)] hover:bg-[var(--color-green-accent)]"
       }`}
       type="button"
     >
       <span className="flex items-center gap-3 font-medium">
         <FontAwesomeIcon
           icon={icon}
-          className={`w-4 ${danger ? "text-red-400" : "text-green-500"}`}
+          className={`w-4 ${danger ? "text-red-600" : "text-[var(--color-green-primary)]"}`}
         />
         {label}
       </span>
-      <FontAwesomeIcon icon={faChevronRight} className="w-3 text-zinc-500" />
+      <FontAwesomeIcon icon={faChevronRight} className="w-3 text-[var(--color-text-secondary)]" />
     </button>
   );
 }
 
 export default function SettingsPage() {
   return (
-    <main className="min-h-screen bg-zinc-900 text-white">
+    <main className="min-h-screen bg-[var(--color-bg-main)] text-[var(--color-text-primary)]">
       <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col">
-        <header className="bg-linear-to-r from-green-700 to-green-600 text-white px-6 pt-6 pb-8 rounded-b-3xl dark:from-green-900 dark:to-green-800">
+        <header className="bg-gradient-to-r from-[var(--color-green-primary)] to-[var(--color-green-primary)] text-[var(--color-text-on-green)] px-6 pt-6 pb-8 rounded-b-3xl">
           <div className="flex items-center justify-between gap-3 mb-5">
             <div className="flex items-center gap-2">
               <Link
@@ -203,45 +203,45 @@ export default function SettingsPage() {
               >
                 <FontAwesomeIcon icon={faArrowLeft} className="w-4" />
               </Link>
-              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-green-700">
+              <div className="w-8 h-8 bg-[var(--color-text-on-green)] rounded-full flex items-center justify-center text-[var(--color-green-primary)]">
                 <FontAwesomeIcon icon={faRobot} className="w-4" />
               </div>
               <div>
-                <p className="text-xs text-green-100">SEB: Eco Assistant</p>
-                <h1 className="text-xl font-semibold">Settings</h1>
+                <p className="text-xs text-white/80 font-[family-name:var(--font-body)]">SEB: Eco Assistant</p>
+                <h1 className="text-xl font-semibold font-[family-name:var(--font-header)]">Settings</h1>
               </div>
             </div>
             <Link
               href="../HomePage"
-              className="flex items-center gap-2 rounded-lg bg-white/20 px-3 py-2 text-sm font-medium hover:bg-white/30 transition-colors"
+              className="flex items-center gap-2 rounded-lg bg-white/20 px-3 py-2 text-sm font-medium hover:bg-white/30 transition-colors font-[family-name:var(--font-header)]"
             >
               <FontAwesomeIcon icon={faHome} className="w-4" />
               Home
             </Link>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm dark:shadow-none">
+          <div className="bg-[var(--color-bg-card)] rounded-xl p-4 shadow-sm">
             <div className="flex justify-between items-start mb-3">
               <div>
-                <p className="text-gray-600 dark:text-gray-300 text-sm font-medium">
+                <p className="text-[var(--color-text-secondary)] text-sm font-medium font-[family-name:var(--font-body)]">
                   Eco Legend in Training
                 </p>
-                <p className="text-2xl font-bold text-black dark:text-white mt-1">
-                  Points: <span className="text-green-700">12,450</span>
+                <p className="text-2xl font-bold text-[var(--color-text-primary)] mt-1 font-[family-name:var(--font-header)]">
+                  Points: <span className="text-[var(--color-green-primary)]">12,450</span>
                 </p>
               </div>
               <div className="flex flex-col items-center">
                 <FontAwesomeIcon icon={faTrophy} className="w-6 text-amber-500" />
-                <span className="text-xs text-gray-500 mt-1">Level 7</span>
+                <span className="text-xs text-[var(--color-text-secondary)] mt-1 font-[family-name:var(--font-body)]">Level 7</span>
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+            <div className="flex items-center justify-between text-xs text-[var(--color-text-secondary)] mb-2 font-[family-name:var(--font-body)]">
               <span>Progress to Level 8</span>
               <span>70%</span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div className="bg-green-600 h-2 rounded-full w-[70%]" />
+            <div className="w-full bg-[var(--color-green-accent)] rounded-full h-2">
+              <div className="bg-[var(--color-green-primary)] h-2 rounded-full w-[70%]" />
             </div>
           </div>
         </header>
@@ -474,7 +474,7 @@ export default function SettingsPage() {
 
           <Link
             href="../HomePage"
-            className="flex w-full items-center justify-center gap-2 bg-red-600 text-white p-3 rounded-xl font-semibold hover:bg-red-700 transition-colors"
+            className="flex w-full items-center justify-center gap-2 bg-red-600 text-white p-3 rounded-xl font-semibold hover:bg-red-700 transition-colors font-[family-name:var(--font-header)]"
           >
             <FontAwesomeIcon icon={faSignOutAlt} className="w-4" />
             Logout

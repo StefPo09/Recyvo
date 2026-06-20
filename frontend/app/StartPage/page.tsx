@@ -34,52 +34,52 @@ export default function StartPage() {
   // Show loading while checking
   if (isChecking) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-black">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--color-bg-card)]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <div className="w-12 h-12 border-4 border-[var(--color-green-accent)] border-t-[var(--color-green-primary)] rounded-full animate-spin"></div>
+          <p className="text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f8f9fA] px-5 py-6 text-[#1A2B23] dark:bg-black dark:text-green-100">
-      <section className="flex w-full max-w-md flex-col items-center overflow-hidden rounded-3xl bg-white shadow-[0_18px_45px_rgba(26,43,35,0.12)] dark:bg-gray-900">
-        <div className="w-full rounded-b-3xl bg-linear-to-r from-green-700 to-green-600 px-6 pb-8 pt-8 text-center text-white shadow-[0_10px_24px_rgba(18,84,39,0.22)] dark:from-green-900 dark:to-green-800">
-          <div className="mx-auto mb-5 flex h-36 w-36 items-center justify-center rounded-full bg-white shadow-[inset_0_2px_8px_rgba(255,255,255,0.85),0_8px_18px_rgba(18,84,39,0.25)]">
+    <main className="flex min-h-screen items-center justify-center bg-[var(--color-bg-main)] px-5 py-6">
+      <section className="flex w-full max-w-md flex-col items-center overflow-hidden rounded-3xl bg-[var(--color-bg-card)] shadow-lg">
+        <div className="w-full rounded-b-3xl bg-gradient-to-r from-[var(--color-green-primary)] to-[var(--color-green-primary)] px-6 pb-8 pt-8 text-center text-[var(--color-text-on-green)] shadow-lg">
+          <div className="mx-auto mb-5 flex h-36 w-36 items-center justify-center rounded-full bg-[var(--color-text-on-green)] shadow-lg">
             <Image
               src={logo}
-              alt="Recyvo logo"
+              alt="Recycylo logo"
               height={118}
               width={118}
               priority
             />
           </div>
 
-          <div className="mb-3 flex items-center justify-center gap-2 text-sm font-medium uppercase tracking-[0.18em] text-white/75">
+          <div className="mb-3 flex items-center justify-center gap-2 text-sm font-medium uppercase tracking-wider text-white/75 font-[family-name:var(--font-header)]">
             <FontAwesomeIcon icon={faLeaf} />
             Smart city sorting
           </div>
-          <h1 className="text-[28px] font-bold leading-tight">
+          <h1 className="text-[28px] font-bold leading-tight font-[family-name:var(--font-logo)]">
             Your smart path to a cleaner city.
           </h1>
-          <p className="mt-2 text-[20px] font-medium text-white/85">
+          <p className="mt-2 text-[20px] font-medium text-white/85 font-[family-name:var(--font-header)]">
             Scan. Sort. Share.
           </p>
         </div>
 
         <div className="w-full px-6 pb-7 pt-6">
-          <div className="mb-5 rounded-xl border-l-4 border-green-600 bg-[#f8f9fA] p-4 dark:bg-gray-800">
+          <div className="mb-5 rounded-xl border-l-4 border-[var(--color-green-primary)] bg-[var(--color-bg-main)] p-4">
             <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-700 text-white">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-green-primary)] text-[var(--color-text-on-green)]">
                 <FontAwesomeIcon icon={faRecycle} className="text-lg" />
               </div>
               <div>
-                <p className="font-semibold text-gray-800 dark:text-gray-100">
+                <p className="font-semibold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">
                   Meet SEB
                 </p>
-                <p className="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                <p className="mt-1 text-sm leading-6 text-[var(--color-text-secondary)] font-[family-name:var(--font-body)]">
                   Scan waste, find the right bin, and earn points for every
                   better choice.
                 </p>
@@ -90,7 +90,7 @@ export default function StartPage() {
           <div className="flex w-full flex-col gap-3">
             <Link
               href={"../LogInPage"}
-              className="flex h-14 items-center justify-center rounded-lg bg-[#17692f] text-[18px] font-semibold text-white shadow-[inset_0_2px_6px_rgba(255,255,255,0.14),0_3px_7px_rgba(18,84,39,0.25)] transition hover:bg-[#125826] focus:outline-none focus:ring-4 focus:ring-[#17692f]/25"
+              className="flex h-14 items-center justify-center rounded-lg bg-[var(--color-green-primary)] text-base font-bold text-[var(--color-text-on-green)] shadow-lg transition hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-[var(--color-green-primary)]/30 font-[family-name:var(--font-header)]"
             >
               LOGIN
               <FontAwesomeIcon
@@ -100,20 +100,20 @@ export default function StartPage() {
             </Link>
             <Link
               href={"../SignUpPage"}
-              className="flex h-14 items-center justify-center rounded-lg border-2 border-[#17692f] bg-white text-[17px] font-semibold text-[#17692f] transition hover:bg-[#f3faf5] focus:outline-none focus:ring-4 focus:ring-[#17692f]/20 dark:bg-gray-900"
+              className="flex h-14 items-center justify-center rounded-lg border-2 border-[var(--color-green-primary)] bg-[var(--color-bg-card)] text-base font-bold text-[var(--color-green-primary)] transition hover:bg-[var(--color-green-accent)] focus:outline-none focus:ring-4 focus:ring-[var(--color-green-primary)]/20 font-[family-name:var(--font-header)]"
             >
-              <FontAwesomeIcon icon={faUser} className="mr-3 text-[18px]" />
+              <FontAwesomeIcon icon={faUser} className="mr-3 text-lg" />
               CREATE FREE ACCOUNT
             </Link>
-            <button className="flex h-12 items-center justify-center rounded-lg border-2 border-[#17692f] bg-white text-[16px] font-medium text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] transition hover:bg-[#e8ecee] focus:outline-none focus:ring-4 focus:ring-slate-300 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800">
-              <FcGoogle className="mr-2 text-[22px]" />
+            <button className="flex h-14 items-center justify-center rounded-lg border-2 border-[var(--color-green-primary)] bg-[var(--color-bg-card)] text-base font-medium text-[var(--color-text-primary)] shadow-sm transition hover:bg-[var(--color-green-accent)] focus:outline-none focus:ring-4 focus:ring-[var(--color-green-primary)]/20 font-[family-name:var(--font-body)]">
+              <FcGoogle className="mr-2 text-2xl" />
               Sign in with Google
             </button>
           </div>
 
           <a
             href=""
-            className="mt-5 block text-center text-[14px] font-medium text-[#1A2B23] hover:underline dark:text-green-200"
+            className="mt-5 block text-center text-sm font-medium text-[var(--color-text-primary)] hover:underline font-[family-name:var(--font-body)]"
           >
             Forgot password? Contact support.
           </a>

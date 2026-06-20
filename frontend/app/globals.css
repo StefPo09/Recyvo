@@ -3,3 +3,89 @@
 @import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
 
 @import "tailwindcss";
+
+
+/* ============================================================
+   FONTURI LOCALE — public/fonts/
+   ============================================================ */
+
+@font-face {
+  font-family: 'Syne';
+  src: url('/fonts/Syne-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  src: url('/fonts/Quicksand_Book.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  src: url('/fonts/Quicksand_Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nunito';
+  src: url('/fonts/Nunito-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+
+:root {
+  /* Culori principale */
+  --color-green-primary:  #2D8A56;
+  --color-green-accent:   #EAF5EE;
+
+  /* Fundaluri */
+  --color-bg-main:        #F8F9FA;
+  --color-bg-card:        #FFFFFF;
+
+  /* Text */
+  --color-text-primary:   #1A2B23;
+  --color-text-secondary: #677A70;
+  --color-text-on-green:  #FFFFFF;
+
+  /* Fonturi */
+  --font-logo:    'Syne', sans-serif;
+  --font-header:  'Quicksand', sans-serif;
+  --font-body:    'Nunito', sans-serif;
+}
+
+/* Dark mode — automat după OS */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-green-primary:  #3AA868;
+    --color-green-accent:   #1A3328;
+    --color-bg-main:        #0F1A14;
+    --color-bg-card:        #172219;
+    --color-text-primary:   #E8F5EE;
+    --color-text-secondary: #7FA890;
+    --color-text-on-green:  #FFFFFF;
+  }
+}
+
+/* Dark mode — toggle manual cu clasa .dark */
+.dark {
+  --color-green-primary:  #3AA868;
+  --color-green-accent:   #1A3328;
+  --color-bg-main:        #0F1A14;
+  --color-bg-card:        #172219;
+  --color-text-primary:   #E8F5EE;
+  --color-text-secondary: #7FA890;
+  --color-text-on-green:  #FFFFFF;
+}
