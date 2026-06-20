@@ -90,71 +90,18 @@ class UserPointsUpdate(BaseModel):
 # Prompts & Dicționare de Căutare
 # ---------------------------------------------------------------------------
 
-SYSTEM_PROMPT = """Ești un asistent expert în identificarea deșeurilor și
-reciclare. Analizezi imagini și identifici cu precizie tipul de deșeu
-(sticlă, plastic, baterii, deșeuri electronice, hârtie/carton, metal,
-deșeuri organice, deșeuri periculoase etc.), explicând clar cum trebuie
-aruncat sau reciclat corect.
-
-IMPORTANT: Răspunzi EXCLUSIV în format JSON valid, fără text suplimentar,
-fără backtick-uri markdown. Structura JSON obligatorie:
-
-{
-  "item_name": "Numele obiectului identificat (în română, ex: 'Sticlă de plastic PET')",
-  "waste_category": "O categorie STRICT dintre: 'sticla', 'plastic', 'baterii', 'electronice', 'hartie_carton', 'metal', 'organic', 'periculos', 'altele'",
-  "description": "Descriere scurtă a obiectului și de ce intră în această categorie (1-3 propoziții)",
-  "is_recyclable": true,
-  "disposal_instructions": [
-    "Pasul 1: ...",
-    "Pasul 2: ...",
-    "..."
-  ],
-  "warnings": [
-    "Avertisment sau precauție importantă (ex: bateriile NU se aruncă la gunoi menajer)...",
-    "..."
-  ]
-}
-
-Dacă imaginea nu conține un deșeu identificabil, răspunde cu:
-{
-  "item_name": "Obiect neidentificat",
-  "waste_category": "altele",
-  "description": "Nu am putut identifica un tip de deșeu în această imagine. Vă rugăm să fotografiați obiectul mai clar.",
-  "is_recyclable": false,
-  "disposal_instructions": [],
-  "warnings": ["Asigurați-vă că obiectul este vizibil și bine iluminat în fotografie."]
-}
-
-Răspunde mereu în limba română. Fii precis, concis și prietenos."""
-
-USER_PROMPT = """Analizează această imagine și identifică tipul de deșeu
-(sticlă, plastic, baterie, deșeu electronic, hârtie, metal, etc.).
-Oferă instrucțiuni clare despre cum trebuie aruncat/reciclat corect și
-orice avertismente importante. Răspunde DOAR cu JSON, fără alt text."""
-
-CATEGORY_SEARCH_QUERY = {
-    "sticla": "centru de colectare sticla reciclare",
-    "plastic": "punct de colectare reciclare plastic",
-    "baterii": "punct de colectare baterii uzate reciclare",
-    "electronice": "centru de colectare deseuri electronice electrocasnice",
-    "hartie_carton": "punct de colectare hartie carton reciclare",
-    "metal": "centru de colectare deseuri metalice reciclare fier vechi",
-    "organic": "centru de compostare deseuri organice",
-    "periculos": "centru de colectare deseuri periculoase",
-    "altele": "punct de colectare deseuri reciclabile",
-}
-
-GEMINI_TO_LOCAL_BIN_MAP = {
-    "plastic": "plastic",
-    "sticla": "sticla",
-    "hartie_carton": "hartie",
-    "electronice": "electronic",
-    "baterii": "electronic",
-    "metal": "general",
-    "organic": "general",
-    "periculos": "general",
-    "altele": "general"
-}
+SYSTEM_PROMPT = """You are an expert assistant in waste identification and recycling. You analyze images and accurately identify the type of waste (glass, plastic, batteries, electronic waste, paper/cardboard, metal, organic waste, hazardous waste, etc.), clearly explaining how it should be properly disposed of or recycled. IMPORTANT: Respond EXCLUSIVELY in valid JSON format, without additional text and without markdown backticks. Required JSON structure: { "item_name": "Name of the identified object (in English, e.g., 'PET Plastic Bottle')", "waste_category": "A category STRICTLY from: 'glass', 'plastic', 'batteries', 'electronics', 'paper_cardboard', 'metal', 'organic', 'hazardous', 'other'", "description": "Short description of the object and why it belongs to this category (1–3 sentences)", "is_recyclable": true, "disposal_instructions": [ "Step 1: ...", "Step 2: ...", "..." ], "warnings": [ "Important warning or precaution (e.g., batteries must NOT be disposed of in household waste)...", "..." ] } If the image does not contain an identifiable waste item, respond with: { "item_name": "Unidentified Object", "waste_category": "other", "description": "I could not identify a type of waste in this image. Please take a clearer photo of the object.", "is_recyclable": false, "disposal_instructions": [], "warnings": ["Make sure the object is visible and well lit in the photo."] } Always respond in English. Be precise, concise, and friendly."""
+USER_PROMPT = """Analyze this image and identify the type of waste (glass, plastic, battery, electronic waste, paper, metal, etc.). Provide clear instructions on how it should be properly disposed of/recycled and any important warnings. Respond ONLY with JSON, without any additional text."""
+CATEGORY_SEARCH_QUERY = {"glass": "glass recycling collection center", "plastic": "plastic recycling collection point",
+                         "batteries": "used battery recycling collection point",
+                         "electronics": "electronic waste and appliance collection center",
+                         "paper_cardboard": "paper cardboard recycling collection point",
+                         "metal": "metal waste recycling center scrap metal",
+                         "organic": "organic waste composting center", "hazardous": "hazardous waste collection center",
+                         "other": "recyclable waste collection point", }
+GEMINI_TO_LOCAL_BIN_MAP = {"plastic": "plastic", "glass": "glass", "paper_cardboard": "paper",
+                           "electronics": "electronic", "batteries": "electronic", "metal": "general",
+                           "organic": "general", "hazardous": "general", "other": "general"}
 
 
 # ---------------------------------------------------------------------------
