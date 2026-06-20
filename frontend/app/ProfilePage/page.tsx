@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
@@ -21,7 +20,7 @@ import {
 import {useRouter} from "next/navigation";
 import {useEffect, useState, useRef, type ReactNode} from "react";
 import Link from "next/link";
-import { getUserById, updateUser, uploadProfileImage } from "../../lib/api";
+import { getUserById, updateUser, uploadProfileImage, deleteUser } from "@/lib/api";
 
 type ProfileData = {
   username: string;
@@ -212,22 +211,21 @@ function BottomNav() {
 
 export default function Home() {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [savedProfile, setSavedProfile] = useState<ProfileData>(initialProfile);
+  const [draftProfile, setDraftProfile] = useState<ProfileData>(initialProfile);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     if (!userId) {
       router.push("/StartPage");
-      setIsLoading(false);
       return;
     }
 
     (async () => {
       try {
         const resp = await getUserById(userId);
-        setUserData(resp);
         setSavedProfile((current) => ({
           ...current,
           username: resp.username || current.username,
@@ -242,19 +240,12 @@ export default function Home() {
           email: resp.email || current.email,
           profileImage: resp.profile_image || current.profileImage,
         }));
-        setIsAuthenticated(true);
       } catch (err) {
         console.error("Failed to fetch user:", err);
         router.push("/StartPage");
-      } finally {
-        setIsLoading(false);
       }
     })();
   }, [router]);
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [savedProfile, setSavedProfile] = useState<ProfileData>(initialProfile);
-  const [draftProfile, setDraftProfile] = useState<ProfileData>(initialProfile);
 
   const profile = isEditing ? draftProfile : savedProfile;
 
@@ -336,12 +327,26 @@ export default function Home() {
   function handleDeleteAccount() {
     const ok = confirm("Are you sure you want to delete your account? This action cannot be undone.");
     if (!ok) return;
-    // Simulate deletion: clear saved profile and draft
-    setSavedProfile(initialProfile);
-    setDraftProfile(initialProfile);
-    setIsEditing(false);
-    // In a real app you would call the backend and then redirect.
-    alert("Account deleted (simulated).");
+    // Actually delete account from backend
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("Error: User ID not found.");
+      return;
+    }
+
+    (async () => {
+      try {
+        await deleteUser(userId);
+        // Clear all auth data from localStorage
+        localStorage.removeItem("user");
+        localStorage.removeItem("userId");
+        // Redirect to StartPage
+        router.push("/StartPage");
+      } catch (err: any) {
+        console.error("Failed to delete account:", err);
+        alert(err.message || "Failed to delete account. Please try again.");
+      }
+    })();
   }
 
   return (

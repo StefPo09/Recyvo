@@ -220,3 +220,13 @@ export async function uploadProfileImage(userId: string, imageFile: File) {
   return res.json();
 }
 
+export async function deleteUser(userId: string) {
+  const res = await fetch(`${API_URL}/users/${encodeURIComponent(userId)}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Delete user failed: ${res.status} ${text}`);
+  }
+  return res.json();
+}

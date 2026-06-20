@@ -655,6 +655,24 @@ def get_user(user_id: str):
     return dict(row)
 
 
+@app.delete("/users/{user_id}", summary="Șterge un utilizator")
+def delete_user(user_id: str):
+    conn = get_db()
+
+    # Check if user exists
+    row = conn.execute("SELECT id FROM users WHERE id = ?", (user_id,)).fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Utilizatorul nu a fost găsit.")
+
+    # Delete the user
+    conn.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    return {"success": True, "message": "Utilizatorul a fost șters cu succes."}
+
+
 @app.put("/users/{user_id}", response_model=UserResponse, summary="Actualizează profilul unui utilizator")
 def update_user(user_id: str, data: UserUpdate):
     conn = get_db()
