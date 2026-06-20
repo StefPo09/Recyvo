@@ -7,7 +7,7 @@ import { resolve } from 'path';
 const nextConfig: NextConfig = {
   turbopack: {
     // Absolute path to the frontend directory
-    root: resolve(__dirname),
+    root: resolve(process.cwd()),
   },
   // Note: experimental.allowedDevOrigins is not a recognized option in this
   // Next version; omit it to avoid config warnings.
