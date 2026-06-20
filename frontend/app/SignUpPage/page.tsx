@@ -6,6 +6,7 @@ import logo from '../../Logo/Transparent/color.png';
 import { FiUser, FiMail, FiUserPlus, FiLock } from 'react-icons/fi';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
+import { signupUser } from '../../lib/api';
 
 function Input({ name, value, setValue, hasError, errorMessage }: { name: string, value: any, setValue: any, hasError: boolean, errorMessage?: string }){
   const [visible, setVisible] = useState(false);
@@ -32,6 +33,10 @@ function Input({ name, value, setValue, hasError, errorMessage }: { name: string
           }`} size={20} />
         ) : name === 'Email Address' ? (
           <FiMail className={`shrink-0 transition duration-300 ${
+            hasError ? 'text-red-500' : focused ? 'text-emerald-500' : 'text-gray-500 dark:text-gray-400'
+          }`} size={20} />
+        ) : name === 'Full Name' ? (
+          <FiUser className={`shrink-0 transition duration-300 ${
             hasError ? 'text-red-500' : focused ? 'text-emerald-500' : 'text-gray-500 dark:text-gray-400'
           }`} size={20} />
         ) : (
@@ -72,6 +77,7 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [error, setError] = useState("");
   const [usernameError, setUsernameError] = useState(false);
   const [emailAddressError, setEmailAddressError] = useState(false);
@@ -81,6 +87,7 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
   const [uppercaseError, setUppercaseError] = useState(false);
   const [numberError, setNumberError] = useState(false);
   const [specialCharacterError, setSpecialCharacterError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   // Derived checks (live)
@@ -117,7 +124,7 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
 
   // Live validation is handled with useEffect; the previous handleError helper was removed.
 
-  function handleSignUp() {
+  async function handleSignUp() {
     // Final validation before submit
     const isFormValid = username.length > 0 && !username.includes('@') && emailAddress.includes('@') && hasLower && hasUpper && hasNumber && hasSpecial && password === confirmPassword;
     if (!isFormValid) {
@@ -125,21 +132,46 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
       return;
     }
 
-    setUser([
-      ...user,
-      {
-        username,
-        emailAddress,
-        password,
-        id: crypto.randomUUID()
-      }
-    ]);
+    if (!fullName.trim()) {
+      setError('Full name is required.');
+      return;
+    }
 
-    // navigate to home page after successful sign up
+    setIsLoading(true);
     try {
-      router.push('../HomePage');
-    } catch (e) {
-      // ignore navigation errors during dev
+      const response = await signupUser({
+        username,
+        nume: fullName,
+        email: emailAddress,
+        parola: password,
+      });
+
+      // Store user data in localStorage
+      localStorage.setItem('user', JSON.stringify(response));
+      localStorage.setItem('userId', response.id);
+
+      // Also update local state
+      setUser([
+        ...user,
+        {
+          username,
+          emailAddress,
+          password,
+          id: response.id,
+          nume: fullName,
+        }
+      ]);
+
+      // navigate to home page after successful sign up
+      try {
+        router.push('../HomePage');
+      } catch (e) {
+        // ignore navigation errors during dev
+      }
+    } catch (err: any) {
+      setError(err.message || 'Signup failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -158,16 +190,23 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
         {error}
       </div>
 
-      {/* Username */}
-      <Input
-        name="Username"
-        value={username}
-        setValue={setUsername}
-        hasError={usernameError}
-        errorMessage={username.length === 0 ? 'Username is required' : username.includes('@') ? "Username cannot contain '@'" : ''}
-      />
-      <Input
-        name="Email Address"
+       {/* Username */}
+       <Input
+         name="Username"
+         value={username}
+         setValue={setUsername}
+         hasError={usernameError}
+         errorMessage={username.length === 0 ? 'Username is required' : username.includes('@') ? "Username cannot contain '@'" : ''}
+       />
+       <Input
+         name="Full Name"
+         value={fullName}
+         setValue={setFullName}
+         hasError={fullName.length === 0}
+         errorMessage={fullName.length === 0 ? 'Full name is required' : ''}
+       />
+       <Input
+         name="Email Address"
         value={emailAddress}
         setValue={setEmailAddress}
         hasError={emailAddressError}
@@ -243,21 +282,30 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
         errorMessage={confirmPassword.length === 0 ? 'Please confirm your password' : password !== confirmPassword ? 'Passwords do not match' : ''}
       />
 
-      {/* Submit button: disabled until form is valid */}
-      {(() => {
-        const isFormValid = username.length > 0 && !username.includes('@') && emailAddress.includes('@') && hasLower && hasUpper && hasNumber && hasSpecial && password === confirmPassword;
-        return (
-          <button
-            type="button"
-            onClick={handleSignUp}
-            disabled={!isFormValid}
-            className={`mt-8 mb-4 mx-auto max-w-sm w-full px-4 py-3 ${isFormValid ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600' : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'} text-white font-semibold rounded-lg transition duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 transform`}
-          >
-            <FiUserPlus size={20} />
-            Create Account
-          </button>
-        );
-      })()}
+       {/* Submit button: disabled until form is valid */}
+       {(() => {
+         const isFormValid = username.length > 0 && !username.includes('@') && emailAddress.includes('@') && hasLower && hasUpper && hasNumber && hasSpecial && password === confirmPassword && fullName.trim().length > 0;
+         return (
+           <button
+             type="button"
+             onClick={handleSignUp}
+             disabled={!isFormValid || isLoading}
+             className={`mt-8 mb-4 mx-auto max-w-sm w-full px-4 py-3 ${isFormValid && !isLoading ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600' : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'} text-white font-semibold rounded-lg transition duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 transform`}
+           >
+             {isLoading ? (
+               <>
+                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                 Creating Account...
+               </>
+             ) : (
+               <>
+                 <FiUserPlus size={20} />
+                 Create Account
+               </>
+             )}
+           </button>
+         );
+       })()}
     </>
   )
 }
