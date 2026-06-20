@@ -1,5 +1,36 @@
 "use client";
 
+import Image from "next/image";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCoffee } from "@fortawesome/free-solid-svg-icons";
+import {useRouter} from "next/navigation";
+import {useEffect, useState} from "react";
+
+export default function Home() {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const userExists = localStorage.getItem("user");
+
+    if (userExists) {
+      try {
+        const user = JSON.parse(userExists);
+        setUserData(user);
+        setIsAuthenticated(true);
+      } catch (e) {
+        // Invalid user data, redirect to StartPage
+        router.push("/StartPage");
+      }
+    } else {
+      // No user logged in, redirect to StartPage
+      router.push("/StartPage");
+    }
+    setIsLoading(false);
+  }, [router]);
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
