@@ -7,6 +7,7 @@ import { FiGrid } from 'react-icons/fi';
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { listBins, findNearest, fetchRecyclingPlaces } from "@/lib/api";
+import {useRouter} from "next/navigation";
 
 // dynamic import of client-side MapView; typed as any to avoid SSR/type checks
 // @ts-ignore
@@ -205,6 +206,30 @@ function BinMap() {
 }
 
 export default function Home() {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const userExists = localStorage.getItem("user");
+
+    if (userExists) {
+      try {
+        const user = JSON.parse(userExists);
+        setUserData(user);
+        setIsAuthenticated(true);
+      } catch (e) {
+        // Invalid user data, redirect to StartPage
+        router.push("/StartPage");
+      }
+    } else {
+      // No user logged in, redirect to StartPage
+      router.push("/StartPage");
+    }
+    setIsLoading(false);
+  }, [router]);
   return (
       <main className="flex min-h-screen flex-col bg-white dark:bg-black">
         <div className="bg-linear-to-r from-green-700 to-green-600 text-white px-6 pt-6 pb-8 rounded-b-3xl dark:from-green-900 dark:to-green-800">

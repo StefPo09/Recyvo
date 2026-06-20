@@ -11,7 +11,8 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { useState, type Dispatch, type KeyboardEvent, type ChangeEvent, type SetStateAction } from "react";
+import {useState, type Dispatch, type KeyboardEvent, type ChangeEvent, type SetStateAction, useEffect} from "react";
+import {useRouter} from "next/navigation";
 
 type ChatSender = "user" | "robot";
 
@@ -204,6 +205,30 @@ function BottomNav() {
 
 export default function Home() {
   const [chatMessages, setChatMessages] = useState<ChatEntry[]>([]);
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const userExists = localStorage.getItem("user");
+
+    if (userExists) {
+      try {
+        const user = JSON.parse(userExists);
+        setUserData(user);
+        setIsAuthenticated(true);
+      } catch (e) {
+        // Invalid user data, redirect to StartPage
+        router.push("/StartPage");
+      }
+    } else {
+      // No user logged in, redirect to StartPage
+      router.push("/StartPage");
+    }
+    setIsLoading(false);
+  }, [router]);
   return (
     <main className="flex h-screen flex-col bg-white dark:bg-black">
       <div className="rounded-b-3xl bg-linear-to-r from-green-700 to-green-600 px-6 pb-8 pt-6 text-white dark:from-green-900 dark:to-green-800">

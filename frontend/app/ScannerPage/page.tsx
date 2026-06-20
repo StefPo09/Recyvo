@@ -16,6 +16,7 @@ import {
   faRecycle,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 
 const API_BASE_URL = "http://localhost:8000";
 
@@ -614,6 +615,30 @@ export default function ScannerPage() {
   const [scanResult, setScanResult] = useState<WasteResult | null>(null);
   const [scanError, setScanError] = useState<string | null>(null);
   const previewUrl = useObjectUrl(selectedFile);
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const userExists = localStorage.getItem("user");
+
+    if (userExists) {
+      try {
+        const user = JSON.parse(userExists);
+        setUserData(user);
+        setIsAuthenticated(true);
+      } catch (e) {
+        // Invalid user data, redirect to StartPage
+        router.push("/StartPage");
+      }
+    } else {
+      // No user logged in, redirect to StartPage
+      router.push("/StartPage");
+    }
+    setIsLoading(false);
+  }, [router]);
 
   function handleGalleryChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
