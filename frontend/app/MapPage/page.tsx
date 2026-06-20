@@ -1,7 +1,7 @@
 "use client";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMap, faClock, faHome, faUser, faComments, faTrash, faTrashCan, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faMap, faClock, faHome, faUser, faComments, faTrash, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { FiGrid } from 'react-icons/fi';
 import { useState, useEffect } from "react";
@@ -54,7 +54,6 @@ function BinSelect({
 
 function BinMap() {
   const [bin, setBin] = useState("All");
-  const [isAddingBin, setIsAddingBin] = useState(false);
   const [bins, setBins] = useState<any[]>([]);
   const [places, setPlaces] = useState<any[]>([]);
   const [nearest, setNearest] = useState<any | null>(null);
@@ -184,30 +183,9 @@ function BinMap() {
             </span>
           </div>
 
-          <div className="mx-5 mt-5">
-            <button
-                type="button"
-                onClick={() => setIsAddingBin((value) => !value)}
-                className={`absolute right-4 top-4 z-10 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow-lg transition-colors ${
-                    isAddingBin
-                        ? "bg-green-600 text-white shadow-green-600/30 hover:bg-green-700"
-                        : "bg-white text-green-700 hover:bg-green-50 dark:bg-gray-900 dark:text-green-300 dark:hover:bg-gray-800"
-                }`}
-            >
-              <FontAwesomeIcon icon={faPlus} className="text-xs" />
-              {isAddingBin ? "Adding bin" : "Add bin"}
-            </button>
-
-            <div className="mt-4">
-              <MapViewAny bins={bins} places={places} enableAdd={isAddingBin} />
-            </div>
+          <div className="mt-4">
+            <MapViewAny bins={bins} places={places} />
           </div>
-
-          {isAddingBin && (
-              <div className="mx-5 mt-4 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900 dark:border-green-900/60 dark:bg-green-950/30 dark:text-green-100">
-                Add-bin mode is active. Click on the map area to place a new bin.
-              </div>
-          )}
 
           <div className="grid gap-3 px-5 pb-5 pt-5 sm:grid-cols-2">
             <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800">
