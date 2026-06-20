@@ -6,6 +6,7 @@ import logo from '../../Logo/Transparent/color.png';
 import { FiUser, FiLock } from 'react-icons/fi';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
+import { loginUser } from '../../lib/api';
 
 function Input({ name, value, setValue, hasError, errorMessage }: { name: string, value: any, setValue: any, hasError: boolean, errorMessage?: string }){
   const [visible, setVisible] = useState(false);
@@ -69,6 +70,7 @@ function LogIn() {
   const [error, setError] = useState("");
   const [usernameEmailError, setUsernameEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   // Live validation: update error flags as the user types
@@ -84,7 +86,7 @@ function LogIn() {
     }
   }, [usernameEmail, password]);
 
-  function handleSubmit() {
+  async function handleSubmit() {
     // Final validation before submit
     const isFormValid = usernameEmail.length > 0 && password.length > 0;
     if (!isFormValid) {
@@ -92,11 +94,27 @@ function LogIn() {
       return;
     }
 
-    // TODO: Add authentication logic here (check with database)
+    setIsLoading(true);
     try {
-      router.push('../HomePage');
-    } catch (e) {
-      // ignore navigation errors during dev
+      const response = await loginUser({
+        username_or_email: usernameEmail,
+        parola: password,
+      });
+
+      // Store user data in localStorage
+      localStorage.setItem('user', JSON.stringify(response));
+      localStorage.setItem('userId', response.id);
+
+      // navigate to home page after successful login
+      try {
+        router.push('../HomePage');
+      } catch (e) {
+        // ignore navigation errors during dev
+      }
+    } catch (err: any) {
+      setError(err.message || 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -130,20 +148,29 @@ function LogIn() {
         errorMessage={password.length === 0 ? 'Password is required' : ''}
       />
 
-      {(() => {
-        const isFormValid = usernameEmail.length > 0 && password.length > 0;
-        return (
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={!isFormValid}
-            className={`mt-8 mb-4 mx-auto max-w-sm w-full px-4 py-3 ${isFormValid ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 cursor-pointer' : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'} text-white font-semibold rounded-lg transition duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 transform`}
-          >
-            <FiUser size={20} />
-            Log In
-          </button>
-        );
-      })()}
+       {(() => {
+         const isFormValid = usernameEmail.length > 0 && password.length > 0;
+         return (
+           <button
+             type="button"
+             onClick={handleSubmit}
+             disabled={!isFormValid || isLoading}
+             className={`mt-8 mb-4 mx-auto max-w-sm w-full px-4 py-3 ${isFormValid && !isLoading ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 cursor-pointer' : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'} text-white font-semibold rounded-lg transition duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 transform`}
+           >
+             {isLoading ? (
+               <>
+                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                 Logging In...
+               </>
+             ) : (
+               <>
+                 <FiUser size={20} />
+                 Log In
+               </>
+             )}
+           </button>
+         );
+       })()}
     </>
   )
 }

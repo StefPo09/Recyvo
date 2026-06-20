@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
@@ -10,7 +14,35 @@ import logo from '../../Logo/Transparent/color.png';
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 
-export default function Home() {
+export default function StartPage() {
+  const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const userExists = localStorage.getItem("user");
+
+    if (userExists) {
+      // User is already logged in, redirect to HomePage
+      router.push("/HomePage");
+    } else {
+      // No user logged in, show the StartPage
+      setIsChecking(false);
+    }
+  }, [router]);
+
+  // Show loading while checking
+  if (isChecking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-black">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f8f9fA] px-5 py-6 text-[#1A2B23] dark:bg-black dark:text-green-100">
       <section className="flex w-full max-w-md flex-col items-center overflow-hidden rounded-3xl bg-white shadow-[0_18px_45px_rgba(26,43,35,0.12)] dark:bg-gray-900">

@@ -1,12 +1,69 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faCamera, faMap, faClock, faHome, faUser, faComments, faUserGear} from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faMap, faClock, faHome, faUser, faComments, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 
-export default function Home() {
+export default function HomePage() {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const userExists = localStorage.getItem("user");
+
+    if (userExists) {
+      try {
+        const user = JSON.parse(userExists);
+        setUserData(user);
+        setIsAuthenticated(true);
+      } catch (e) {
+        // Invalid user data, redirect to StartPage
+        router.push("/StartPage");
+      }
+    } else {
+      // No user logged in, redirect to StartPage
+      router.push("/StartPage");
+    }
+    setIsLoading(false);
+  }, [router]);
+
+  const handleLogout = () => {
+    // Clear user data from localStorage
+    localStorage.removeItem("user");
+    localStorage.removeItem("userId");
+
+    // Redirect to StartPage
+    router.push("/StartPage");
+  };
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-black">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (router will handle redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-black">
 
       <div className="bg-linear-to-r from-green-700 to-green-600 text-white px-6 pt-6 pb-8 rounded-b-3xl dark:from-green-900 dark:to-green-800">
+      <div className="bg-linear-to-r from-green-700 to-green-600 dark:from-green-900 dark:to-green-800 text-white px-6 pt-6 pb-8 rounded-b-3xl">
         <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-green-700 font-bold text-sm">
@@ -22,14 +79,22 @@ export default function Home() {
             <FontAwesomeIcon icon={faUserGear} className="text-sm text-emerald-200" />
             <span className="text-emerald-100">Settings</span>
           </Link>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-sm"
+            title="Logout"
+          >
+            <FontAwesomeIcon icon={faSignOutAlt} className="text-lg" />
+            <span className="hidden sm:inline">Logout</span>
+          </button>
         </div>
 
 
         <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm dark:shadow-none">
           <div className="flex justify-between items-start mb-3">
             <div>
-              <p className="text-gray-600 dark:text-gray-300 text-sm font-medium">Eco Legend in Training</p>
-              <p className="text-2xl font-bold text-black dark:text-white mt-1">Points: <span className="text-green-700">12,450</span></p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm font-medium">{userData?.nume || "User"}</p>
+              <p className="text-2xl font-bold text-black dark:text-white mt-1">Points: <span className="text-green-700">{userData?.nr_puncte || 0}</span></p>
             </div>
             <div className="flex flex-col items-center">
               <span className="text-2xl">🏅</span>
@@ -46,7 +111,7 @@ export default function Home() {
 
       <div className="flex-1 px-6 py-6 overflow-y-auto">
 
-        <Link href="../ScannerPage" className="bg-gray-100 dark:bg-gray-900 rounded-xl p-8 mb-6 flex flex-col items-center justify-center cursor-pointer">
+        <Link href="../ScannerPage" className="bg-gray-100 dark:bg-gray-900 rounded-xl p-8 mb-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
           <FontAwesomeIcon icon={faCamera} className="text-3xl text-gray-400 dark:text-gray-300 mb-4" />
           <p className="text-gray-700 dark:text-gray-200 font-medium text-center">Scan Your Waste with SEB</p>
         </Link>

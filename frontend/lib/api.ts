@@ -110,3 +110,57 @@ export async function deleteBin(bin_id: string) {
   return res.json();
 }
 
+// User Authentication Functions
+export async function signupUser({
+  username,
+  nume,
+  email,
+  parola,
+}: {
+  username: string;
+  nume: string;
+  email: string;
+  parola: string;
+}) {
+  const res = await fetch(`${API_URL}/users/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username,
+      nume,
+      email,
+      parola,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Signup failed: ${res.status} ${text}`);
+  }
+
+  return res.json();
+}
+
+export async function loginUser({
+  username_or_email,
+  parola,
+}: {
+  username_or_email: string;
+  parola: string;
+}) {
+  const res = await fetch(`${API_URL}/users/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username_or_email,
+      parola,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Login failed: ${res.status} ${text}`);
+  }
+
+  return res.json();
+}
