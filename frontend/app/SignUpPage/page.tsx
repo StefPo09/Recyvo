@@ -295,10 +295,6 @@ export default function Home() {
             <p>Already have an account? <a href="../LogInPage" className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold transition">Log in</a></p>
           </div>
         </div>
-
-        <div className="mt-8 text-center text-xs text-gray-600 dark:text-gray-400">
-          <p>Join our community to help protect<br />our environment together</p>
-        </div>
       </div>
     </main>
   );

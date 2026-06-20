@@ -1,48 +1,92 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowRight,
+  faLeaf,
+  faRecycle,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
+import logo from '../../Logo/Transparent/color.png';
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#f8f9fA] px-5 py-6 sm:grid sm:place-items-center dark:bg-black">
-      <Image
-        src="" // Adauga file path-ul catre logo color
-        alt="LOGO"
-      />
+    <main className="flex min-h-screen items-center justify-center bg-[#f8f9fA] px-5 py-6 text-[#1A2B23] dark:bg-black dark:text-green-100">
+      <section className="flex w-full max-w-md flex-col items-center overflow-hidden rounded-3xl bg-white shadow-[0_18px_45px_rgba(26,43,35,0.12)] dark:bg-gray-900">
+        <div className="w-full rounded-b-3xl bg-linear-to-r from-green-700 to-green-600 px-6 pb-8 pt-8 text-center text-white shadow-[0_10px_24px_rgba(18,84,39,0.22)] dark:from-green-900 dark:to-green-800">
+          <div className="mx-auto mb-5 flex h-36 w-36 items-center justify-center rounded-full bg-white shadow-[inset_0_2px_8px_rgba(255,255,255,0.85),0_8px_18px_rgba(18,84,39,0.25)]">
+            <Image
+              src={logo}
+              alt="Recyvo logo"
+              height={118}
+              width={118}
+              priority
+            />
+          </div>
 
-      <h1 className="mb-4 text-center text-[36px] leading-none tracking-normal text-[#1A2B23] dark:text-green-200">
-        SEB: Brașov Eco Assistant
-      </h1>
-      <div className="mb-8 text-center text-[24px] leading-[1.18] text-[#1A2B23] dark:text-green-200">
-        <p>Your smart path to a cleaner Brașov.</p>
-        <p>Scan. Sort. Share.</p>
-      </div>
-      <div className="flex w-md flex-col gap-3">
-        <Link
-          href={"../LogInPage"}
-          className="h-14 rounded-lg bg-[#17692f] text-[18px] text-white shadow-[inset_0_2px_6px_rgba(255,255,255,0.14),0_3px_7px_rgba(18,84,39,0.25)] transition hover:bg-[#125826] focus:outline-none focus:ring-4 focus:ring-[#17692f]/25">
-          LOGIN{" "}
-          <FontAwesomeIcon
-            icon={faArrowRight}
-            className="ml-1 text-white/50"
-          />
-        </Link>
-        <Link
-          href={"../SignUpPage"}
-          className="flex h-14 items-center justify-center rounded-lg border-2 border-[#17692f] bg-white text-[17px] text-[#17692f] transition hover:bg-[#f3faf5] focus:outline-none focus:ring-4 focus:ring-[#17692f]/20">
-          <FontAwesomeIcon icon={faUser} className="mr-3 text-[18px]" />
-          CREATE FREE ACCOUNT
-        </Link>
-        <button className="flex h-12 items-center justify-center rounded-lg border-2 border-[#17692f] bg-white text-[16px] text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] transition hover:bg-[#e8ecee] focus:outline-none focus:ring-4 focus:ring-slate-300">
-          <FcGoogle className="mr-2 text-[22px]" />
-          Sign in with Google
-        </button>
-      </div>
-      <a href="" className="mt-4 text-center text-[14px] text-[#1A2B23] hover:underline dark:text-green-200">
-        Forgot password? Contact support.
-      </a>
+          <div className="mb-3 flex items-center justify-center gap-2 text-sm font-medium uppercase tracking-[0.18em] text-white/75">
+            <FontAwesomeIcon icon={faLeaf} />
+            Smart city sorting
+          </div>
+          <h1 className="text-[28px] font-bold leading-tight">
+            Your smart path to a cleaner city.
+          </h1>
+          <p className="mt-2 text-[20px] font-medium text-white/85">
+            Scan. Sort. Share.
+          </p>
+        </div>
+
+        <div className="w-full px-6 pb-7 pt-6">
+          <div className="mb-5 rounded-xl border-l-4 border-green-600 bg-[#f8f9fA] p-4 dark:bg-gray-800">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-700 text-white">
+                <FontAwesomeIcon icon={faRecycle} className="text-lg" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-800 dark:text-gray-100">
+                  Meet SEB
+                </p>
+                <p className="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                  Scan waste, find the right bin, and earn points for every
+                  better choice.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex w-full flex-col gap-3">
+            <Link
+              href={"../LogInPage"}
+              className="flex h-14 items-center justify-center rounded-lg bg-[#17692f] text-[18px] font-semibold text-white shadow-[inset_0_2px_6px_rgba(255,255,255,0.14),0_3px_7px_rgba(18,84,39,0.25)] transition hover:bg-[#125826] focus:outline-none focus:ring-4 focus:ring-[#17692f]/25"
+            >
+              LOGIN
+              <FontAwesomeIcon
+                icon={faArrowRight}
+                className="ml-2 text-white/60"
+              />
+            </Link>
+            <Link
+              href={"../SignUpPage"}
+              className="flex h-14 items-center justify-center rounded-lg border-2 border-[#17692f] bg-white text-[17px] font-semibold text-[#17692f] transition hover:bg-[#f3faf5] focus:outline-none focus:ring-4 focus:ring-[#17692f]/20 dark:bg-gray-900"
+            >
+              <FontAwesomeIcon icon={faUser} className="mr-3 text-[18px]" />
+              CREATE FREE ACCOUNT
+            </Link>
+            <button className="flex h-12 items-center justify-center rounded-lg border-2 border-[#17692f] bg-white text-[16px] font-medium text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] transition hover:bg-[#e8ecee] focus:outline-none focus:ring-4 focus:ring-slate-300 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800">
+              <FcGoogle className="mr-2 text-[22px]" />
+              Sign in with Google
+            </button>
+          </div>
+
+          <a
+            href=""
+            className="mt-5 block text-center text-[14px] font-medium text-[#1A2B23] hover:underline dark:text-green-200"
+          >
+            Forgot password? Contact support.
+          </a>
+        </div>
+      </section>
     </main>
   );
 }

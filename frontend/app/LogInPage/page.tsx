@@ -130,7 +130,6 @@ function LogIn() {
         errorMessage={password.length === 0 ? 'Password is required' : ''}
       />
 
-      {/* Submit button: disabled until form is valid */}
       {(() => {
         const isFormValid = usernameEmail.length > 0 && password.length > 0;
         return (
@@ -145,15 +144,6 @@ function LogIn() {
           </button>
         );
       })()}
-
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Don't have an account?
-          <a href="../SignUpPage" className="ml-2 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold transition">
-            Sign up
-          </a>
-        </p>
-      </div>
     </>
   )
 }
@@ -186,10 +176,6 @@ export default function Home() {
           <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-600 dark:text-gray-400">
             <p>Don't have an account? <a href="../SignUpPage" className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold transition">Sign up</a></p>
           </div>
-        </div>
-
-        <div className="mt-8 text-center text-xs text-gray-600 dark:text-gray-400">
-          <p>Welcome back to our eco-friendly<br />community</p>
         </div>
       </div>
     </main>
