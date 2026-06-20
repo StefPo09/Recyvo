@@ -259,9 +259,9 @@ export default function Home() {
             <FontAwesomeIcon icon={faMap} className="text-xl" />
             <span className="text-xs font-medium">Map</span>
           </button>
-          <Link href="../CommunityPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+          <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
             <FontAwesomeIcon icon={faComments} className="text-xl" />
-            <span className="text-xs font-medium">Community</span>
+            <span className="text-xs font-medium">SEB</span>
           </Link>
           <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
             <FontAwesomeIcon icon={faUser} className="text-xl" />
