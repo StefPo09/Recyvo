@@ -213,14 +213,14 @@ export default function Home() {
     if (!userExists) router.push("/StartPage");
   }, [router]);
   return (
-    <main className="flex h-screen flex-col bg-[var(--color-bg-main)] text-[var(--color-text-primary)]">
-      <div className="bg-gradient-to-r from-[var(--color-green-primary)] to-[var(--color-green-primary)] text-[var(--color-text-on-green)] px-6 pt-6 pb-8 rounded-b-3xl">
+    <main className="flex h-screen flex-col bg-(--color-bg-main) text-(--color-text-primary)">
+      <div className="bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
         <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[var(--color-text-on-green)] rounded-full flex items-center justify-center text-[var(--color-green-primary)] font-bold text-sm">
+            <div className="w-8 h-8 bg-(--color-text-on-green) rounded-full flex items-center justify-center text-(--color-green-primary) font-bold text-sm">
               🤖
             </div>
-            <h1 className="text-lg font-semibold font-[family-name:var(--font-header)]">SEB: Eco Assistant</h1>
+            <h1 className="text-lg font-semibold font-(family-name:--font-header)">SEB: Eco Assistant</h1>
           </div>
           <Link
             href="./" // Add settingsPage
@@ -233,20 +233,20 @@ export default function Home() {
         </div>
 
 
-        <div className="rounded-xl bg-[var(--color-bg-card)] p-4 shadow-sm">
+        <div className="rounded-xl bg-(--color-bg-card) p-4 shadow-sm">
           <div className="mb-3 flex items-start justify-between">
             <div>
-              <p className="text-[var(--color-text-secondary)] text-sm font-medium font-[family-name:var(--font-body)]">Eco Legend in Training</p>
-              <p className="mt-1 text-2xl font-bold text-[var(--color-text-primary)] font-[family-name:var(--font-header)]">Points: <span className="text-[var(--color-green-primary)]">12,450</span></p>
+              <p className="text-(--color-text-secondary) text-sm font-medium font-(family-name:--font-body)">Eco Legend in Training</p>
+              <p className="mt-1 text-2xl font-bold text-(--color-text-primary) font-(family-name:--font-header)">Points: <span className="text-(--color-green-primary)">12,450</span></p>
             </div>
             <div className="flex flex-col items-center">
               <span className="text-2xl">🏅</span>
-              <span className="text-xs text-[var(--color-text-secondary)] mt-1">Level 7</span>
+              <span className="text-xs text-(--color-text-secondary) mt-1">Level 7</span>
             </div>
           </div>
 
-          <div className="h-2 w-full rounded-full bg-[var(--color-green-accent)]">
-            <div className="h-2 rounded-full bg-[var(--color-green-primary)]" style={{ width: "70%" }}></div>
+          <div className="h-2 w-full rounded-full bg-(--color-green-accent)">
+            <div className="h-2 rounded-full bg-(--color-green-primary)" style={{ width: "70%" }}></div>
           </div>
         </div>
       </div>
@@ -263,28 +263,7 @@ export default function Home() {
         setChatMessages={setChatMessages}
       />
 
-      <div className="mt-auto border-t border-[var(--color-green-accent)] bg-[var(--color-bg-card)] px-6 py-4 flex justify-around">
-        <Link href="../HomePage" className="flex flex-col items-center gap-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
-          <FontAwesomeIcon icon={faHome} className="text-xl" />
-          <span className="text-xs font-medium font-[family-name:var(--font-body)]">Home</span>
-        </Link>
-        <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
-          <FontAwesomeIcon icon={faClock} className="text-xl" />
-          <span className="text-xs font-medium font-[family-name:var(--font-body)]">Scanner</span>
-        </Link>
-        <Link href="../MapPage" className="flex flex-col items-center gap-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
-          <FontAwesomeIcon icon={faMap} className="text-xl" />
-          <span className="text-xs font-medium font-[family-name:var(--font-body)]">Map</span>
-        </Link>
-        <button className="flex flex-col items-center gap-1 text-[var(--color-green-primary)]">
-          <FontAwesomeIcon icon={faComments} className="text-xl" />
-          <span className="text-xs font-medium font-[family-name:var(--font-body)]">SEB</span>
-        </button>
-        <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
-          <FontAwesomeIcon icon={faUser} className="text-xl" />
-          <span className="text-xs font-medium font-[family-name:var(--font-body)]">Profile</span>
-        </Link>
-      </div>
+      <BottomNav />
     </main>
   );
 }
