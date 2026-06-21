@@ -19,6 +19,7 @@ import Link from "next/link";
 import {useRouter} from "next/navigation";
 
 const API_BASE_URL = "http://localhost:8000";
+import { addUserPoints, getUserById } from "@/lib/api";
 
 // ---------------------------------------------------------------------------
 // Tipuri care reflectă WasteResult din backend (main.py)
@@ -112,12 +113,12 @@ function ScannerHeader() {
 
         <div className="rounded-xl bg-(--color-bg-card) p-4 shadow-sm">
           <div className="mb-3 flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-(--color-text-secondary)] font-(family-name:--font-body)">Eco Legend in Training</p>
-              <p className="mt-1 text-2xl font-bold text-(--color-text-primary)] font-(family-name:--font-header)">
-                Points: <span className="text-(--color-green-primary)]">12,450</span>
-              </p>
-            </div>
+              <div>
+                <p className="text-sm font-medium text-(--color-text-secondary)] font-(family-name:--font-body)">Eco Legend in Training</p>
+                <p className="mt-1 text-2xl font-bold text-(--color-text-primary)] font-(family-name:--font-header)">
+                  Karma Points: <span className="text-(--color-green-primary)]">12,450</span>
+                </p>
+              </div>
             <div className="flex flex-col items-center">
               <span className="text-2xl">🏅</span>
               <span className="mt-1 text-xs text-(--color-text-secondary)]">Level 7</span>
@@ -703,6 +704,27 @@ export default function ScannerPage() {
 
       const data: WasteResult = await response.json();
       setScanResult(data);
+      // Award points based on scan result and update backend + local state
+      try {
+        const stored = localStorage.getItem("user");
+        if (stored) {
+          const u = JSON.parse(stored);
+          // Decide points to award: recyclable items get more points
+          const pointsToAdd = data.is_recyclable ? 10 : 1;
+          if (u?.username) {
+            await addUserPoints(u.username, pointsToAdd);
+            // refresh user data from backend (to get updated nr_puncte)
+            if (u?.id) {
+              const fresh = await getUserById(u.id);
+              localStorage.setItem("user", JSON.stringify(fresh));
+              setUserData(fresh);
+            }
+          }
+        }
+      } catch (e) {
+        // silently ignore errors related to points updating
+        console.warn("Failed to award points:", e);
+      }
     } catch (error) {
       const message =
           error instanceof Error

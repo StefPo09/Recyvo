@@ -263,7 +263,7 @@ export default function Home() {
             <div className="flex justify-between items-start mb-3">
               <div>
                 <p className="text-(--color-text-secondary) text-sm font-medium font-(family-name:--font-body)">Eco Legend in Training</p>
-                <p className="text-2xl font-bold text-(--color-text-primary) mt-1 font-(family-name:--font-header)">Points: <span className="text-(--color-green-primary)">12,450</span></p>
+                <p className="text-2xl font-bold text-(--color-text-primary) mt-1 font-(family-name:--font-header)">Karma Points: <span className="text-(--color-green-primary)">12,450</span></p>
               </div>
               <div className="flex flex-col items-center">
                 <span className="text-2xl">🏅</span>

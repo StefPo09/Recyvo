@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faMap, faClock, faHome, faUser, faComments, faUserGear } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import { getUserById } from "@/lib/api";
 
 export default function HomePage() {
   const router = useRouter();
@@ -16,11 +17,46 @@ export default function HomePage() {
     // Check if user is logged in
     const userExists = localStorage.getItem("user");
 
+    let cleanup: (() => void) | undefined;
+
     if (userExists) {
       try {
         const user = JSON.parse(userExists);
         setUserData(user);
         setIsAuthenticated(true);
+        // Refresh latest user data from backend (points etc.)
+        (async () => {
+          try {
+            if (user?.id) {
+              const fresh = await getUserById(user.id);
+              // merge and persist
+              localStorage.setItem("user", JSON.stringify(fresh));
+              setUserData(fresh);
+            }
+          } catch (e) {
+            // ignore network errors here; keep local data
+            console.warn("Failed to refresh user data:", e);
+          }
+        })();
+
+        // When the page becomes visible again (user returns from scanner), refresh points
+        const onVisibility = async () => {
+          try {
+            const cur = localStorage.getItem("user");
+            if (!cur) return;
+            const parsed = JSON.parse(cur);
+            if (parsed?.id) {
+              const fresh = await getUserById(parsed.id);
+              localStorage.setItem("user", JSON.stringify(fresh));
+              setUserData(fresh);
+            }
+          } catch (err) {
+            console.warn("visibility refresh failed:", err);
+          }
+        };
+
+        document.addEventListener("visibilitychange", onVisibility);
+        cleanup = () => document.removeEventListener("visibilitychange", onVisibility);
       } catch (e) {
         // Invalid user data, redirect to StartPage
         router.push("/StartPage");
@@ -29,7 +65,12 @@ export default function HomePage() {
       // No user logged in, redirect to StartPage
       router.push("/StartPage");
     }
+
     setIsLoading(false);
+
+    return () => {
+      if (cleanup) cleanup();
+    };
   }, [router]);
 // Show loading while checking authentication
   if (isLoading) {
@@ -71,20 +112,72 @@ export default function HomePage() {
 
 
         <div className="bg-(--color-bg-card) rounded-xl p-4 shadow-sm">
+          {/* Show name and points */}
           <div className="flex justify-between items-start mb-3">
             <div>
               <p className="text-(--color-text-secondary) text-sm font-medium font-(family-name:--font-body)">{userData?.nume || "User"}</p>
-              <p className="text-2xl font-bold text-(--color-text-primary) mt-1 font-(family-name:--font-header)">Points: <span className="text-(--color-green-primary)">{userData?.nr_puncte || 0}</span></p>
+              <p className="text-2xl font-bold text-(--color-text-primary) mt-1 font-(family-name:--font-header)">Karma Points: <span className="text-(--color-green-primary)">{userData?.nr_puncte ?? 0}</span></p>
             </div>
-            <div className="flex flex-col items-center">
-              <span className="text-2xl">🏅</span>
-              <span className="text-xs text-(--color-text-secondary) mt-1">Level 7</span>
+
+            {/* Medal badge - clickable to LeaguesPage */}
+            <div>
+              {(() => {
+                const points: number = userData?.nr_puncte ?? 0;
+
+                // Define rank bands
+                const bands = [
+                  { name: "No Rank", min: 0, max: 9, emoji: "—" },
+                  { name: "Bronze", min: 10, max: 49, emoji: "🥉" },
+                  { name: "Silver", min: 50, max: 199, emoji: "🥈" },
+                  { name: "Gold", min: 200, max: 499, emoji: "🥇" },
+                  { name: "Diamond", min: 500, max: 999, emoji: "💎" },
+                  { name: "Eco Champion", min: 1000, max: Infinity, emoji: "🏆" },
+                ];
+
+                const current = bands.find(b => points >= b.min && points <= b.max) || bands[0];
+
+                return (
+                  <Link href="../LeaguesPage" className="flex flex-col items-center cursor-pointer">
+                    <span className="text-2xl">{current.emoji}</span>
+                    <span className="text-xs text-(--color-text-secondary) mt-1">{current.name}</span>
+                  </Link>
+                );
+              })()}
             </div>
           </div>
 
-          <div className="w-full bg-(--color-green-accent) rounded-full h-2">
-            <div className="bg-(--color-green-primary) h-2 rounded-full" style={{ width: "70%" }}></div>
-          </div>
+          {/* Progress bar - width reflects progress within current tier, starts from 0 */}
+          {(() => {
+            const points: number = userData?.nr_puncte ?? 0;
+            const bands = [
+              { name: "No Rank", min: 0, max: 9 },
+              { name: "Bronze", min: 10, max: 49 },
+              { name: "Silver", min: 50, max: 199 },
+              { name: "Gold", min: 200, max: 499 },
+              { name: "Diamond", min: 500, max: 999 },
+              { name: "Eco Champion", min: 1000, max: Infinity },
+            ];
+            const current = bands.find(b => points >= b.min && points <= b.max) || bands[0];
+            let percent: number;
+            let label: string;
+            if (current.max === Infinity) {
+              percent = 100;
+              label = `${points} pts`;
+            } else {
+              const range = current.max - current.min + 1;
+              percent = Math.max(0, Math.min(100, Math.round(((points - current.min) / range) * 100)));
+              label = `${points}/${current.max}`;
+            }
+
+            return (
+              <div>
+                <div className="w-full bg-(--color-green-accent) rounded-full h-2">
+                  <div className="bg-(--color-green-primary) h-2 rounded-full" style={{ width: `${percent}%` }}></div>
+                </div>
+                <p className="text-xs text-(--color-text-secondary) mt-2">{label}</p>
+              </div>
+            );
+          })()}
         </div>
       </div>
 
