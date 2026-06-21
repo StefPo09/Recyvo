@@ -25,7 +25,6 @@ import {
   faSignOutAlt,
   faSun,
   faTextHeight,
-  faTrophy,
   faUniversalAccess,
   faWifi,
 } from "@fortawesome/free-solid-svg-icons";
@@ -722,7 +721,7 @@ function ActionButton({
 }
 
 export default function SettingsPage() {
-  const { settings, updateToggle, updateMaterial, updateSetting, resolvedTheme, isDark, savedMessage, setSavedMessage, hasUnsavedChanges, setHasUnsavedChanges, savePreferencesManually } = useSettings();
+  const { settings, updateToggle, updateMaterial, updateSetting, resolvedTheme, isDark, savedMessage, setSavedMessage, hasUnsavedChanges, savePreferencesManually } = useSettings();
   const [modal, setModal] = useState<ModalContent | null>(null);
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<(() => void) | null>(null);
@@ -1295,7 +1294,7 @@ export default function SettingsPage() {
             <button
                 type="button"
                 onClick={handleLogout}
-                className="flex w-full items-center justify-center gap-2 bg-red-600 text-white p-3 rounded-xl font-semibold hover:bg-red-700 transition-colors mt-2"
+                className="flex w-full items-center justify-center gap-2 bg-red-600 text-white p-3 rounded-xl font-semibold hover:bg-red-700 transition-colors mt-2 cursor-pointer"
             >
               <FontAwesomeIcon icon={faSignOutAlt} className="w-4" />
               {t("Logout")}
@@ -1380,7 +1379,7 @@ export default function SettingsPage() {
                           pendingNavigation();
                         }
                       }}
-                      className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+                      className={`cursor-pointer flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
                           isDark
                               ? "bg-zinc-700 text-white hover:bg-zinc-600"
                               : "bg-zinc-100 text-zinc-950 hover:bg-zinc-200"
@@ -1400,7 +1399,7 @@ export default function SettingsPage() {
                         setIsSaving(false);
                       }}
                       disabled={isSaving}
-                      className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+                      className={`cursor-pointer flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
                           isSaving
                               ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                               : "bg-green-600 text-white hover:bg-green-700"

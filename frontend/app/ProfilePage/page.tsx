@@ -169,7 +169,7 @@ function ActionButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-lg transition-transform hover:-translate-y-0.5 active:translate-y-0 ${styles}`}
+      className={`cursor-pointer inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-lg transition-transform hover:-translate-y-0.5 active:translate-y-0 ${styles}`}
     >
       {children}
     </button>
@@ -333,6 +333,15 @@ export default function Home() {
     })();
   }
 
+  function logout() {
+    // Clear all localStorage
+    window.localStorage.removeItem("recyvo-settings");
+    window.localStorage.removeItem("userId");
+    window.localStorage.removeItem("user");
+    // Redirect to StartPage
+    window.location.href = "/StartPage";
+  }
+
   function handleDeleteAccount() {
     const ok = confirm("Are you sure you want to delete your account? This action cannot be undone.");
     if (!ok) return;
@@ -441,19 +450,19 @@ export default function Home() {
 
             {isEditing && (
               <div className="mt-10">
-                <Link
-                  href="../StartPage"
-                  className="flex w-full items-center justify-center gap-3 rounded-full bg-red-600 px-6 py-4 text-base font-bold text-white shadow-lg transition-colors hover:bg-red-700"
+                <button
+                  onClick={logout}
+                  className="cursor-pointer flex w-full items-center justify-center gap-3 rounded-full bg-red-600 px-6 py-4 text-base font-bold text-white shadow-lg transition-colors hover:bg-red-700"
                   style={{ fontFamily: 'var(--font-header)' }}
                 >
                   <FontAwesomeIcon icon={faRightFromBracket} />
                   Logout
-                </Link>
+                </button>
                 <div className="mt-4">
                   <button
                     type="button"
                     onClick={handleDeleteAccount}
-                    className="flex w-full items-center justify-center gap-3 rounded-full border-2 border-red-600 bg-transparent px-6 py-4 text-base font-bold text-red-500 shadow-sm transition-colors hover:bg-red-600 hover:text-white"
+                    className="cursor-pointer flex w-full items-center justify-center gap-3 rounded-full border-2 border-red-600 bg-transparent px-6 py-4 text-base font-bold text-red-500 shadow-sm transition-colors hover:bg-red-600 hover:text-white"
                     style={{ fontFamily: 'var(--font-header)' }}
                   >
                     Delete Account
