@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import logoSrc from "@/Logo/Transparent/color.png";
 
 export const metadata: Metadata = {
   title: "Scanner | Recyvo",
   icons: {
-    icon: "favicon.png",
+    icon: logoSrc.src,
   },
 };
 

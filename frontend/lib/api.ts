@@ -38,9 +38,12 @@ export async function analyzeImage(req: AnalyzeRequest) {
 }
 
 export async function listBins(bin_type?: string) {
-  const url = new URL(`${API_URL}/bins/`);
-  if (bin_type) url.searchParams.set("bin_type", bin_type);
-  const res = await fetch(url.toString());
+  // Use a plain string URL here (new URL() can throw in browser contexts when
+  // API_URL is a relative path). Build the query string manually to avoid
+  // runtime errors accessing URL methods.
+  let url = `${API_URL}/bins/`;
+  if (bin_type) url += `?bin_type=${encodeURIComponent(bin_type)}`;
+  const res = await fetch(url);
   if (!res.ok) throw new Error(`List bins failed: ${res.status}`);
   return res.json();
 }
@@ -55,13 +58,13 @@ export async function findNearest(lat: number, lng: number, bin_type: string, ma
 }
 
 export async function fetchRecyclingPlaces(lat: number, lng: number, waste_category: string, max_results = 5) {
-  const url = new URL(`${API_URL}/places/nearby/`);
-  url.searchParams.set("lat", String(lat));
-  url.searchParams.set("lng", String(lng));
-  url.searchParams.set("waste_category", waste_category);
-  url.searchParams.set("max_results", String(max_results));
+  // Avoid `new URL()` in the browser (it requires a base for relative URLs).
+  const url = `${API_URL}/places/nearby/?lat=${encodeURIComponent(String(lat))}` +
+    `&lng=${encodeURIComponent(String(lng))}` +
+    `&waste_category=${encodeURIComponent(waste_category)}` +
+    `&max_results=${encodeURIComponent(String(max_results))}`;
 
-  const res = await fetch(url.toString());
+  const res = await fetch(url);
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Fetch places failed: ${res.status} ${text}`);
