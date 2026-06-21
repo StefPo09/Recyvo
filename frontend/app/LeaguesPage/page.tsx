@@ -15,24 +15,29 @@ const rankBands = [
 ] as const;
 
 function getRankProgress(points: number) {
-  const current = rankBands.find((band) => points >= band.min && points <= band.max) ?? rankBands[0];
+  // find current band
+  const currentIdx = rankBands.findIndex((b) => points >= b.min && points <= b.max);
+  const current = currentIdx >= 0 ? rankBands[currentIdx] : rankBands[0];
 
-  if (current.max === Infinity) {
-    return {
-      current,
-      percent: 100,
-      label: `${points} pts`,
-    };
+  const idx = currentIdx >= 0 ? currentIdx : 0;
+  const isLast = idx === rankBands.length - 1;
+
+  const currentMin = current.min;
+  const nextMin = isLast ? currentMin : rankBands[idx + 1].min;
+
+  let fraction: number;
+  if (isLast) {
+    fraction = 1;
+  } else {
+    const denom = Math.max(1, nextMin - currentMin);
+    fraction = (points - currentMin) / denom;
+    fraction = Math.max(0, Math.min(1, fraction));
   }
 
-  const range = current.max - current.min + 1;
-  const percent = Math.max(0, Math.min(100, Math.round(((points - current.min) / range) * 100)));
+  const percent = Math.round(fraction * 100);
+  const label = isLast ? `${points} pts` : `${points} / ${nextMin} pts`;
 
-  return {
-    current,
-    percent,
-    label: `${points}/${current.max} pts`,
-  };
+  return { current, percent, label, nextMin, isLast, currentMin };
 }
 
 export default function LeaguesPage() {
