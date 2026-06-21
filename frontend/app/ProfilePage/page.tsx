@@ -20,7 +20,7 @@ import {
 import {useRouter} from "next/navigation";
 import {useEffect, useState, useRef, type ReactNode} from "react";
 import Link from "next/link";
-import { getUserById, updateUser, uploadProfileImage } from "@/lib/api";
+import { updateUser, uploadProfileImage } from "@/lib/api";
 
 type ProfileData = {
   username: string;
@@ -36,9 +36,9 @@ const initialProfile: ProfileData = {
   profileImage: null,
 };
 
-function TopHeader() {
-  return (
-    <div className="bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
+function TopBar({userData}  : {userData: any}) {
+  return(
+    <div className="shrink-0 bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
       <div className="flex items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-(--color-text-on-green) rounded-full flex items-center justify-center text-(--color-green-primary) font-bold text-sm">
@@ -56,11 +56,12 @@ function TopHeader() {
         </Link>
       </div>
 
+
       <div className="bg-(--color-bg-card) rounded-xl p-4 shadow-sm">
         <div className="flex justify-between items-start mb-3">
           <div>
-            <p className="text-(--color-text-secondary) text-sm font-medium font-(family-name:--font-body)">Eco Legend in Training</p>
-            <p className="text-2xl font-bold text-(--color-text-primary) mt-1 font-(family-name:--font-header)">Karma Points: <span className="text-(--color-green-primary)">12,450</span></p>
+            <p className="text-(--color-text-secondary) text-sm font-medium font-(family-name:--font-body)">{userData?.nume || "User"}</p>
+            <p className="text-2xl font-bold text-(--color-text-primary) mt-1 font-(family-name:--font-header)">Points: <span className="text-(--color-green-primary)">{userData?.nr_puncte || 0}</span></p>
           </div>
           <div className="flex flex-col items-center">
             <span className="text-2xl">🏅</span>
@@ -73,7 +74,7 @@ function TopHeader() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function ProfileAvatar({ image, isEditing, onImageChange }: { image: string | null; isEditing: boolean; onImageChange: (file: File) => void }) {
@@ -184,68 +185,78 @@ function ActionButton({
 
 function BottomNav() {
   return (
-    <div className="mt-auto border-t border-(--color-green-accent) bg-(--color-bg-card) px-6 py-4 flex justify-around">
-      <Link href="../HomePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
+    <div className="shrink-0 border-t border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-black">
+      <div className="flex justify-around">
+      <Link href="../HomePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
         <FontAwesomeIcon icon={faHome} className="text-xl" />
-        <span className="text-xs font-medium font-(family-name:--font-body)">Home</span>
+        <span className="text-xs font-medium">Home</span>
       </Link>
-      <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
+      <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
         <FontAwesomeIcon icon={faClock} className="text-xl" />
-        <span className="text-xs font-medium font-(family-name:--font-body)">Scanner</span>
+        <span className="text-xs font-medium">Scanner</span>
       </Link>
-      <Link href="../MapPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
+      <Link href="../MapPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
         <FontAwesomeIcon icon={faMap} className="text-xl" />
-        <span className="text-xs font-medium font-(family-name:--font-body)">Map</span>
+        <span className="text-xs font-medium">Map</span>
       </Link>
-      <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
+      <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
         <FontAwesomeIcon icon={faComments} className="text-xl" />
-        <span className="text-xs font-medium font-(family-name:--font-body)">SEB</span>
+        <span className="text-xs font-medium">SEB</span>
       </Link>
-      <button className="flex flex-col items-center gap-1 text-(--color-green-primary)">
+      <button className="flex flex-col items-center gap-1 text-green-700">
         <FontAwesomeIcon icon={faUser} className="text-xl" />
-        <span className="text-xs font-medium font-(family-name:--font-body)">Profile</span>
+        <span className="text-xs font-medium">Profile</span>
       </button>
+      </div>
     </div>
   );
 }
 
 export default function Home() {
   const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [isEditing, setIsEditing] = useState(false);
   const [savedProfile, setSavedProfile] = useState<ProfileData>(initialProfile);
   const [draftProfile, setDraftProfile] = useState<ProfileData>(initialProfile);
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      router.push("/StartPage");
-      return;
-    }
+    // Check if user is logged in
+    const userExists = localStorage.getItem("user");
 
-    (async () => {
+    if (userExists) {
       try {
-        const resp = await getUserById(userId);
-        setSavedProfile((current) => ({
-          ...current,
-          username: resp.username || current.username,
-          fullName: resp.nume || current.fullName,
-          email: resp.email || current.email,
-          profileImage: resp.profile_image || current.profileImage,
-        }));
-        setDraftProfile((current) => ({
-          ...current,
-          username: resp.username || current.username,
-          fullName: resp.nume || current.fullName,
-          email: resp.email || current.email,
-          profileImage: resp.profile_image || current.profileImage,
-        }));
-      } catch (err) {
-        console.error("Failed to fetch user:", err);
+        const user = JSON.parse(userExists);
+        setUserData(user);
+        setIsAuthenticated(true);
+      } catch (e) {
+        // Invalid user data, redirect to StartPage
         router.push("/StartPage");
       }
-    })();
+    } else {
+      // No user logged in, redirect to StartPage
+      router.push("/StartPage");
+    }
+    setIsLoading(false);
   }, [router]);
+// Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-(--color-bg-card)">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-(--color-green-accent) border-t-(--color-green-primary) rounded-full animate-spin"></div>
+          <p className="text-(--color-text-secondary) font-(family-name:--font-body)">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (router will handle redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const profile = isEditing ? draftProfile : savedProfile;
 
@@ -360,11 +371,13 @@ export default function Home() {
   }
 
   return (
-    <main className="flex h-screen flex-col bg-(--color-bg-main)">
-      <div className="flex h-full w-full flex-col bg-(--color-bg-card) text-(--color-text-primary) shadow-2xl">
-        <TopHeader />
+    <main className="flex h-screen flex-col overflow-hidden bg-(--color-bg-main)">
+      <div className="flex flex-1 min-h-0 w-full flex-col bg-(--color-bg-card) text-(--color-text-primary) shadow-2xl">
+        <TopBar
+          userData={userData}
+        />
 
-        <section className="flex-1 overflow-y-auto px-4 py-4">
+        <section className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
           <div className="rounded-4xl bg-(--color-bg-card) px-4 pb-6 pt-2">
             <div className="text-center">
               <div className="mb-3 flex items-center justify-center gap-2 text-(--color-green-primary) font-(family-name:--font-header)">

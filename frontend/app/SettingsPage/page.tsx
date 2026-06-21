@@ -31,7 +31,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, useEffect, type ReactNode } from "react";
 import { useSettings } from "@/lib/SettingsContext";
 
 const notificationSettings = [
@@ -722,10 +722,48 @@ function ActionButton({
 }
 
 export default function SettingsPage() {
-  const { settings, updateToggle, updateMaterial, updateSetting, resolvedTheme, isDark, savedMessage, setSavedMessage } = useSettings();
+  const { settings, updateToggle, updateMaterial, updateSetting, resolvedTheme, isDark, savedMessage, setSavedMessage, hasUnsavedChanges, setHasUnsavedChanges, savePreferencesManually } = useSettings();
   const [modal, setModal] = useState<ModalContent | null>(null);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<(() => void) | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // resolvedTheme and isDark come from the SettingsProvider
+  // Handle unsaved changes on page unload
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  // Handle manual save button
+  async function handleSaveClick() {
+    setIsSaving(true);
+    try {
+      const success = await savePreferencesManually();
+      if (success) {
+        setSavedMessage("✓ All preferences saved successfully!");
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  // Handle logout with unsaved changes check
+  function handleLogout() {
+    if (hasUnsavedChanges) {
+      setShowUnsavedDialog(true);
+      setPendingNavigation(() => () => logout());
+    } else {
+      logout();
+    }
+  }
 
   const mainClassName = useMemo(() => {
     const textSizeClass =
@@ -864,8 +902,12 @@ export default function SettingsPage() {
   }
 
   function logout() {
+    // Clear all localStorage
     window.localStorage.removeItem("recyvo-settings");
-    window.location.href = "../HomePage";
+    window.localStorage.removeItem("userId");
+    window.localStorage.removeItem("user");
+    // Redirect to StartPage
+    window.location.href = "/StartPage";
   }
 
   return (
@@ -1279,8 +1321,22 @@ export default function SettingsPage() {
 
             <button
                 type="button"
-                onClick={logout}
-                className="flex w-full items-center justify-center gap-2 bg-red-600 text-white p-3 rounded-xl font-semibold hover:bg-red-700 transition-colors"
+                onClick={handleSaveClick}
+                disabled={!hasUnsavedChanges || isSaving}
+                className={`flex w-full items-center justify-center gap-2 p-3 rounded-xl font-semibold transition-colors ${
+                    hasUnsavedChanges && !isSaving
+                        ? "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+                        : "bg-zinc-400 text-zinc-200 cursor-not-allowed"
+                }`}
+            >
+              <FontAwesomeIcon icon={isSaving ? faArrowsRotate : faDownload} className={`w-4 ${isSaving ? "animate-spin" : ""}`} />
+              {isSaving ? "Saving..." : hasUnsavedChanges ? "Save Preferences" : "All Saved"}
+            </button>
+
+            <button
+                type="button"
+                onClick={handleLogout}
+                className="flex w-full items-center justify-center gap-2 bg-red-600 text-white p-3 rounded-xl font-semibold hover:bg-red-700 transition-colors mt-2"
             >
               <FontAwesomeIcon icon={faSignOutAlt} className="w-4" />
               {t("Logout")}
@@ -1330,6 +1386,69 @@ export default function SettingsPage() {
                     }`}
                 >
                   {modal.body}
+                </div>
+              </div>
+            </div>
+        ) : null}
+        
+        {/* Unsaved Changes Warning Dialog */}
+        {showUnsavedDialog ? (
+            <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="unsaved-dialog-title"
+            >
+              <div
+                  className={`w-full max-w-sm rounded-xl border p-6 shadow-xl ${
+                      isDark
+                          ? "border-white/10 bg-zinc-800 text-white"
+                          : "border-zinc-200 bg-white text-zinc-950"
+                  }`}
+              >
+                <h2 id="unsaved-dialog-title" className="text-lg font-semibold mb-3">
+                  Unsaved Changes
+                </h2>
+                <p className={`text-sm mb-6 ${isDark ? "text-zinc-300" : "text-zinc-700"}`}>
+                  You have unsaved preference changes. Do you want to save them before leaving?
+                </p>
+                <div className="flex gap-3">
+                  <button
+                      type="button"
+                      onClick={() => {
+                        setShowUnsavedDialog(false);
+                        if (pendingNavigation) {
+                          pendingNavigation();
+                        }
+                      }}
+                      className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+                          isDark
+                              ? "bg-zinc-700 text-white hover:bg-zinc-600"
+                              : "bg-zinc-100 text-zinc-950 hover:bg-zinc-200"
+                      }`}
+                  >
+                    Leave Anyway
+                  </button>
+                  <button
+                      type="button"
+                      onClick={async () => {
+                        setIsSaving(true);
+                        const success = await savePreferencesManually();
+                        if (success && pendingNavigation) {
+                          setShowUnsavedDialog(false);
+                          pendingNavigation();
+                        }
+                        setIsSaving(false);
+                      }}
+                      disabled={isSaving}
+                      className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+                          isSaving
+                              ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                              : "bg-green-600 text-white hover:bg-green-700"
+                      }`}
+                  >
+                    {isSaving ? "Saving..." : "Save & Leave"}
+                  </button>
                 </div>
               </div>
             </div>

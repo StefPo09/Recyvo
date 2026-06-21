@@ -22,6 +22,47 @@ import {useRouter} from "next/navigation";
 // @ts-ignore
 const MapViewAny: any = dynamic(() => import("../../components/MapView"), { ssr: false });
 
+function TopBar({userData}  : {userData: any}) {
+  return(
+    <div className="shrink-0 bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-(--color-text-on-green) rounded-full flex items-center justify-center text-(--color-green-primary) font-bold text-sm">
+            🤖
+          </div>
+          <h1 className="text-lg font-semibold font-(family-name:--font-header)">SEB: Eco Assistant</h1>
+        </div>
+        <Link
+          href="../SettingsPage"
+          className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium hover:bg-white/20 transition-colors"
+          aria-label="Settings"
+        >
+          <FontAwesomeIcon icon={faUserGear} className="text-sm" />
+          <span>Settings</span>
+        </Link>
+      </div>
+
+
+      <div className="bg-(--color-bg-card) rounded-xl p-4 shadow-sm">
+        <div className="flex justify-between items-start mb-3">
+          <div>
+            <p className="text-(--color-text-secondary) text-sm font-medium font-(family-name:--font-body)">{userData?.nume || "User"}</p>
+            <p className="text-2xl font-bold text-(--color-text-primary) mt-1 font-(family-name:--font-header)">Points: <span className="text-(--color-green-primary)">{userData?.nr_puncte || 0}</span></p>
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="text-2xl">🏅</span>
+            <span className="text-xs text-(--color-text-secondary) mt-1">Level 7</span>
+          </div>
+        </div>
+
+        <div className="w-full bg-(--color-green-accent) rounded-full h-2">
+          <div className="bg-(--color-green-primary) h-2 rounded-full" style={{ width: "70%" }}></div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function BinSelect({
                      name,
                      active,
@@ -214,6 +255,35 @@ function BinMap() {
   )
 }
 
+function BottomNav() {
+  return (
+    <div className="shrink-0 border-t border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-black">
+      <div className="flex justify-around">
+      <Link href="../HomePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <FontAwesomeIcon icon={faHome} className="text-xl" />
+        <span className="text-xs font-medium">Home</span>
+      </Link>
+      <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <FontAwesomeIcon icon={faClock} className="text-xl" />
+        <span className="text-xs font-medium">Scanner</span>
+      </Link>
+      <button className="flex flex-col items-center gap-1 text-green-700">
+        <FontAwesomeIcon icon={faMap} className="text-xl" />
+        <span className="text-xs font-medium">Map</span>
+      </button>
+      <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <FontAwesomeIcon icon={faComments} className="text-xl" />
+        <span className="text-xs font-medium">SEB</span>
+      </Link>
+      <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <FontAwesomeIcon icon={faUser} className="text-xl" />
+        <span className="text-xs font-medium">Profile</span>
+      </Link>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -239,43 +309,27 @@ export default function Home() {
     }
     setIsLoading(false);
   }, [router]);
-  return (
-      <main className="flex min-h-screen flex-col bg-(--color-bg-main)">
-        <div className="bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
-          <div className="flex items-center justify-between gap-2 mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-(--color-text-on-green) rounded-full flex items-center justify-center text-(--color-green-primary) font-bold text-sm">
-                🤖
-              </div>
-              <h1 className="text-lg font-semibold font-(family-name:--font-header)">SEB: Eco Assistant</h1>
-            </div>
-            <Link
-              href="../SettingsPage"
-              className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium hover:bg-white/20 transition-colors"
-              aria-label="Settings"
-            >
-              <FontAwesomeIcon icon={faUserGear} className="text-sm" />
-              <span>Settings</span>
-            </Link>
-          </div>
-
-          <div className="bg-(--color-bg-card) rounded-xl p-4 shadow-sm">
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <p className="text-(--color-text-secondary) text-sm font-medium font-(family-name:--font-body)">Eco Legend in Training</p>
-                <p className="text-2xl font-bold text-(--color-text-primary) mt-1 font-(family-name:--font-header)">Karma Points: <span className="text-(--color-green-primary)">12,450</span></p>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-2xl">🏅</span>
-                <span className="text-xs text-(--color-text-secondary) mt-1">Level 7</span>
-              </div>
-            </div>
-
-            <div className="w-full bg-(--color-green-accent) rounded-full h-2">
-              <div className="bg-(--color-green-primary) h-2 rounded-full" style={{ width: "70%" }}></div>
-            </div>
-          </div>
+// Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-(--color-bg-card)">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-(--color-green-accent) border-t-(--color-green-primary) rounded-full animate-spin"></div>
+          <p className="text-(--color-text-secondary) font-(family-name:--font-body)">Loading...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (router will handle redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
+  return (
+      <main className="flex h-screen flex-col overflow-hidden bg-(--color-bg-main)">
+        <TopBar
+          userData={userData}
+        />
 
         <div className="flex-1 px-6 py-6 overflow-y-auto">
           <div className="mb-6 flex items-end justify-between gap-4">
@@ -290,28 +344,7 @@ export default function Home() {
           <BinMap />
         </div>
 
-        <div className="mt-auto border-t border-(--color-green-accent) bg-(--color-bg-card) px-6 py-4 flex justify-around">
-          <Link href="../HomePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
-            <FontAwesomeIcon icon={faHome} className="text-xl" />
-            <span className="text-xs font-medium font-(family-name:--font-body)">Home</span>
-          </Link>
-          <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
-            <FontAwesomeIcon icon={faClock} className="text-xl" />
-            <span className="text-xs font-medium font-(family-name:--font-body)">Scanner</span>
-          </Link>
-          <button className="flex cursor-pointer flex-col items-center gap-1 text-(--color-green-primary)">
-            <FontAwesomeIcon icon={faMap} className="text-xl" />
-            <span className="text-xs font-medium font-(family-name:--font-body)">Map</span>
-          </button>
-          <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
-            <FontAwesomeIcon icon={faComments} className="text-xl" />
-            <span className="text-xs font-medium font-(family-name:--font-body)">SEB</span>
-          </Link>
-          <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
-            <FontAwesomeIcon icon={faUser} className="text-xl" />
-            <span className="text-xs font-medium font-(family-name:--font-body)">Profile</span>
-          </Link>
-        </div>
+        <BottomNav />
       </main>
   );
 }

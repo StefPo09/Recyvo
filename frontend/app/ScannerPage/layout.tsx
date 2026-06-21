@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "Profile | Recyvo"
+  title: "Scanner | Recyvo"
 };
 
 export default function RootLayout({

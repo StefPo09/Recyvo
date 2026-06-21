@@ -113,10 +113,21 @@ export default function MapView({
         else if (t === "hartie" || t === "paper") color = "#3b82f6"; // blue for paper
         else if (t === "electronic") color = "#6b7280"; // neutral/grey
 
-        const marker = L.circleMarker([b.lat, b.lng], { radius: 8, color }).addTo(map);
-        // popup content (no delete button)
-        marker.bindPopup(`<div class=\\"text-sm\\"><div class=\\"font-semibold\\">${b.address || b.id}</div><div class=\\"text-xs\\">Type: ${b.bin_type}</div></div>`);
-        // no dblclick hide behavior here — filtering is handled by the parent page; MapView simply renders the `bins` prop it receives.
+         const marker = L.circleMarker([b.lat, b.lng], { radius: 8, color }).addTo(map);
+         // popup content with maps links
+         const googleMapsUrl = `https://www.google.com/maps?q=${b.lat},${b.lng}`;
+         const appleMapsUrl = `https://maps.apple.com/?daddr=${b.lat},${b.lng}`;
+         const popupContent = `
+           <div class="text-sm" style="max-width: 200px;">
+             <div class="font-semibold">${b.address || 'Recycling Bin'}</div>
+             <div class="text-xs text-gray-600 mb-2">Type: ${b.bin_type}</div>
+             <div class="flex gap-2">
+               <a href="${googleMapsUrl}" target="_blank" style="color: #4285F4; text-decoration: none; font-size: 0.75rem;">Google Maps</a>
+               <a href="${appleMapsUrl}" target="_blank" style="color: #555; text-decoration: none; font-size: 0.75rem;">Apple Maps</a>
+             </div>
+           </div>
+         `;
+         marker.bindPopup(popupContent);
         created.push(marker);
       } catch (e) {}
     });
@@ -125,8 +136,20 @@ export default function MapView({
     const createdPlaces: any[] = [];
     places.forEach((p) => {
       try {
-        const marker = L.circleMarker([p.latitude, p.longitude], { radius: 7, color: "#1e3a8a" }).addTo(map);
-        marker.bindPopup(`<div class=\\"text-sm\\"><div class=\\"font-semibold\\">${p.name}</div><div class=\\"text-xs\\">${p.address}</div></div>`);
+         const marker = L.circleMarker([p.latitude, p.longitude], { radius: 7, color: "#1e3a8a" }).addTo(map);
+         const googleMapsUrl = `https://www.google.com/maps?q=${p.latitude},${p.longitude}`;
+         const appleMapsUrl = `https://maps.apple.com/?daddr=${p.latitude},${p.longitude}`;
+         const popupContent = `
+           <div class="text-sm" style="max-width: 200px;">
+             <div class="font-semibold">${p.name}</div>
+             <div class="text-xs text-gray-600 mb-2">${p.address}</div>
+             <div class="flex gap-2">
+               <a href="${googleMapsUrl}" target="_blank" style="color: #4285F4; text-decoration: none; font-size: 0.75rem;">Google Maps</a>
+               <a href="${appleMapsUrl}" target="_blank" style="color: #555; text-decoration: none; font-size: 0.75rem;">Apple Maps</a>
+             </div>
+           </div>
+         `;
+         marker.bindPopup(popupContent);
         createdPlaces.push(marker);
       } catch (e) {}
     });
