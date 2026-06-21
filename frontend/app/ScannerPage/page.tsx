@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 
 const API_BASE_URL = "http://localhost:8000";
+import { addUserPoints, getUserById } from "@/lib/api";
 
 // ---------------------------------------------------------------------------
 // Tipuri care reflectă WasteResult din backend (main.py)
@@ -680,6 +681,27 @@ export default function ScannerPage() {
 
       const data: WasteResult = await response.json();
       setScanResult(data);
+      // Award points based on scan result and update backend + local state
+      try {
+        const stored = localStorage.getItem("user");
+        if (stored) {
+          const u = JSON.parse(stored);
+          // Decide points to award: recyclable items get more points
+          const pointsToAdd = data.is_recyclable ? 10 : 1;
+          if (u?.username) {
+            await addUserPoints(u.username, pointsToAdd);
+            // refresh user data from backend (to get updated nr_puncte)
+            if (u?.id) {
+              const fresh = await getUserById(u.id);
+              localStorage.setItem("user", JSON.stringify(fresh));
+              setUserData(fresh);
+            }
+          }
+        }
+      } catch (e) {
+        // silently ignore errors related to points updating
+        console.warn("Failed to award points:", e);
+      }
     } catch (error) {
       const message =
         error instanceof Error

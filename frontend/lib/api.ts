@@ -183,11 +183,28 @@ export async function loginUser({
 }
 
 export async function getUserById(userId: string) {
-  const res = await fetch(`${API_URL}/users/${encodeURIComponent(userId)}`);
+  const res = await fetch(`${API_URL}/users/${encodeURIComponent(userId)}`, {
+    cache: "no-store",
+  });
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Get user failed: ${res.status} ${text}`);
   }
+  return res.json();
+}
+
+export async function addUserPoints(username: string, pointsToAdd: number) {
+  const res = await fetch(`${API_URL}/users/${encodeURIComponent(username)}/points`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ puncte_adaugate: pointsToAdd }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Add points failed: ${res.status} ${text}`);
+  }
+
   return res.json();
 }
 

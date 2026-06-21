@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faMap, faClock, faHome, faUser, faComments, faUserGear } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import { getUserById } from "@/lib/api";
 
 function TopBar({userData}  : {userData: any}) {
   return(
@@ -86,11 +87,46 @@ export default function HomePage() {
     // Check if user is logged in
     const userExists = localStorage.getItem("user");
 
+    let cleanup: (() => void) | undefined;
+
     if (userExists) {
       try {
         const user = JSON.parse(userExists);
         setUserData(user);
         setIsAuthenticated(true);
+        // Refresh latest user data from backend (points etc.)
+        (async () => {
+          try {
+            if (user?.id) {
+              const fresh = await getUserById(user.id);
+              // merge and persist
+              localStorage.setItem("user", JSON.stringify(fresh));
+              setUserData(fresh);
+            }
+          } catch (e) {
+            // ignore network errors here; keep local data
+            console.warn("Failed to refresh user data:", e);
+          }
+        })();
+
+        // When the page becomes visible again (user returns from scanner), refresh points
+        const onVisibility = async () => {
+          try {
+            const cur = localStorage.getItem("user");
+            if (!cur) return;
+            const parsed = JSON.parse(cur);
+            if (parsed?.id) {
+              const fresh = await getUserById(parsed.id);
+              localStorage.setItem("user", JSON.stringify(fresh));
+              setUserData(fresh);
+            }
+          } catch (err) {
+            console.warn("visibility refresh failed:", err);
+          }
+        };
+
+        document.addEventListener("visibilitychange", onVisibility);
+        cleanup = () => document.removeEventListener("visibilitychange", onVisibility);
       } catch (e) {
         // Invalid user data, redirect to StartPage
         router.push("/StartPage");
@@ -99,7 +135,12 @@ export default function HomePage() {
       // No user logged in, redirect to StartPage
       router.push("/StartPage");
     }
+
     setIsLoading(false);
+
+    return () => {
+      if (cleanup) cleanup();
+    };
   }, [router]);
 // Show loading while checking authentication
   if (isLoading) {

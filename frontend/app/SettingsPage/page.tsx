@@ -109,12 +109,12 @@ const supportActions = [
 ];
 
 const translations: Record<string, Record<string, string>> = {
-  "Romanian (RO)": {
+    "Romanian (RO)": {
     Settings: "Setari",
     Home: "Acasa",
     "SEB: Eco Assistant": "SEB: Asistent Eco",
     "Eco Legend in Training": "Legenda eco in devenire",
-    Points: "Puncte",
+    "Karma Points": "Puncte",
     "Level 7": "Nivel 7",
     "Progress to Level 8": "Progres catre nivelul 8",
     Notifications: "Notificari",
@@ -233,7 +233,7 @@ const translations: Record<string, Record<string, string>> = {
     Home: "Startseite",
     "SEB: Eco Assistant": "SEB: Oeko-Assistent",
     "Eco Legend in Training": "Oeko-Legende im Training",
-    Points: "Punkte",
+    "Karma Points": "Punkte",
     "Level 7": "Stufe 7",
     "Progress to Level 8": "Fortschritt zu Stufe 8",
     Notifications: "Benachrichtigungen",
@@ -352,7 +352,7 @@ const translations: Record<string, Record<string, string>> = {
     Home: "Accueil",
     "SEB: Eco Assistant": "SEB : Assistant eco",
     "Eco Legend in Training": "Legende eco en formation",
-    Points: "Points",
+    "Karma Points": "Points",
     "Level 7": "Niveau 7",
     "Progress to Level 8": "Progression vers le niveau 8",
     Notifications: "Notifications",
@@ -471,7 +471,7 @@ const translations: Record<string, Record<string, string>> = {
     Home: "Inicio",
     "SEB: Eco Assistant": "SEB: Asistente eco",
     "Eco Legend in Training": "Leyenda eco en entrenamiento",
-    Points: "Puntos",
+    "Karma Points": "Puntos",
     "Level 7": "Nivel 7",
     "Progress to Level 8": "Progreso al nivel 8",
     Notifications: "Notificaciones",
@@ -965,7 +965,7 @@ export default function SettingsPage() {
                           isDark ? "text-white" : "text-black"
                       }`}
                   >
-                    {t("Points")}: <span className="text-green-700">12,450</span>
+                    {t("Karma Points")}: <span className="text-green-700">12,450</span>
                   </p>
                 </div>
                 <div className="flex flex-col items-center">
