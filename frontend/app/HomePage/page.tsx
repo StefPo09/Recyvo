@@ -1,16 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faMap, faClock, faHome, faUser, faComments, faUserGear } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import { useSettings } from "@/lib/SettingsContext";
 
 export default function HomePage() {
   const router = useRouter();
+  const { isDark, settings } = useSettings();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userData, setUserData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const mainClassName = useMemo(() => {
+    const textSizeClass =
+        settings.textSize === "Small"
+            ? "text-sm"
+            : settings.textSize === "Large"
+                ? "text-lg"
+                : "text-base";
+    const themeClass = isDark
+        ? "bg-zinc-900 text-white"
+        : "bg-zinc-100 text-zinc-950";
+    const contrastClass = (settings.toggles as Record<string, boolean>)["High contrast mode"]
+        ? "contrast-125"
+        : "";
+
+    return `${themeClass} ${textSizeClass} ${contrastClass}`;
+  }, [isDark, settings.textSize, settings.toggles]);
 
   useEffect(() => {
     // Check if user is logged in
@@ -49,9 +68,9 @@ export default function HomePage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-(--color-bg-card)">
+    <div className={`flex flex-col h-screen ${mainClassName}`}>
 
-      <div className="bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
+      <div className={`bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl ${isDark ? "from-green-900 to-green-800" : "from-green-600 to-green-500"}`}>
         <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-(--color-text-on-green) rounded-full flex items-center justify-center text-(--color-green-primary) font-bold text-sm">

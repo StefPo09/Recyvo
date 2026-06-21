@@ -1,6 +1,6 @@
 "use client";
 
-import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCamera,
@@ -14,9 +14,11 @@ import {
   faUser,
   faTriangleExclamation,
   faRecycle, faUserGear,
+  faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
+import { useSettings } from "@/lib/SettingsContext";
 
 const API_BASE_URL = "http://localhost:8000";
 
@@ -214,7 +216,7 @@ function CameraCaptureModal({
         }
       } catch {
         if (!cancelled) {
-          setErrorMessage("Camera access is unavailable. Please allow permissions or use storage instead.");
+          setErrorMessage("Camera access is not enabled. Please enable camera permissions from your device settings to use this feature.");
         }
       } finally {
         if (!cancelled) {
@@ -505,6 +507,17 @@ function ScanResultCard({ result }: { result: WasteResult }) {
                 </ul>
               </div>
           )}
+
+           {result.is_recyclable && (
+               <Link
+                   href={`../MapPage?category=${encodeURIComponent(result.waste_category)}`}
+                   className="inline-flex items-center gap-2 rounded-full bg-(--color-green-primary) px-4 py-2 text-sm font-semibold text-(--color-text-on-green) shadow-lg transition-colors hover:bg-(--color-green-primary) font-(family-name:--font-header) mt-2"
+               >
+                 <FontAwesomeIcon icon={faMap} />
+                 Find nearest bin
+                 <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
+               </Link>
+           )}
         </div>
       </div>
   );
@@ -626,28 +639,40 @@ export default function ScannerPage() {
   const [scanError, setScanError] = useState<string | null>(null);
   const previewUrl = useObjectUrl(selectedFile);
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isDark, settings } = useSettings();
+
+  const mainClassName = useMemo(() => {
+    const textSizeClass =
+        settings.textSize === "Small"
+            ? "text-sm"
+            : settings.textSize === "Large"
+                ? "text-lg"
+                : "text-base";
+    const themeClass = isDark
+        ? "bg-zinc-900 text-white"
+        : "bg-zinc-100 text-zinc-950";
+    const contrastClass = (settings.toggles as Record<string, boolean>)["High contrast mode"]
+        ? "contrast-125"
+        : "";
+
+    return `${themeClass} ${textSizeClass} ${contrastClass}`;
+  }, [isDark, settings.textSize, settings.toggles]);
 
   useEffect(() => {
     // Check if user is logged in
     const userExists = localStorage.getItem("user");
 
-    if (userExists) {
+    if (!userExists) {
+      // No user logged in, redirect to StartPage
+      router.push("/StartPage");
+    } else {
       try {
-        const user = JSON.parse(userExists);
-        setUserData(user);
-        setIsAuthenticated(true);
+        JSON.parse(userExists); // Validate JSON
       } catch (e) {
         // Invalid user data, redirect to StartPage
         router.push("/StartPage");
       }
-    } else {
-      // No user logged in, redirect to StartPage
-      router.push("/StartPage");
     }
-    setIsLoading(false);
   }, [router]);
 
   function handleGalleryChange(event: ChangeEvent<HTMLInputElement>) {
@@ -715,7 +740,7 @@ export default function ScannerPage() {
   }
 
   return (
-      <div className="flex min-h-screen flex-col bg-(--color-bg-main) font-(family-name:--font-body)">
+      <div className={`flex min-h-screen flex-col font-(family-name:--font-body) ${mainClassName}`}>
         <ScannerHeader />
 
         <ScannerBody

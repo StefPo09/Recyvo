@@ -1,6 +1,5 @@
-// Avoid referencing the `process` global type directly (which can cause TS errors in the browser
-// build). Use globalThis as any to safely read environment-injected values when available.
-const API_URL = ((globalThis as any).process?.env?.NEXT_PUBLIC_API_URL) || "http://localhost:8000";
+// Use NEXT_PUBLIC_API_URL from environment or default to localhost:8000
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 type AnalyzeRequest = {
   image: string; // base64 without prefix
@@ -220,3 +219,38 @@ export async function uploadProfileImage(userId: string, imageFile: File) {
   return res.json();
 }
 
+export async function deleteUser(userId: string) {
+  const res = await fetch(`${API_URL}/users/${encodeURIComponent(userId)}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Delete user failed: ${res.status} ${text}`);
+  }
+  return res.json();
+}
+
+export async function getUserPreferences(userId: string) {
+  const res = await fetch(`${API_URL}/users/${encodeURIComponent(userId)}/preferences`);
+  if (!res.ok) {
+    if (res.status === 404) {
+      return {}; // Return empty preferences if user not found
+    }
+    const text = await res.text();
+    throw new Error(`Get preferences failed: ${res.status} ${text}`);
+  }
+  return res.json();
+}
+
+export async function saveUserPreferences(userId: string, preferences: any) {
+  const res = await fetch(`${API_URL}/users/${encodeURIComponent(userId)}/preferences`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(preferences),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Save preferences failed: ${res.status} ${text}`);
+  }
+  return res.json();
+}

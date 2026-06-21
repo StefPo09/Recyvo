@@ -11,8 +11,9 @@ import {
   faUser, faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import {useState, type Dispatch, type KeyboardEvent, type ChangeEvent, type SetStateAction, useEffect} from "react";
+import {useState, type Dispatch, type KeyboardEvent, type ChangeEvent, type SetStateAction, useEffect, useMemo} from "react";
 import {useRouter} from "next/navigation";
+import { useSettings } from "@/lib/SettingsContext";
 
 type ChatSender = "user" | "robot";
 
@@ -206,6 +207,24 @@ function BottomNav() {
 export default function Home() {
   const [chatMessages, setChatMessages] = useState<ChatEntry[]>([]);
   const router = useRouter();
+  const { isDark, settings } = useSettings();
+
+  const mainClassName = useMemo(() => {
+    const textSizeClass =
+        settings.textSize === "Small"
+            ? "text-sm"
+            : settings.textSize === "Large"
+                ? "text-lg"
+                : "text-base";
+    const themeClass = isDark
+        ? "bg-zinc-900 text-white"
+        : "bg-zinc-100 text-zinc-950";
+    const contrastClass = (settings.toggles as Record<string, boolean>)["High contrast mode"]
+        ? "contrast-125"
+        : "";
+
+    return `${themeClass} ${textSizeClass} ${contrastClass}`;
+  }, [isDark, settings.textSize, settings.toggles]);
 
   useEffect(() => {
     // simple redirect if no user in localStorage
@@ -213,8 +232,8 @@ export default function Home() {
     if (!userExists) router.push("/StartPage");
   }, [router]);
   return (
-    <main className="flex h-screen flex-col bg-(--color-bg-main) text-(--color-text-primary)">
-      <div className="bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
+    <main className={`flex h-screen flex-col ${mainClassName}`}>
+      <div className={`bg-linear-to-r text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl ${isDark ? "from-green-900 to-green-800" : "from-green-600 to-green-500"}`}>
         <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-(--color-text-on-green) rounded-full flex items-center justify-center text-(--color-green-primary) font-bold text-sm">

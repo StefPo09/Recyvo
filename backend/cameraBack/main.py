@@ -103,6 +103,16 @@ class UserUpdate(BaseModel):
     parola: Optional[str] = None
 
 
+class UserPreferences(BaseModel):
+    toggles: Dict = {}
+    materials: Dict = {}
+    language: str = "English (US)"
+    theme: str = "Dark"
+    maxDistance: str = "1 km"
+    distanceUnit: str = "Kilometers"
+    textSize: str = "Medium"
+
+
 # ---------------------------------------------------------------------------
 # Prompts & Dicționare de Căutare
 # ---------------------------------------------------------------------------
@@ -181,6 +191,7 @@ def init_db():
                      email TEXT UNIQUE NOT NULL,
                      parola TEXT NOT NULL,
                      profile_image TEXT,
+                     preferences TEXT DEFAULT '{}',
                      nr_puncte INTEGER DEFAULT 0,
                      created_at TEXT DEFAULT (datetime('now'))
                  )
@@ -192,6 +203,9 @@ def init_db():
         cols = [r[1] for r in conn.execute("PRAGMA table_info(users)").fetchall()]
         if "profile_image" not in cols:
             conn.execute("ALTER TABLE users ADD COLUMN profile_image TEXT")
+            conn.commit()
+        if "preferences" not in cols:
+            conn.execute("ALTER TABLE users ADD COLUMN preferences TEXT DEFAULT '{}'")
             conn.commit()
     except Exception:
         # If the users table does not exist yet or PRAGMA fails, ignore — create above will handle it.
@@ -711,6 +725,68 @@ def upload_profile_image(user_id: str, image: UploadFile = File(...)):
     if not row:
         raise HTTPException(status_code=404, detail="Utilizatorul nu a fost găsit.")
     return dict(row)
+
+
+@app.delete("/users/{user_id}", summary="Șterge un utilizator")
+def delete_user(user_id: str):
+    conn = get_db()
+    row = conn.execute("SELECT profile_image FROM users WHERE id = ?", (user_id,)).fetchone()
+    
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Utilizatorul nu a fost găsit.")
+    
+    # Delete profile image file if it exists
+    if row["profile_image"]:
+        try:
+            filepath = os.path.join(".", row["profile_image"])
+            if os.path.exists(filepath):
+                os.remove(filepath)
+        except Exception:
+            pass  # Ignore file deletion errors
+    
+    # Delete user from database
+    conn.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+    
+    return {"success": True, "deleted_id": user_id, "message": "Utilizator șters cu succes."}
+
+
+@app.get("/users/{user_id}/preferences", summary="Obține preferințele unui utilizator")
+def get_user_preferences(user_id: str):
+    conn = get_db()
+    row = conn.execute("SELECT preferences FROM users WHERE id = ?", (user_id,)).fetchone()
+    conn.close()
+
+    if not row:
+        raise HTTPException(status_code=404, detail="Utilizatorul nu a fost găsit.")
+
+    try:
+        preferences = json.loads(row["preferences"]) if row["preferences"] else {}
+    except:
+        preferences = {}
+
+    return preferences
+
+
+@app.put("/users/{user_id}/preferences", summary="Salvează preferințele unui utilizator")
+def save_user_preferences(user_id: str, preferences: UserPreferences):
+    conn = get_db()
+
+    # Check if user exists
+    row = conn.execute("SELECT id FROM users WHERE id = ?", (user_id,)).fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Utilizatorul nu a fost găsit.")
+
+    # Save preferences as JSON
+    prefs_json = json.dumps(preferences.dict())
+    conn.execute("UPDATE users SET preferences = ? WHERE id = ?", (prefs_json, user_id))
+    conn.commit()
+    conn.close()
+
+    return {"success": True, "message": "Preferințele au fost salvate."}
 
 
 # ---------------------------------------------------------------------------
