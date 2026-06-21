@@ -20,20 +20,20 @@ function Input({ name, value, setValue, hasError, errorMessage }: { name: string
     <div className="w-full max-w-sm mx-auto mt-5">
       <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition duration-300 backdrop-blur-sm
         ${hasError 
-          ? 'bg-red-50 dark:bg-red-950/20 border-red-400 dark:border-red-600' 
+          ? 'bg-red-50 border-red-400' 
           : focused 
-          ? 'bg-white dark:bg-gray-900 border-emerald-500 dark:border-emerald-400 shadow-md shadow-emerald-200/50 dark:shadow-emerald-900/50' 
-          : 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700'}`}
+          ? 'bg-(--color-bg-card) border-(--color-green-primary) shadow-md shadow-(--color-green-accent)' 
+          : 'bg-(--color-bg-card) border-(--color-green-accent)'}`}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       >
         {name === 'Username or Email' ? (
           <FiUser className={`shrink-0 transition duration-300 ${
-            hasError ? 'text-red-500' : focused ? 'text-emerald-500' : 'text-gray-500 dark:text-gray-400'
+            hasError ? 'text-red-500' : focused ? 'text-(--color-green-primary)' : 'text-(--color-text-secondary)'
           }`} size={20} />
         ) : (
           <FiLock className={`shrink-0 transition duration-300 ${
-            hasError ? 'text-red-500' : focused ? 'text-emerald-500' : 'text-gray-500 dark:text-gray-400'
+            hasError ? 'text-red-500' : focused ? 'text-(--color-green-primary)' : 'text-(--color-text-secondary)'
           }`} size={20} />
         )}
 
@@ -42,7 +42,7 @@ function Input({ name, value, setValue, hasError, errorMessage }: { name: string
           placeholder={name}
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          className="w-full bg-transparent outline-none text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 text-base font-medium"
+          className="w-full bg-transparent text-base font-medium text-(--color-text-primary) placeholder-(--color-text-secondary) outline-none font-(family-name:--font-body)"
         />
 
         {name === 'Password' ? (
@@ -50,15 +50,15 @@ function Input({ name, value, setValue, hasError, errorMessage }: { name: string
             type="button"
             onClick={toggleVisibility}
             className={`shrink-0 transition duration-300 focus:outline-none ${
-              hasError ? 'text-red-500' : focused ? 'text-emerald-500' : 'text-gray-500 dark:text-gray-400'
-            } hover:text-emerald-500 dark:hover:text-emerald-400 cursor-pointer`}
+              hasError ? 'text-red-500' : focused ? 'text-(--color-green-primary)' : 'text-(--color-text-secondary)'
+            } cursor-pointer hover:text-(--color-green-primary)`}
           >
             {visible ? <IoMdEyeOff size={20} /> : <IoMdEye size={20} />}
           </button>
         ) : null}
       </div>
       {errorMessage ? (
-        <p className="mt-2 text-sm text-red-500 max-w-sm mx-auto">{errorMessage}</p>
+        <p className="mx-auto mt-2 max-w-sm text-sm text-red-500 font-(family-name:--font-body)">{errorMessage}</p>
       ) : null}
     </div>
   )
@@ -120,14 +120,14 @@ function LogIn() {
 
   return (
     <>
-      <h1 className="mt-6 mb-2 text-center text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+      <h1 className="mb-2 text-center text-[28px] font-bold leading-tight text-(--color-text-primary) font-(family-name:--font-logo)">
         Welcome Back
       </h1>
-      <p className="mb-8 text-center text-gray-600 dark:text-gray-400 text-sm">Log in to your account</p>
+      <p className="mb-6 text-center text-sm text-(--color-text-secondary) font-(family-name:--font-body)">Log in to your account</p>
 
       <div className={`mb-3 px-4 py-3 rounded-lg text-center text-sm font-medium transition duration-300 ${
         error 
-          ? 'bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-800' 
+          ? 'bg-red-50 text-red-700 border border-red-300' 
           : 'hidden'
       }`}>
         {error}
@@ -155,7 +155,7 @@ function LogIn() {
              type="button"
              onClick={handleSubmit}
              disabled={!isFormValid || isLoading}
-             className={`mt-8 mb-4 mx-auto max-w-sm w-full px-4 py-3 ${isFormValid && !isLoading ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 cursor-pointer' : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'} text-white font-semibold rounded-lg transition duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 transform`}
+             className={`mt-8 mb-4 mx-auto flex h-14 w-full max-w-sm items-center justify-center gap-2 rounded-lg text-base font-bold text-(--color-text-on-green) shadow-lg transition font-(family-name:--font-header) ${isFormValid && !isLoading ? 'cursor-pointer bg-(--color-green-primary) hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-(--color-green-primary)/30' : 'cursor-not-allowed bg-(--color-text-secondary) opacity-60'}`}
            >
              {isLoading ? (
                <>
@@ -177,34 +177,55 @@ function LogIn() {
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col bg-(--color-bg-main) text-(--color-text-primary) px-4 py-8 sm:py-12">
-      <div className="max-w-md mx-auto">
-        <div className="text-center mb-8">
-          <div className="inline-block">
+    <main className="flex min-h-screen items-center justify-center bg-(--color-bg-main) px-5 py-6 text-(--color-text-primary)">
+      <section className="flex w-full max-w-md flex-col items-center overflow-hidden rounded-3xl bg-(--color-bg-card) shadow-lg">
+        <div className="w-full rounded-b-3xl bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) px-6 pb-8 pt-8 text-center text-(--color-text-on-green) shadow-lg">
+          <div className="mx-auto mb-5 flex h-36 w-36 items-center justify-center rounded-full bg-(--color-text-on-green) shadow-lg">
             <Image
               src={logo}
-              alt="LOGO"
-              width={150}
-              height={150}
-              className="object-contain"
+              alt="Recyvo logo"
+              height={118}
+              width={118}
+              priority
             />
           </div>
+
+          <div className="mb-3 text-sm font-medium uppercase tracking-wider text-white/75 font-(family-name:--font-header)">
+            Smart city sorting
+          </div>
+          <h1 className="text-[28px] font-bold leading-tight font-(family-name:--font-logo)">
+            Welcome back.
+          </h1>
+          <p className="mt-2 text-[20px] font-medium text-white/85 font-(family-name:--font-header)">
+            Scan. Sort. Share.
+          </p>
         </div>
 
-        <div className="bg-(--color-bg-card) dark:bg-gray-950 rounded-2xl shadow-xl border border-(--color-bg-card) overflow-hidden text-(--color-text-primary)">
-          <div className="bg-linear-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50 px-6 py-4 border-b border-(--color-green-accent)">
-            <h2 className="text-(--color-text-secondary)] text-xs font-semibold uppercase tracking-widest font-(family-name:--font-body)">Log In</h2>
+        <div className="w-full px-6 pb-7 pt-6">
+          <div className="mb-5 rounded-xl border-l-4 border-(--color-green-primary) bg-(--color-bg-main) p-4">
+            <p className="font-semibold text-(--color-text-primary) font-(family-name:--font-header)">
+              Continue where you left off
+            </p>
+            <p className="mt-1 text-sm leading-6 text-(--color-text-secondary) font-(family-name:--font-body)">
+              Log in to access the scanner, map, and your saved progress.
+            </p>
           </div>
 
-          <div className="px-6 py-8">
-            <LogIn />
-          </div>
+          <LogIn />
 
-          <div className="px-6 py-4 bg-(--color-bg-card) border-t border-(--color-green-accent) text-center text-xs text-(--color-text-secondary)">
-            <p>Don't have an account? <a href="../SignUpPage" className="text-(--color-green-primary) hover:opacity-90 font-semibold transition">Sign up</a></p>
+          <div className="mt-5 text-center text-sm text-(--color-text-secondary) font-(family-name:--font-body)">
+            <p>
+              Don&apos;t have an account?{" "}
+              <a
+                href="../SignUpPage"
+                className="font-semibold text-(--color-green-primary) transition hover:opacity-90"
+              >
+                Sign up
+              </a>
+            </p>
           </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 }
