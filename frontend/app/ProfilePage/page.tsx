@@ -18,9 +18,10 @@ import {
   faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
 import {useRouter} from "next/navigation";
-import {useEffect, useState, useRef, type ReactNode} from "react";
+import {useEffect, useState, useRef, type ReactNode, useMemo} from "react";
 import Link from "next/link";
-import { getUserById, updateUser, uploadProfileImage } from "@/lib/api";
+import { getUserById, updateUser, uploadProfileImage, deleteUser } from "@/lib/api";
+import { useSettings } from "@/lib/SettingsContext";
 
 type ProfileData = {
   username: string;
@@ -211,10 +212,24 @@ function BottomNav() {
 
 export default function Home() {
   const router = useRouter();
+  const { isDark, settings } = useSettings();
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [savedProfile, setSavedProfile] = useState<ProfileData>(initialProfile);
-  const [draftProfile, setDraftProfile] = useState<ProfileData>(initialProfile);
+  const mainClassName = useMemo(() => {
+    const textSizeClass =
+        settings.textSize === "Small"
+            ? "text-sm"
+            : settings.textSize === "Large"
+                ? "text-lg"
+                : "text-base";
+    const themeClass = isDark
+        ? "bg-zinc-900 text-white"
+        : "bg-zinc-100 text-zinc-950";
+    const contrastClass = (settings.toggles as Record<string, boolean>)["High contrast mode"]
+        ? "contrast-125"
+        : "";
+
+    return `${themeClass} ${textSizeClass} ${contrastClass}`;
+  }, [isDark, settings.textSize, settings.toggles]);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -240,12 +255,21 @@ export default function Home() {
           email: resp.email || current.email,
           profileImage: resp.profile_image || current.profileImage,
         }));
-      } catch (err) {
-        console.error("Failed to fetch user:", err);
-        router.push("/StartPage");
-      }
+       } catch (err) {
+         console.error("Failed to fetch user:", err);
+         // If it's a network error, show helpful message
+         const errorMsg = err instanceof Error ? err.message : String(err);
+         if (errorMsg.includes("Failed to fetch") || errorMsg.includes("Network error")) {
+           alert("Failed to load profile. Please make sure the backend is running and accessible at: " + ((globalThis as any).process?.env?.NEXT_PUBLIC_API_URL || "http://localhost:8000"));
+         }
+         router.push("/StartPage");
+       }
     })();
   }, [router]);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [savedProfile, setSavedProfile] = useState<ProfileData>(initialProfile);
+  const [draftProfile, setDraftProfile] = useState<ProfileData>(initialProfile);
 
   const profile = isEditing ? draftProfile : savedProfile;
 
@@ -327,41 +351,32 @@ export default function Home() {
   function handleDeleteAccount() {
     const ok = confirm("Are you sure you want to delete your account? This action cannot be undone.");
     if (!ok) return;
-    // Actually delete account from backend
+
     const userId = localStorage.getItem("userId");
     if (!userId) {
-      alert("Error: User ID not found.");
+      alert("Not authenticated");
       return;
     }
 
     (async () => {
       try {
-        // Dynamic import to avoid static TS resolution issues in some dev setups
-        const mod = await import("../../lib/api");
-        // access as any to avoid editor/typecheck complaining in some environments
-        const deleteFn = (mod as any).deleteUser as (id: string) => Promise<any>;
-        if (typeof deleteFn !== "function") {
-          // avoid throwing inside the same try/catch (ESLint warning) — show user-friendly message instead
-          alert("Delete function not available. Please try again later.");
-          return;
-        }
-
-        await deleteFn(userId);
-        // Clear all auth data from localStorage
-        localStorage.removeItem("user");
+        await deleteUser(userId);
+        // Clear all localStorage
         localStorage.removeItem("userId");
+        localStorage.removeItem("user");
         // Redirect to StartPage
         router.push("/StartPage");
+        alert("Account deleted successfully.");
       } catch (err: any) {
         console.error("Failed to delete account:", err);
-        alert(err.message || "Failed to delete account. Please try again.");
+        alert(err.message || "Failed to delete account.");
       }
     })();
   }
 
   return (
-    <main className="flex h-screen flex-col bg-(--color-bg-main)">
-      <div className="flex h-full w-full flex-col bg-(--color-bg-card) text-(--color-text-primary) shadow-2xl">
+    <main className={`flex h-screen flex-col ${mainClassName}`}>
+      <div className={`flex h-full w-full flex-col shadow-2xl ${isDark ? "bg-gray-950" : "bg-white"}`}>
         <TopHeader />
 
         <section className="flex-1 overflow-y-auto px-4 py-4">
@@ -374,8 +389,8 @@ export default function Home() {
 
               <ProfileAvatar image={profile.profileImage} isEditing={isEditing} onImageChange={handleImageChange} />
 
-              <p className="mt-5 text-2xl font-bold text-(--color-text-primary) font-(family-name:--font-header)">{profile.fullName}</p>
-              <p className="mt-3 text-sm font-semibold text-(--color-text-secondary) font-(family-name:--font-body)">{profile.email}</p>
+              <p className="mt-5 text-2xl font-bold text-(--color-text-primary) font-(family-name:--font-header)"> {profile.fullName}</p>
+              <p className="mt-3 text-sm font-semibold text-(--color-text-secondary) font-(family-name:--font-body)"> {profile.email}</p>
 
               <div className="mt-6 flex justify-center gap-3">
                 {isEditing ? (
@@ -440,14 +455,18 @@ export default function Home() {
 
             {isEditing && (
               <div className="mt-10">
-                <Link
-                  href="../StartPage"
+                <button
+                  onClick={() => {
+                    localStorage.removeItem("userId");
+                    localStorage.removeItem("user");
+                    router.push("/StartPage");
+                  }}
                   className="flex w-full items-center justify-center gap-3 rounded-full bg-red-600 px-6 py-4 text-base font-bold text-white shadow-lg transition-colors hover:bg-red-700"
                   style={{ fontFamily: 'var(--font-header)' }}
                 >
                   <FontAwesomeIcon icon={faRightFromBracket} />
                   Logout
-                </Link>
+                </button>
                 <div className="mt-4">
                   <button
                     type="button"

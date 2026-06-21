@@ -13,10 +13,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { FiGrid } from 'react-icons/fi';
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { listBins, findNearest, fetchRecyclingPlaces } from "@/lib/api";
-import {useRouter} from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
+import { useSettings } from "@/lib/SettingsContext";
 
 // dynamic import of client-side MapView; typed as any to avoid SSR/type checks
 // @ts-ignore
@@ -63,10 +64,27 @@ function BinSelect({
 }
 
 function BinMap() {
-  const [bin, setBin] = useState("All");
-  const [bins, setBins] = useState<any[]>([]);
-  const [places, setPlaces] = useState<any[]>([]);
-  const [nearest, setNearest] = useState<any | null>(null);
+   const searchParams = useSearchParams();
+   const categoryParam = searchParams.get("category");
+
+   // Map backend waste_category to UI bin type
+   const mapCategoryToBin = (category: string | null): string => {
+     if (!category) return "All";
+     const lowerCat = category.toLowerCase();
+     if (lowerCat === "plastic") return "Plastic and Metal";
+     if (lowerCat === "hartie_carton" || lowerCat === "hartie") return "Paper";
+     if (lowerCat === "sticla" || lowerCat === "glass") return "Glass";
+     if (lowerCat === "metal") return "Plastic and Metal";
+     if (lowerCat === "electronics" || lowerCat === "electronic") return "Household";
+     if (lowerCat === "batteries") return "Household";
+     if (lowerCat === "organic" || lowerCat === "hazardous") return "Household";
+     return "All";
+   };
+
+   const [bin, setBin] = useState(() => mapCategoryToBin(categoryParam));
+   const [bins, setBins] = useState<any[]>([]);
+   const [places, setPlaces] = useState<any[]>([]);
+   const [nearest, setNearest] = useState<any | null>(null);
 
   async function ShowTrashBins(selectedBin: string) {
     // map UI category to backend bin_type and place category
@@ -96,13 +114,26 @@ function BinMap() {
         } catch (err) {
           // ignore
         }
+      }, (err) => {
+        // Location permission denied
+        if (err.code === 1) { // PERMISSION_DENIED
+          alert("Location access is disabled. Please enable location permissions in your device settings to find nearby recycling bins.");
+        }
       });
     }
   }
 
-  const binOptions = ["All", "Plastic and Metal", "Paper", "Glass", "Household"];
+   const binOptions = ["All", "Plastic and Metal", "Paper", "Glass", "Household"];
 
-  useEffect(() => {
+    // Auto-trigger bin selection when category param is set
+    useEffect(() => {
+      if (categoryParam) {
+        const selectedBin = mapCategoryToBin(categoryParam);
+        setBin(selectedBin);
+      }
+    }, [categoryParam]);
+
+   useEffect(() => {
     let mounted = true;
 
     async function load() {
@@ -143,6 +174,11 @@ function BinMap() {
             }
           } catch (e) {
             // ignore
+          }
+        }, (err) => {
+          // Location permission denied
+          if (err.code === 1) { // PERMISSION_DENIED
+            alert("Location access is disabled. Please enable location permissions in your device settings to find nearby recycling bins.");
           }
         });
       }
@@ -216,32 +252,38 @@ function BinMap() {
 
 export default function Home() {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isDark, settings } = useSettings();
+
+  const mainClassName = useMemo(() => {
+    const textSizeClass =
+        settings.textSize === "Small"
+            ? "text-sm"
+            : settings.textSize === "Large"
+                ? "text-lg"
+                : "text-base";
+    const themeClass = isDark
+        ? "bg-zinc-900 text-white"
+        : "bg-zinc-100 text-zinc-950";
+    const contrastClass = (settings.toggles as Record<string, boolean>)["High contrast mode"]
+        ? "contrast-125"
+        : "";
+
+    return `${themeClass} ${textSizeClass} ${contrastClass}`;
+  }, [isDark, settings.textSize, settings.toggles]);
 
   useEffect(() => {
     // Check if user is logged in
     const userExists = localStorage.getItem("user");
 
-    if (userExists) {
-      try {
-        const user = JSON.parse(userExists);
-        setUserData(user);
-        setIsAuthenticated(true);
-      } catch (e) {
-        // Invalid user data, redirect to StartPage
-        router.push("/StartPage");
-      }
-    } else {
+    if (!userExists) {
       // No user logged in, redirect to StartPage
       router.push("/StartPage");
     }
-    setIsLoading(false);
   }, [router]);
+
   return (
-      <main className="flex min-h-screen flex-col bg-(--color-bg-main)">
-        <div className="bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
+      <main className={`flex min-h-screen flex-col ${mainClassName}`}>
+        <div className={`bg-linear-to-r text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl ${isDark ? "from-green-900 to-green-800" : "from-green-600 to-green-500"}`}>
           <div className="flex items-center justify-between gap-2 mb-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-(--color-text-on-green) rounded-full flex items-center justify-center text-(--color-green-primary) font-bold text-sm">
@@ -275,6 +317,7 @@ export default function Home() {
               <div className="bg-(--color-green-primary) h-2 rounded-full" style={{ width: "70%" }}></div>
             </div>
           </div>
+
         </div>
 
         <div className="flex-1 px-6 py-6 overflow-y-auto">
@@ -287,7 +330,9 @@ export default function Home() {
               Nearby bins
             </div>
           </div>
-          <BinMap />
+          <Suspense fallback={<div>Loading...</div>}>
+            <BinMap />
+          </Suspense>
         </div>
 
         <div className="mt-auto border-t border-(--color-green-accent) bg-(--color-bg-card) px-6 py-4 flex justify-around">
