@@ -1,6 +1,12 @@
 // Use NEXT_PUBLIC_API_URL from environment or default to localhost:8000
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+type UserPreferences = Record<string, unknown>;
+
+function getErrorMessage(err: unknown) {
+  return err instanceof Error ? err.message : String(err);
+}
+
 type AnalyzeRequest = {
   image: string; // base64 without prefix
   mime_type?: string;
@@ -16,9 +22,11 @@ export async function analyzeImage(req: AnalyzeRequest) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(req),
     });
-  } catch (err: any) {
-    const msg = String(err?.message || err);
-    throw new Error(`Network error when calling ${API_URL}/analyze: ${msg}. Is the backend running and reachable?`);
+  } catch (err: unknown) {
+    const msg = getErrorMessage(err);
+    throw new Error(`Network error when calling ${API_URL}/analyze: ${msg}. Is the backend running and reachable?`, {
+      cause: err,
+    });
   }
 
   if (!res.ok) {
@@ -90,10 +98,12 @@ export async function addBin({
       method: "POST",
       body: form,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     // network error / CORS / backend not reachable
-    const msg = String(err?.message || err);
-    throw new Error(`Network error when calling ${API_URL}/bins/: ${msg}. Is the backend running and reachable?`);
+    const msg = getErrorMessage(err);
+    throw new Error(`Network error when calling ${API_URL}/bins/: ${msg}. Is the backend running and reachable?`, {
+      cause: err,
+    });
   }
 
   if (!res.ok) {
@@ -139,9 +149,11 @@ export async function signupUser({
         parola,
       }),
     });
-  } catch (err: any) {
-    const msg = String(err?.message || err);
-    throw new Error(`Network error when calling ${API_URL}/users/: ${msg}. Is the backend running and reachable?`);
+  } catch (err: unknown) {
+    const msg = getErrorMessage(err);
+    throw new Error(`Network error when calling ${API_URL}/users/: ${msg}. Is the backend running and reachable?`, {
+      cause: err,
+    });
   }
 
   if (!res.ok) {
@@ -169,9 +181,11 @@ export async function loginUser({
         parola,
       }),
     });
-  } catch (err: any) {
-    const msg = String(err?.message || err);
-    throw new Error(`Network error when calling ${API_URL}/users/login: ${msg}. Is the backend running and reachable?`);
+  } catch (err: unknown) {
+    const msg = getErrorMessage(err);
+    throw new Error(`Network error when calling ${API_URL}/users/login: ${msg}. Is the backend running and reachable?`, {
+      cause: err,
+    });
   }
 
   if (!res.ok) {
@@ -259,7 +273,7 @@ export async function getUserPreferences(userId: string) {
   return res.json();
 }
 
-export async function saveUserPreferences(userId: string, preferences: any) {
+export async function saveUserPreferences(userId: string, preferences: UserPreferences) {
   const res = await fetch(`${API_URL}/users/${encodeURIComponent(userId)}/preferences`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },

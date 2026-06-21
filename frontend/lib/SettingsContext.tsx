@@ -92,7 +92,9 @@ export function SettingsProvider({
     useEffect(() => {
         // First, try to load from backend if user is logged in
         try {
-            const userId = typeof window !== 'undefined' ? window.localStorage.getItem("userId") : null;
+            // Read stored userId but guard against the literal strings 'undefined' or 'null'
+            const rawUserId = typeof window !== 'undefined' ? window.localStorage.getItem("userId") : null;
+            const userId = rawUserId && rawUserId !== 'undefined' && rawUserId !== 'null' ? rawUserId : null;
             if (userId) {
                 // Async load from backend
                 getUserPreferences(userId)
@@ -164,25 +166,32 @@ export function SettingsProvider({
         }
         
         // Also save to backend if user is logged in
-        try {
-            const userId = typeof window !== 'undefined' ? window.localStorage.getItem("userId") : null;
-            if (userId) {
-                console.debug("Syncing settings to backend for user:", userId);
-                saveUserPreferences(userId, settings)
-                    .then((result) => {
-                        console.debug("Settings synced to backend successfully:", result);
-                        setSavedMessage("✓ Synced to backend - click Save Preferences to finalize");
-                        // Don't set hasUnsavedChanges to false here
-                        // Let user manually click Save button
-                    })
-                    .catch((err) => {
-                        console.error("Failed to sync settings to backend:", err);
-                        setSavedMessage("⚠ Sync failed - click Save Preferences to retry");
-                    });
-            }
-        } catch (err) {
-            console.error("Error syncing settings:", err);
-        }
+         try {
+             const rawUserId = typeof window !== 'undefined' ? window.localStorage.getItem("userId") : null;
+             const userId = rawUserId && rawUserId !== 'undefined' && rawUserId !== 'null' ? rawUserId : null;
+             if (userId) {
+                 console.debug("Syncing settings to backend for user:", userId);
+                 saveUserPreferences(userId, settings)
+                     .then((result) => {
+                         console.debug("Settings synced to backend successfully:", result);
+                         setSavedMessage("✓ Synced to backend - click Save Preferences to finalize");
+                         // Don't set hasUnsavedChanges to false here
+                         // Let user manually click Save button
+                     })
+                     .catch((err) => {
+                         // Handle 404 gracefully - user might not exist yet on backend
+                         if (err.message && err.message.includes("404")) {
+                             console.debug("User not found on backend (404), will retry on next manual save");
+                             setSavedMessage("⚡ Changes made - click Save Preferences to confirm");
+                         } else {
+                             console.error("Failed to sync settings to backend:", err);
+                             setSavedMessage("⚠ Sync failed - click Save Preferences to retry");
+                         }
+                     });
+             }
+         } catch (err) {
+             console.error("Error syncing settings:", err);
+         }
     }, [settings, isInitialLoad]);
 
     const resolvedTheme = settings.theme === "Device" ? browserTheme : (settings.theme as "Light" | "Dark");
@@ -279,37 +288,50 @@ export function SettingsProvider({
     }
 
     // Manual save function that returns a promise
-    async function savePreferencesManually(): Promise<boolean> {
-        console.debug("Manual save triggered");
+     async function savePreferencesManually(): Promise<boolean> {
+         console.debug("Manual save triggered");
 
-        // Save to localStorage
-        try {
-            window.localStorage.setItem(storageKey, JSON.stringify(settings));
-        } catch (err) {
-            console.error("Failed to save to localStorage:", err);
-            return false;
-        }
+         // Save to localStorage
+         try {
+             window.localStorage.setItem(storageKey, JSON.stringify(settings));
+         } catch (err) {
+             console.error("Failed to save to localStorage:", err);
+             return false;
+         }
 
-        // Save to backend
-        try {
-            const userId = typeof window !== 'undefined' ? window.localStorage.getItem("userId") : null;
-            if (userId) {
-                await saveUserPreferences(userId, settings);
-                console.debug("Manual save to backend successful");
-                setSavedMessage("✓ All preferences saved successfully!");
-                setHasUnsavedChanges(false);
-                return true;
-            } else {
-                setSavedMessage("✓ Preferences saved locally");
-                setHasUnsavedChanges(false);
-                return true;
-            }
-        } catch (err) {
-            console.error("Failed to manually save to backend:", err);
-            setSavedMessage("Error saving - please try again");
-            return false;
-        }
-    }
+         // Save to backend
+         try {
+             const rawUserId = typeof window !== 'undefined' ? window.localStorage.getItem("userId") : null;
+             const userId = rawUserId && rawUserId !== 'undefined' && rawUserId !== 'null' ? rawUserId : null;
+             if (userId) {
+                 try {
+                     await saveUserPreferences(userId, settings);
+                     console.debug("Manual save to backend successful");
+                     setSavedMessage("✓ All preferences saved successfully!");
+                     setHasUnsavedChanges(false);
+                     return true;
+                 } catch (backendErr) {
+                     // Handle 404 gracefully - user might not exist on backend yet
+                     if (backendErr instanceof Error && backendErr.message.includes("404")) {
+                         console.debug("User not found on backend (404) - saving to localStorage only");
+                         setSavedMessage("✓ Preferences saved locally (user not synced to backend)");
+                         setHasUnsavedChanges(false);
+                         return true;
+                     } else {
+                         throw backendErr;
+                     }
+                 }
+             } else {
+                 setSavedMessage("✓ Preferences saved locally");
+                 setHasUnsavedChanges(false);
+                 return true;
+             }
+         } catch (err) {
+             console.error("Failed to manually save to backend:", err);
+             setSavedMessage("Error saving - please try again");
+             return false;
+         }
+     }
 
     const value = useMemo(
         () => ({
@@ -337,7 +359,8 @@ export function SettingsProvider({
                 } catch (e) {
                     console.error("Error reading localStorage:", e);
                 }
-                const userId = window.localStorage.getItem("userId");
+                const rawUserId = window.localStorage.getItem("userId");
+                const userId = rawUserId && rawUserId !== 'undefined' && rawUserId !== 'null' ? rawUserId : null;
                 console.log("Current userId:", userId);
                 console.log("Saved message:", savedMessage);
                 console.log("Has unsaved changes:", hasUnsavedChanges);

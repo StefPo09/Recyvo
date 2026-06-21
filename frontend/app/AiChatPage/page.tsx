@@ -16,13 +16,18 @@ import {useRouter} from "next/navigation";
 
 type ChatSender = "user" | "robot";
 
+type UserData = {
+  nume?: string;
+  nr_puncte?: number;
+};
+
 type ChatEntry = {
   id: string;
   message: string;
   sender: ChatSender;
 };
 
-function TopBar({userData}  : {userData: any}) {
+function TopBar({userData}  : {userData: UserData | null}) {
   return(
     <div className="shrink-0 bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
       <div className="flex items-center justify-between gap-2 mb-4">
@@ -77,8 +82,10 @@ function SebAvatar() {
 
 function ChatInput({
   setChatMessages,
+  setIsLoadingResponse,
 }: {
   setChatMessages: Dispatch<SetStateAction<ChatEntry[]>>;
+  setIsLoadingResponse: Dispatch<SetStateAction<boolean>>;
 }) {
   const [inputText, setInputText] = useState("");
 
@@ -93,129 +100,98 @@ function ChatInput({
     }
   }
 
-   // Remove markdown formatting (bold, italic, etc.) from text
-   function stripMarkdown(text: string): string {
-     return text
-       .replace(/\*\*(.*?)\*\*/g, "$1") // **bold** → bold
-       .replace(/\*(.*?)\*/g, "$1") // *italic* → italic
-       .replace(/__(.*?)__/g, "$1") // __bold__ → bold
-       .replace(/_(.*?)_/g, "$1") // _italic_ → italic
-       .replace(/~~(.*?)~~/g, "$1"); // ~~strikethrough~~ → strikethrough
-   }
-
-  function sendMessage() {
+  async function sendMessage() {
     const trimmedMessage = inputText.trim();
 
     if (!trimmedMessage) {
       return;
     }
-    // add the user's message immediately to the UI
-    const userEntry = {
-      message: trimmedMessage,
-      sender: "user" as ChatSender,
-      id: crypto.randomUUID(),
+
+    // Add the user's message immediately
+    setChatMessages((previousMessages) => [
+      ...previousMessages,
+      {
+        message: trimmedMessage,
+        sender: "user",
+        id: crypto.randomUUID(),
+      },
+    ]);
+
+    setInputText("");
+    setIsLoadingResponse(true);
+
+    // Build payload for the AI proxy. The proxy forwards this to NVIDIA's chat completions endpoint.
+    const payload = {
+      model: "minimaxai/minimax-m3",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are SEB, an eco-friendly assistant. Only answer questions about recycling, sustainable living, and environmental topics. If the user asks about unrelated topics, politely decline and steer them to an eco-friendly subject. Use family-friendly language suitable for all ages.",
+        },
+        { role: "user", content: trimmedMessage },
+      ],
+      max_tokens: 2048,
+      temperature: 0.6,
+      top_p: 0.95,
+      stream: false,
     };
 
-    setChatMessages((previousMessages) => [...previousMessages, userEntry]);
-    setInputText("");
+    // Call the local ai-proxy route which forwards to NVIDIA. Extract a sensible assistant text from the response.
+    let assistantText = "Sorry, I couldn't get a response.";
+    try {
+      const res = await fetch("/api/ai-proxy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    // Call the local AI endpoint once per message (stateless) and do NOT send prior conversation
-    // The AI is instructed via a system prompt to only discuss eco-friendly topics and be family-friendly.
-    (async () => {
-        try {
-        // use same-origin proxy to avoid CORS/mixed-content issues
-        const aiEndpoint = "/api/ai-proxy";
-        const payload = {
-          model: "minimaxai/minimax-m3",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are SEB, an eco-friendly assistant. Only talk about recycling, sustainable living, and environmental topics. Do not reference or continue any previous conversations or mention memory. If the user asks about unrelated topics, politely decline and steer the user to an eco-friendly subject. Always use family-friendly language suitable for all ages. Do NOT use bold, italic, or any markdown formatting. Use plain text only.",
-            },
-            { role: "user", content: trimmedMessage },
-          ],
-          temperature: 0.6,
-          max_tokens: 2048,
-        };
-
-        const res = await fetch(aiEndpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-
-        if (!res.ok) {
-          // try to extract body text for better diagnostics
-          let bodyText = "";
-          try {
-            bodyText = await res.text();
-          } catch (e) {
-            bodyText = String(e);
-          }
-          throw new Error(`AI request failed: ${res.status} ${res.statusText} - ${bodyText}`);
-        }
-
+      if (!res.ok) {
+        const txt = await res.text();
+        console.error("ai-proxy error", res.status, txt);
+        assistantText = "Sorry, the assistant is unavailable.";
+      } else {
         const data = await res.json();
 
-        // Handle error objects returned by the proxy
-        if (data?.error) {
-          const errorMsg = data?.details ?? data?.body?.detail ?? JSON.stringify(data);
-          throw new Error(`API error: ${errorMsg}`);
-        }
-
-        // Support common OpenAI-compatible shape: choices[0].message.content
-        let aiText = "";
-        if (data?.choices && Array.isArray(data.choices) && data.choices[0]) {
-          aiText = data.choices[0].message?.content ?? data.choices[0].text ?? "";
-        } else if (typeof data === "string") {
-          aiText = data;
-        } else if (data?.choices && data.choices.length === 0) {
-          throw new Error("Model returned empty response. Please try again.");
+        // Typical NVIDIA / OpenAI-like response formats: try several known fields
+        if (data?.choices && data.choices[0]?.message?.content) {
+          assistantText = data.choices[0].message.content;
+        } else if (Array.isArray(data?.output) && data.output[0]?.content?.[0]?.text) {
+          assistantText = data.output[0].content[0].text;
+        } else if (typeof data?.text === "string") {
+          assistantText = data.text;
         } else {
-          aiText = JSON.stringify(data);
+          // Fallback: stringify the whole response for debugging
+          assistantText = JSON.stringify(data);
         }
-
-        if (!aiText) {
-          throw new Error("Model returned empty message content.");
-        }
-
-        // Strip any markdown formatting as a safeguard
-        const cleanedText = stripMarkdown(aiText);
-
-        const botEntry = {
-          message: cleanedText,
-          sender: "robot" as ChatSender,
-          id: crypto.randomUUID(),
-        };
-
-        setChatMessages((previousMessages) => [...previousMessages, botEntry]);
-      } catch (err) {
-        const errMessage = `Sorry, I couldn't reach the assistant. Please try again later.`;
-        setChatMessages((previousMessages) => [
-          ...previousMessages,
-          {
-            message: errMessage,
-            sender: "robot" as ChatSender,
-            id: crypto.randomUUID(),
-          },
-        ]);
-        // Keep the error in console for debugging
-        // eslint-disable-next-line no-console
-        console.error(err);
       }
-    })();
+    } catch (err) {
+      // Network or parsing error
+      // eslint-disable-next-line no-console
+      console.error("AI request failed:", err);
+      assistantText = "Sorry, the assistant is unreachable.";
+    }
+
+    // Append the assistant's response
+    setChatMessages((previousMessages) => [
+      ...previousMessages,
+      {
+        message: assistantText,
+        sender: "robot",
+        id: crypto.randomUUID(),
+      },
+    ]);
+    console.log(assistantText);
+    setIsLoadingResponse(false);
   }
 
   return (
     <div className="border-t border-gray-200 bg-white px-4 py-2 dark:border-gray-800 dark:bg-black">
-      <div className="mx-auto flex max-w-md items-center gap-2 rounded-full border-2 border-green-800 bg-white px-3 py-2 shadow-sm transition-shadow focus-within:shadow-md dark:border-green-700 dark:bg-gray-950">
+      <div className="mx-auto flex max-w-6/7 items-center gap-2 rounded-full border-2 border-green-800 bg-white px-3 py-2 shadow-sm transition-shadow focus-within:shadow-md dark:border-green-700 dark:bg-gray-950">
         <input
           type="text"
           className="min-w-0 flex-1 bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-500 dark:text-gray-50 dark:placeholder:text-gray-400"
-          placeholder="Ask about recycling, eco-friendly tips, or sustainable living..."
+          placeholder="Type your message to SEB..."
           onChange={saveInputText}
           value={inputText}
           onKeyDown={enterPressed}
@@ -241,7 +217,7 @@ function AssistantMessage({ message }: { message: string }) {
         <SebAvatar />
         <span className="mt-0.5 text-[10px] leading-none text-gray-500 dark:text-gray-400">{formatTime()}</span>
       </div>
-      <div className="max-w-[74%] rounded-2xl rounded-bl-sm border border-gray-200 bg-white px-3.5 py-3 text-[15px] font-semibold leading-tight text-gray-950 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50">
+      <div className="max-w-[75%] rounded-2xl rounded-bl-sm border border-gray-200 bg-white px-3.5 py-3 text-[15px] font-semibold leading-tight text-gray-950 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50">
         {message}
       </div>
     </div>
@@ -251,7 +227,7 @@ function AssistantMessage({ message }: { message: string }) {
 function UserMessage({ message }: { message: string }) {
   return (
     <div className="flex justify-end">
-      <div className="max-w-[74%] rounded-2xl rounded-br-sm bg-green-800 px-3.5 py-3 text-[15px] font-medium leading-tight text-white shadow-sm dark:bg-green-700">
+      <div className="max-w-[75%] rounded-2xl rounded-br-sm bg-green-800 px-3.5 py-3 text-[15px] font-medium leading-tight text-white shadow-sm dark:bg-green-700">
         {message}
         <span className="ml-2 align-baseline text-[10px] text-green-100">{formatTime()}</span>
       </div>
@@ -275,21 +251,25 @@ function ChatBubble({ message, sender }: Omit<ChatEntry, "id">) {
   );
 }
 
-function ChatMessages({ chatMessages }: { chatMessages: ChatEntry[] }) {
-  if (chatMessages.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-green-200 bg-white/80 px-6 py-10 text-center shadow-sm backdrop-blur dark:border-green-900 dark:bg-gray-900/70">
-        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-2xl text-green-700 dark:bg-green-950/50 dark:text-green-400">
-          🤖
-        </div>
-        <p className="text-base font-semibold text-gray-900 dark:text-gray-50">Start a conversation with SEB</p>
-        <p className="mt-1 max-w-xs text-sm text-gray-500 dark:text-gray-400">
-          Ask for recycling tips, bin locations, or eco-friendly ideas.
-        </p>
+function ThinkingIndicator() {
+  return (
+    <div className="flex items-end gap-2">
+      <div className="flex flex-col items-center">
+        <SebAvatar />
+        <span className="mt-0.5 text-[10px] leading-none text-gray-500 dark:text-gray-400">{formatTime()}</span>
       </div>
-    );
-  }
+      <div className="max-w-[75%] rounded-2xl rounded-bl-sm border border-gray-200 bg-white px-3.5 py-3 text-[15px] font-semibold leading-tight text-gray-950 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50">
+        <div className="flex items-center gap-1">
+          <span className="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+          <span className="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+          <span className="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
+function ChatMessages({ chatMessages, isLoading }: { chatMessages: ChatEntry[]; isLoading: boolean }) {
   return (
     <>
       {chatMessages.map((chatMessage) => {
@@ -301,6 +281,7 @@ function ChatMessages({ chatMessages }: { chatMessages: ChatEntry[] }) {
           />
         );
       })}
+      {isLoading && <ThinkingIndicator />}
     </>
   );
 }
@@ -336,68 +317,97 @@ function BottomNav() {
 
 export default function Home() {
   const [chatMessages, setChatMessages] = useState<ChatEntry[]>([]);
+  const [isLoadingResponse, setIsLoadingResponse] = useState(false);
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   useEffect(() => {
-    // Check if user is logged in
     const userExists = localStorage.getItem("user");
-    if (!userExists) router.push("/StartPage");
-  }, [router]);
-  return (
-    <main className="flex h-screen flex-col bg-(--color-bg-main) text-(--color-text-primary)">
-      <div className="bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
-        <div className="flex items-center justify-between gap-2 mb-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-(--color-text-on-green) rounded-full flex items-center justify-center text-(--color-green-primary) font-bold text-sm">
-              🤖
-            </div>
-            <h1 className="text-lg font-semibold font-(family-name:--font-header)">SEB: Eco Assistant</h1>
-          </div>
-          <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-            <span className="font-medium">Privacy:</span> Conversations won't be saved. SEB does not retain or recall past discussions.
-          </div>
-          <Link
-            href="./" // Add settingsPage
-            className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium hover:bg-white/20 transition-colors"
-            aria-label="Settings"
-          >
-            <FontAwesomeIcon icon={faUserGear} className="text-sm" />
-            <span>Settings</span>
-          </Link>
-        </div>
+    if (!userExists) {
+      router.push("/StartPage");
+      setIsLoading(false);
+      return;
+    }
 
-
-        <div className="rounded-xl bg-(--color-bg-card) p-4 shadow-sm">
-          <div className="mb-3 flex items-start justify-between">
-            <div>
-              <p className="text-(--color-text-secondary) text-sm font-medium font-(family-name:--font-body)">Eco Legend in Training</p>
-              <p className="mt-1 text-2xl font-bold text-(--color-text-primary) font-(family-name:--font-header)">Karma Points: <span className="text-(--color-green-primary)">12,450</span></p>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-2xl">🏅</span>
-              <span className="text-xs text-(--color-text-secondary) mt-1">Level 7</span>
-            </div>
-          </div>
-
-    if (userExists) {
-      try {
-        const user = JSON.parse(userExists);
-        setUserData(user);
-        setIsAuthenticated(true);
-      } catch (e) {
-        // Invalid user data, redirect to StartPage
-        router.push("/StartPage");
-      }
-    } else {
-      // No user logged in, redirect to StartPage
+    try {
+      const user = JSON.parse(userExists) as UserData;
+      setUserData(user);
+      setIsAuthenticated(true);
+    } catch {
       router.push("/StartPage");
     }
+
     setIsLoading(false);
   }, [router]);
-// Show loading while checking authentication
+
+  // Initialize with a greeting message from the bot when user is authenticated
+  useEffect(() => {
+    if (isAuthenticated && !hasInitialized) {
+      setHasInitialized(true);
+
+      async function fetchInitialGreeting() {
+        setIsLoadingResponse(true);
+
+        const payload = {
+          model: "minimaxai/minimax-m3",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are SEB, an eco-friendly assistant. Only answer questions about recycling, sustainable living, and environmental topics. If the user asks about unrelated topics, politely decline and steer them to an eco-friendly subject. Use family-friendly language suitable for all ages.",
+            },
+            { role: "user", content: "Hello!" },
+          ],
+          max_tokens: 2048,
+          temperature: 0.6,
+          top_p: 0.95,
+          stream: false,
+        };
+
+        let greetingText = "Hello! I'm SEB, your eco-friendly assistant. How can I help you today?";
+        try {
+          const res = await fetch("/api/ai-proxy", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+
+            // Extract the greeting response
+            if (data?.choices && data.choices[0]?.message?.content) {
+              greetingText = data.choices[0].message.content;
+            } else if (Array.isArray(data?.output) && data.output[0]?.content?.[0]?.text) {
+              greetingText = data.output[0].content[0].text;
+            } else if (typeof data?.text === "string") {
+              greetingText = data.text;
+            }
+          }
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error("Failed to fetch greeting:", err);
+        }
+
+        // Add only the bot's greeting (not the user's "Hello!")
+        setChatMessages([
+          {
+            message: greetingText,
+            sender: "robot",
+            id: crypto.randomUUID(),
+          },
+        ]);
+
+        setIsLoadingResponse(false);
+      }
+
+      fetchInitialGreeting();
+    }
+  }, [isAuthenticated, hasInitialized]);
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-(--color-bg-card)">
@@ -409,29 +419,31 @@ export default function Home() {
     );
   }
 
-  // Don't render if not authenticated (router will handle redirect)
   if (!isAuthenticated) {
     return null;
   }
+
   return (
     <main className="flex h-screen flex-col overflow-hidden bg-(--color-bg-main) text-(--color-text-primary)">
       <TopBar
         userData={userData}
       />
 
-      <section className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
-        <div className="mx-auto flex max-w-md flex-col gap-3">
-          <ChatMessages
-            chatMessages={chatMessages}
-          />
-        </div>
-      </section>
+       <section className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+         <div className="mx-auto flex max-w-6/7 flex-col gap-3">
+           <ChatMessages
+             chatMessages={chatMessages}
+             isLoading={isLoadingResponse}
+           />
+         </div>
+       </section>
 
-      <div className="shrink-0">
-        <ChatInput
-          setChatMessages={setChatMessages}
-        />
-      </div>
+       <div className="shrink-0">
+         <ChatInput
+           setChatMessages={setChatMessages}
+           setIsLoadingResponse={setIsLoadingResponse}
+         />
+       </div>
 
       <BottomNav />
     </main>

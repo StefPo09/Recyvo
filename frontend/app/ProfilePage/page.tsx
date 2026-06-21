@@ -20,7 +20,26 @@ import {
 import {useRouter} from "next/navigation";
 import {useEffect, useState, useRef, type ReactNode} from "react";
 import Link from "next/link";
-import { updateUser, uploadProfileImage } from "@/lib/api";
+import { deleteUser, updateUser, uploadProfileImage } from "@/lib/api";
+
+type UserData = {
+  id?: string;
+  username?: string;
+  nume?: string;
+  email?: string;
+  profile_image?: string | null;
+  nr_puncte?: number;
+};
+
+type UserApiResponse = {
+  id?: string;
+  username: string;
+  nume: string;
+  email: string;
+  profile_image?: string | null;
+  profileImage?: string | null;
+  nr_puncte?: number;
+};
 
 type ProfileData = {
   username: string;
@@ -36,7 +55,20 @@ const initialProfile: ProfileData = {
   profileImage: null,
 };
 
-function TopBar({userData}  : {userData: any}) {
+function getErrorMessage(err: unknown) {
+  return err instanceof Error ? err.message : String(err);
+}
+
+function profileFromUser(user: UserData): ProfileData {
+  return {
+    username: user.username || initialProfile.username,
+    fullName: user.nume || initialProfile.fullName,
+    email: user.email || initialProfile.email,
+    profileImage: user.profile_image ?? initialProfile.profileImage,
+  };
+}
+
+function TopBar({userData}  : {userData: UserData | null}) {
   return(
     <div className="shrink-0 bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
       <div className="flex items-center justify-between gap-2 mb-4">
@@ -215,7 +247,7 @@ function BottomNav() {
 export default function Home() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -228,10 +260,13 @@ export default function Home() {
 
     if (userExists) {
       try {
-        const user = JSON.parse(userExists);
+        const user = JSON.parse(userExists) as UserData;
         setUserData(user);
+        const userProfile = profileFromUser(user);
+        setSavedProfile(userProfile);
+        setDraftProfile(userProfile);
         setIsAuthenticated(true);
-      } catch (e) {
+      } catch {
         // Invalid user data, redirect to StartPage
         router.push("/StartPage");
       }
@@ -284,7 +319,7 @@ export default function Home() {
           username: draftProfile.username,
           nume: draftProfile.fullName,
           email: draftProfile.email,
-        });
+        }) as UserApiResponse;
 
         const updatedProfile = {
           username: resp.username,
@@ -300,18 +335,20 @@ export default function Home() {
         try {
           const existing = localStorage.getItem("user");
           if (existing) {
-            const parsed = JSON.parse(existing);
+            const parsed = JSON.parse(existing) as UserData;
             const merged = { ...parsed, ...resp };
             localStorage.setItem("user", JSON.stringify(merged));
+            setUserData(merged);
           } else {
             localStorage.setItem("user", JSON.stringify(resp));
+            setUserData(resp);
           }
-        } catch (e) {
+        } catch {
           // ignore localStorage errors
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Failed to update profile:", err);
-        alert(err.message || "Failed to update profile.");
+        alert(getErrorMessage(err) || "Failed to update profile.");
       }
     })();
   }
@@ -325,10 +362,10 @@ export default function Home() {
 
     (async () => {
       try {
-        const resp = await uploadProfileImage(userId, file);
+        const resp = await uploadProfileImage(userId, file) as UserApiResponse;
         const imageUrl = resp.profile_image || resp.profileImage || null;
         setDraftProfile((current) => ({ ...current, profileImage: imageUrl }));
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Upload profile image failed:", err);
         alert("Failed to upload profile image.");
       }
@@ -347,25 +384,15 @@ export default function Home() {
 
     (async () => {
       try {
-        // Dynamic import to avoid static TS resolution issues in some dev setups
-        const mod = await import("../../lib/api");
-        // access as any to avoid editor/typecheck complaining in some environments
-        const deleteFn = (mod as any).deleteUser as (id: string) => Promise<any>;
-        if (typeof deleteFn !== "function") {
-          // avoid throwing inside the same try/catch (ESLint warning) — show user-friendly message instead
-          alert("Delete function not available. Please try again later.");
-          return;
-        }
-
-        await deleteFn(userId);
+        await deleteUser(userId);
         // Clear all auth data from localStorage
         localStorage.removeItem("user");
         localStorage.removeItem("userId");
         // Redirect to StartPage
         router.push("/StartPage");
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Failed to delete account:", err);
-        alert(err.message || "Failed to delete account. Please try again.");
+        alert(getErrorMessage(err) || "Failed to delete account. Please try again.");
       }
     })();
   }

@@ -46,6 +46,13 @@ type WasteResult = {
   local_bins: Record<string, unknown>[];
 };
 
+type UserData = {
+  id?: string;
+  username?: string;
+  nume?: string;
+  nr_puncte?: number;
+};
+
 const CATEGORY_LABELS: Record<string, string> = {
   sticla: "Sticlă",
   plastic: "Plastic",
@@ -90,7 +97,7 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
-function TopBar({userData}  : {userData: any}) {
+function TopBar({userData}  : {userData: UserData | null}) {
   return(
     <div className="shrink-0 bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
       <div className="flex items-center justify-between gap-2 mb-4">
@@ -626,7 +633,14 @@ export default function ScannerPage() {
   const [scanResult, setScanResult] = useState<WasteResult | null>(null);
   const [scanError, setScanError] = useState<string | null>(null);
   const previewUrl = useObjectUrl(selectedFile);
-  const [userData] = useState<any>(null);
+  const [userData, setUserData] = useState<UserData | null>(() => {
+    try {
+      const stored = localStorage.getItem("user");
+      return stored ? (JSON.parse(stored) as UserData) : null;
+    } catch {
+      return null;
+    }
+  });
 
   function handleGalleryChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
@@ -685,7 +699,7 @@ export default function ScannerPage() {
       try {
         const stored = localStorage.getItem("user");
         if (stored) {
-          const u = JSON.parse(stored);
+          const u = JSON.parse(stored) as UserData;
           // Decide points to award: recyclable items get more points
           const pointsToAdd = data.is_recyclable ? 10 : 1;
           if (u?.username) {
