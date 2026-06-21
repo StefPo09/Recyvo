@@ -198,6 +198,12 @@ export default function Home() {
               Sign up
             </Link>
           </p>
+          <Link
+              href="/ForgotPasswordPage"
+              className="mt-5 block font-medium text-(--color-text-primary) hover:underline"
+          >
+            Forgot password?
+          </Link>
         </div>
       }
     >

@@ -46,14 +46,6 @@ export default function StartPage() {
       subtitle="Scan. Sort. Share."
       introTitle="Meet SEB"
       introBody="Scan waste, find the right bin, and earn points for every better choice."
-      footer={
-        <Link
-          href="/ForgotPasswordPage"
-          className="mt-5 block text-center text-sm font-medium text-(--color-text-primary) hover:underline font-(family-name:--font-body)"
-        >
-          Forgot password? Contact support.
-        </Link>
-      }
     >
       <div className="flex w-full flex-col gap-3">
         <Link
