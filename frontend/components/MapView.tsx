@@ -10,9 +10,9 @@ declare global {
 }
 
 export default function MapView({
-  bins: propBins,
-  places: propPlaces,
-}: {
+                                  bins: propBins,
+                                  places: propPlaces,
+                                }: {
   bins?: any[];
   places?: any[];
   enableAdd?: boolean;
@@ -46,32 +46,71 @@ export default function MapView({
         return;
       }
       const L = window.L;
-      if (leafletMapRef.current) return;
+      if (leafletMapRef.current) {
+        console.log("Map already initialized, skipping re-initialization");
+        return;
+      }
 
+      console.log("Initializing Leaflet map...");
       const map = L.map(mapRef.current).setView([44.439663, 26.096306], 13);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
       leafletMapRef.current = map;
-      // nothing extra to attach on init; we only support add-by-current-location now
+      console.log("Leaflet map initialized successfully");
+
+      // Force map to recalculate bounds and eliminate the partial/square map loading glitch
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
+    }
+
+    // Inject CSS if it doesn't exist yet
+    const linkId = "leaflet-cdn-css";
+    if (!document.getElementById(linkId)) {
+      const link = document.createElement("link");
+      link.id = linkId;
+      link.rel = "stylesheet";
+      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+      document.head.appendChild(link);
     }
 
     if (window.L) {
+      console.log("Leaflet already available, initializing map immediately");
       initLeaflet();
     } else {
+      console.log("Leaflet not available, loading from CDN...");
       const scriptId = "leaflet-cdn-script";
-      if (!document.getElementById(scriptId)) {
+      const existing = document.getElementById(scriptId) as HTMLScriptElement | null;
+
+      if (!existing) {
+        console.log("Creating new Leaflet script element");
         const s = document.createElement("script");
         s.id = scriptId;
         s.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
         s.async = true;
-        s.onload = () => initLeaflet();
+        s.onload = () => {
+          console.log("Leaflet script loaded from CDN");
+          // Small delay to ensure window.L is available
+          setTimeout(() => initLeaflet(), 0);
+        };
         s.onerror = () => console.error("Failed to load Leaflet script from CDN");
         document.body.appendChild(s);
       } else {
-        const existing = document.getElementById(scriptId) as HTMLScriptElement;
-        existing.addEventListener("load", initLeaflet);
+        console.log("Leaflet script element already exists");
+        if ((window as any).L) {
+          console.log("Leaflet already loaded, initializing map");
+          initLeaflet();
+        } else {
+          console.log("Waiting for Leaflet script to load...");
+          const handleLoad = () => {
+            console.log("Leaflet script finished loading (via cached script load event)");
+            setTimeout(() => initLeaflet(), 0);
+            existing.removeEventListener("load", handleLoad);
+          };
+          existing.addEventListener("load", handleLoad);
+        }
       }
     }
 
@@ -83,17 +122,37 @@ export default function MapView({
     };
   }, [mapRef]);
 
-  // click-based adding removed: we only support adding at current location
-
   // render markers when bins, places or current location change
   useEffect(() => {
     const map = leafletMapRef.current;
     if (!map || !window.L) return;
     const L = window.L;
 
-    // clear existing
-    if ((map as any)._customMarkers) (map as any)._customMarkers.forEach((m: any) => m.remove());
-    if ((map as any)._customPlaces) (map as any)._customPlaces.forEach((m: any) => m.remove());
+    // clear existing - Added try/catch blocks for robust cleanup
+    let markersRemovedCount: number = 0;
+    if ((map as any)._customMarkers) {
+      (map as any)._customMarkers.forEach((m: any) => {
+        try {
+          m.remove();
+          markersRemovedCount++;
+        } catch (e) {
+          console.warn("Failed to remove custom bin marker:", e);
+        }
+      });
+    }
+
+    let placesRemovedCount: number = 0;
+    if ((map as any)._customPlaces) {
+      (map as any)._customPlaces.forEach((m: any) => {
+        try {
+          m.remove();
+          placesRemovedCount++;
+        } catch (e) {
+          console.warn("Failed to remove custom place marker:", e);
+        }
+      });
+    }
+
     // remove previous current location marker
     if ((map as any)._currentLocationMarker) {
       try {
@@ -113,11 +172,11 @@ export default function MapView({
         else if (t === "hartie" || t === "paper") color = "#3b82f6"; // blue for paper
         else if (t === "electronic") color = "#6b7280"; // neutral/grey
 
-         const marker = L.circleMarker([b.lat, b.lng], { radius: 8, color }).addTo(map);
-         // popup content with maps links
-         const googleMapsUrl = `https://www.google.com/maps?q=${b.lat},${b.lng}`;
-         const appleMapsUrl = `https://maps.apple.com/?daddr=${b.lat},${b.lng}`;
-         const popupContent = `
+        const marker = L.circleMarker([b.lat, b.lng], { radius: 8, color }).addTo(map);
+        // popup content with maps links
+        const googleMapsUrl = `http://googleusercontent.com/maps.google.com/${b.lat},${b.lng}`;
+        const appleMapsUrl = `https://maps.apple.com/?daddr=${b.lat},${b.lng}`;
+        const popupContent = `
            <div class="text-sm" style="max-width: 200px;">
              <div class="font-semibold">${b.address || 'Recycling Bin'}</div>
              <div class="text-xs text-gray-600 mb-2">Type: ${b.bin_type}</div>
@@ -127,19 +186,21 @@ export default function MapView({
              </div>
            </div>
          `;
-         marker.bindPopup(popupContent);
+        marker.bindPopup(popupContent);
         created.push(marker);
-      } catch (e) {}
+      } catch (e) {
+        console.error("Error rendering bin marker:", e);
+      }
     });
     (map as any)._customMarkers = created;
 
     const createdPlaces: any[] = [];
     places.forEach((p) => {
       try {
-         const marker = L.circleMarker([p.latitude, p.longitude], { radius: 7, color: "#1e3a8a" }).addTo(map);
-         const googleMapsUrl = `https://www.google.com/maps?q=${p.latitude},${p.longitude}`;
-         const appleMapsUrl = `https://maps.apple.com/?daddr=${p.latitude},${p.longitude}`;
-         const popupContent = `
+        const marker = L.circleMarker([p.latitude, p.longitude], { radius: 7, color: "#1e3a8a" }).addTo(map);
+        const googleMapsUrl = `http://googleusercontent.com/maps.google.com/${p.latitude},${p.longitude}`;
+        const appleMapsUrl = `https://maps.apple.com/?daddr=${p.latitude},${p.longitude}`;
+        const popupContent = `
            <div class="text-sm" style="max-width: 200px;">
              <div class="font-semibold">${p.name}</div>
              <div class="text-xs text-gray-600 mb-2">${p.address}</div>
@@ -149,9 +210,11 @@ export default function MapView({
              </div>
            </div>
          `;
-         marker.bindPopup(popupContent);
+        marker.bindPopup(popupContent);
         createdPlaces.push(marker);
-      } catch (e) {}
+      } catch (e) {
+        console.error("Error rendering place marker:", e);
+      }
     });
     (map as any)._customPlaces = createdPlaces;
 
@@ -174,13 +237,11 @@ export default function MapView({
     if (currentLocation) {
       try {
         const locMarker = L.circleMarker([currentLocation.lat, currentLocation.lng], { radius: 8, color: "#ef4444" }).addTo(map);
-        locMarker.bindPopup(`<div class=\\"text-sm\\">You are here</div>`);
+        locMarker.bindPopup(`<div class="text-sm">You are here</div>`);
         (map as any)._currentLocationMarker = locMarker;
       } catch (e) {}
     }
   }, [bins, places, currentLocation]);
-
-  // popup delete handler removed — delete button has been removed from popups
 
   async function handleAddSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -190,7 +251,6 @@ export default function MapView({
       await addBin({ lat: addingPos.lat, lng: addingPos.lng, address: addingAddr, bin_type: addingType });
       console.log('Added bin at', addingPos);
       setStatusMsg(`Added bin at ${addingPos.lat.toFixed(5)}, ${addingPos.lng.toFixed(5)}`);
-      // refresh bins list locally
       try {
         const all = await listBins();
         setBins(all || []);
@@ -201,7 +261,6 @@ export default function MapView({
       console.error("Add bin error:", err);
       const message = String(err instanceof Error ? err.message : err);
       setStatusMsg(`Add failed: ${message}`);
-      // If it's a network error give a helpful hint
       if (message.includes("Network error when calling") || message.includes("Failed to fetch")) {
         alert("Failed to add bin: could not reach the API.\n" + message + "\n\nPlease ensure the backend is running and that NEXT_PUBLIC_API_URL is set correctly.");
       } else {
@@ -219,102 +278,107 @@ export default function MapView({
     }
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        setCurrentLocation({ lat, lng });
-        // if leaflet map is ready, pan to the location and add a temporary marker
-        try {
-          const map = leafletMapRef.current;
-          if (map && (window as any).L) {
-            map.setView([lat, lng], 14);
-            // attach/update a small marker for immediate feedback (effect will also render one)
-            const L = (window as any).L;
-            if ((map as any)._userMarker) {
-              try {
-                (map as any)._userMarker.setLatLng([lat, lng]);
-              } catch (e) {}
-            } else {
-              try {
-                const m = L.circleMarker([lat, lng], { radius: 8, color: "#ef4444" }).addTo(map);
-                m.bindPopup("You are here");
-                (map as any)._userMarker = m;
-              } catch (e) {}
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setCurrentLocation({ lat, lng });
+          try {
+            const map = leafletMapRef.current;
+            if (map && (window as any).L) {
+              map.setView([lat, lng], 14);
+              const L = (window as any).L;
+              if ((map as any)._userMarker) {
+                try {
+                  (map as any)._userMarker.setLatLng([lat, lng]);
+                } catch (e) {}
+              } else {
+                try {
+                  const m = L.circleMarker([lat, lng], { radius: 8, color: "#ef4444" }).addTo(map);
+                  m.bindPopup("You are here");
+                  (map as any)._userMarker = m;
+                } catch (e) {}
+              }
             }
-          }
-        } catch (e) {}
+          } catch (e) {}
 
-        if (setAsAdding) {
-          setAddingPos({ lat, lng });
-        }
-        setLocating(false);
-      },
-      (err) => {
-        console.error(err);
-        alert("Failed to get current location: " + err.message);
-        setLocating(false);
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
+          if (setAsAdding) {
+            setAddingPos({ lat, lng });
+          }
+          setLocating(false);
+        },
+        (err) => {
+          console.error(err);
+          alert("Failed to get current location: " + err.message);
+          setLocating(false);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
     );
   }
 
-    return (
-    <div className="rounded-2xl overflow-hidden relative">
-      <div ref={mapRef} style={{ height: 480, width: "100%" }} />
+  return (
+      <div className="rounded-2xl overflow-hidden relative bg-gray-100 dark:bg-zinc-900">
+        <div ref={mapRef} style={{ height: 480, width: "100%", background: "#f3f4f6" }} />
 
-      {/* Floating controls - styled to match site */}
-      <div style={{ position: "absolute", left: 16, top: 16, zIndex: 1000 }}>
-        <div className="bg-white p-3 rounded-xl shadow-lg border border-gray-200 flex gap-3 items-center text-sm">
-          <button
-            className={`px-3 py-1 rounded border text-gray-700`}
-            onClick={() => requestCurrentLocation(true)}
-            disabled={locating}
-          >
-            {locating ? "Locating..." : "Add bin at my location"}
-          </button>
+        {/* Floating controls */}
+        <div style={{ position: "absolute", left: 16, top: 16, zIndex: 1000 }}>
+          <div className="bg-white dark:bg-zinc-800 p-3 rounded-xl shadow-lg border border-gray-200 dark:border-zinc-700 flex gap-3 items-center text-sm">
+            <button
+                className="px-3 py-1 rounded border text-gray-700 dark:text-gray-200 border-gray-300 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                onClick={() => requestCurrentLocation(true)}
+                disabled={locating}
+            >
+              {locating ? "Locating..." : "Add bin at my location"}
+            </button>
 
-          <button className="px-2 py-1 border rounded text-sm" onClick={() => requestCurrentLocation(false)} title="Show current location">
-            {locating ? "Locating..." : "Show my location"}
-          </button>
+            <button
+                className="px-2 py-1 border rounded text-sm border-gray-300 dark:border-zinc-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                onClick={() => requestCurrentLocation(false)}
+                title="Show current location"
+            >
+              {locating ? "Locating..." : "Show my location"}
+            </button>
 
-          {/* filtering is handled by the parent page; MapView just renders the provided bins */}
-
-          {statusMsg && <div className="ml-2 text-xs text-gray-600">{statusMsg}</div>}
+            {statusMsg && <div className="ml-2 text-xs text-gray-600 dark:text-gray-400">{statusMsg}</div>}
+          </div>
         </div>
+
+        {/* Add form panel */}
+        {addingPos && (
+            <div className="absolute left-4 right-4 bottom-4 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-lg p-4" style={{ zIndex: 2000 }}>
+              <h4 className="font-semibold mb-2 text-gray-900 dark:text-white">Add bin at {addingPos.lat.toFixed(5)}, {addingPos.lng.toFixed(5)}</h4>
+              <form onSubmit={handleAddSubmit} className="flex gap-2 flex-wrap items-center">
+                <select
+                    className="border border-gray-300 dark:border-zinc-600 rounded px-2 py-1 bg-white dark:bg-zinc-700 text-gray-900 dark:text-white"
+                    value={addingType}
+                    onChange={(e) => setAddingType(e.target.value)}
+                >
+                  <option value="plastic">Plastic & Metal</option>
+                  <option value="hartie">Paper</option>
+                  <option value="sticla">Glass</option>
+                  <option value="general">Household</option>
+                </select>
+                <input
+                    className="border border-gray-300 dark:border-zinc-600 rounded px-2 py-1 flex-1 min-w-50 bg-white dark:bg-zinc-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                    placeholder="Name (optional)"
+                    value={addingAddr}
+                    onChange={(e) => setAddingAddr(e.target.value)}
+                />
+                <button
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded transition-colors"
+                    disabled={loading}
+                >
+                  {loading ? 'Adding...' : 'Add bin'}
+                </button>
+                <button
+                    type="button"
+                    className="px-3 py-1 border border-gray-300 dark:border-zinc-600 rounded text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                    onClick={() => setAddingPos(null)}
+                >
+                  Cancel
+                </button>
+              </form>
+            </div>
+        )}
       </div>
-
-      {/* Add form panel - placed over map bottom and styled */}
-      {addingPos && (
-        <div className="absolute left-4 right-4 bottom-4 bg-white border border-gray-200 rounded-xl shadow-lg p-4" style={{ zIndex: 2000 }}>
-          <h4 className="font-semibold mb-2">Add bin at {addingPos.lat.toFixed(5)}, {addingPos.lng.toFixed(5)}</h4>
-          <form onSubmit={handleAddSubmit} className="flex gap-2 flex-wrap items-center">
-            <select className="border rounded px-2 py-1" value={addingType} onChange={(e) => setAddingType(e.target.value)}>
-              <option value="plastic">Plastic & Metal</option>
-              <option value="hartie">Paper</option>
-              <option value="sticla">Glass</option>
-              <option value="general">Household</option>
-            </select>
-            <input className="border rounded px-2 py-1 flex-1 min-w-50" placeholder="Name (optional)" value={addingAddr} onChange={(e) => setAddingAddr(e.target.value)} />
-            <button className="bg-green-600 text-white px-4 py-1 rounded" disabled={loading}>{loading ? 'Adding...' : 'Add bin'}</button>
-            <button type="button" className="px-3 py-1 border rounded" onClick={() => setAddingPos(null)}>Cancel</button>
-          </form>
-        </div>
-      )}
-    </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
