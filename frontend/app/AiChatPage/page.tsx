@@ -36,7 +36,7 @@ function formatTime(date = new Date()) {
 
 function SebAvatar() {
   return (
-    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-green-200 bg-green-50 text-green-700 shadow-sm">
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-(--color-green-accent) bg-(--color-bg-card) text-(--color-green-primary) shadow-sm">
       <FontAwesomeIcon icon={faRobot} className="text-lg" />
     </div>
   );
@@ -148,11 +148,11 @@ function ChatInput({
   }
 
   return (
-    <div className="border-t border-gray-200 bg-white px-4 py-2 dark:border-gray-800 dark:bg-black">
-      <div className="mx-auto flex max-w-6/7 items-center gap-2 rounded-full border-2 border-green-800 bg-white px-3 py-2 shadow-sm transition-shadow focus-within:shadow-md dark:border-green-700 dark:bg-gray-950">
+    <div className="border-t border-(--color-green-accent) bg-(--color-bg-card) px-4 py-2">
+      <div className="mx-auto flex max-w-6/7 items-center gap-2 rounded-full border-2 border-(--color-green-primary) bg-(--color-bg-main) px-3 py-2 shadow-sm transition-shadow focus-within:shadow-md">
         <input
           type="text"
-          className="min-w-0 flex-1 bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-500 dark:text-gray-50 dark:placeholder:text-gray-400"
+          className="min-w-0 flex-1 bg-transparent text-sm text-(--color-text-primary) outline-none placeholder:text-(--color-text-secondary)"
           placeholder="Type your message to SEB..."
           onChange={saveInputText}
           value={inputText}
@@ -163,7 +163,7 @@ function ChatInput({
           onClick={sendMessage}
           aria-label="Send message"
           disabled={!inputText.trim()}
-          className="cursor-pointer flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-800 text-white shadow-sm transition-colors hover:bg-green-900 disabled:cursor-not-allowed disabled:bg-green-300 dark:bg-green-700 dark:hover:bg-green-600 dark:disabled:bg-green-900/40"
+          className="cursor-pointer flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-(--color-green-primary) text-(--color-text-on-green) shadow-sm transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <FontAwesomeIcon icon={faPaperPlane} className="text-sm" />
         </button>
@@ -177,9 +177,9 @@ function AssistantMessage({ message }: { message: string }) {
     <div className="flex items-end gap-2">
       <div className="flex flex-col items-center">
         <SebAvatar />
-        <span className="mt-0.5 text-[10px] leading-none text-gray-500 dark:text-gray-400">{formatTime()}</span>
+        <span className="mt-0.5 text-[10px] leading-none text-(--color-text-secondary)">{formatTime()}</span>
       </div>
-      <div className="max-w-[75%] rounded-2xl rounded-bl-sm border border-gray-200 bg-white px-3.5 py-3 text-[15px] font-semibold leading-tight text-gray-950 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50">
+      <div className="max-w-[75%] rounded-2xl rounded-bl-sm border border-(--color-green-accent) bg-(--color-bg-card) px-3.5 py-3 text-[15px] font-semibold leading-tight text-(--color-text-primary) shadow-sm">
         {message}
       </div>
     </div>
@@ -189,9 +189,9 @@ function AssistantMessage({ message }: { message: string }) {
 function UserMessage({ message }: { message: string }) {
   return (
     <div className="flex justify-end">
-      <div className="max-w-[75%] rounded-2xl rounded-br-sm bg-green-800 px-3.5 py-3 text-[15px] font-medium leading-tight text-white shadow-sm dark:bg-green-700">
+      <div className="max-w-[75%] rounded-2xl rounded-br-sm bg-(--color-green-primary) px-3.5 py-3 text-[15px] font-medium leading-tight text-(--color-text-on-green) shadow-sm">
         {message}
-        <span className="ml-2 align-baseline text-[10px] text-green-100">{formatTime()}</span>
+        <span className="ml-2 align-baseline text-[10px] text-white/80">{formatTime()}</span>
       </div>
     </div>
   );
@@ -218,13 +218,13 @@ function ThinkingIndicator() {
     <div className="flex items-end gap-2">
       <div className="flex flex-col items-center">
         <SebAvatar />
-        <span className="mt-0.5 text-[10px] leading-none text-gray-500 dark:text-gray-400">{formatTime()}</span>
+        <span className="mt-0.5 text-[10px] leading-none text-(--color-text-secondary)">{formatTime()}</span>
       </div>
-      <div className="max-w-[75%] rounded-2xl rounded-bl-sm border border-gray-200 bg-white px-3.5 py-3 text-[15px] font-semibold leading-tight text-gray-950 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-50">
+      <div className="max-w-[75%] rounded-2xl rounded-bl-sm border border-(--color-green-accent) bg-(--color-bg-card) px-3.5 py-3 text-[15px] font-semibold leading-tight text-(--color-text-primary) shadow-sm">
         <div className="flex items-center gap-1">
-          <span className="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-          <span className="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-          <span className="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+          <span className="inline-block w-2 h-2 bg-(--color-text-secondary) rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+          <span className="inline-block w-2 h-2 bg-(--color-text-secondary) rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+          <span className="inline-block w-2 h-2 bg-(--color-text-secondary) rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
         </div>
       </div>
     </div>
@@ -250,25 +250,25 @@ function ChatMessages({ chatMessages, isLoading }: { chatMessages: ChatEntry[]; 
 
 function BottomNav() {
   return (
-    <div className="shrink-0 border-t border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-black">
+    <div className="shrink-0 border-t border-(--color-green-accent) bg-(--color-bg-card) px-6 py-4">
       <div className="flex justify-around">
-        <Link href="../HomePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <Link href="../HomePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
           <FontAwesomeIcon icon={faHome} className="text-xl" />
           <span className="text-xs font-medium">Home</span>
         </Link>
-        <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
           <FontAwesomeIcon icon={faClock} className="text-xl" />
           <span className="text-xs font-medium">Scanner</span>
         </Link>
-        <Link href="../MapPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <Link href="../MapPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
           <FontAwesomeIcon icon={faMap} className="text-xl" />
           <span className="text-xs font-medium">Map</span>
         </Link>
-        <button className="flex flex-col items-center gap-1 text-green-700">
+        <button className="flex flex-col items-center gap-1 text-(--color-green-primary)">
           <FontAwesomeIcon icon={faComments} className="text-xl" />
           <span className="text-xs font-medium">SEB</span>
         </button>
-        <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
           <FontAwesomeIcon icon={faUser} className="text-xl" />
           <span className="text-xs font-medium">Profile</span>
         </Link>

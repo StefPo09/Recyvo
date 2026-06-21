@@ -179,7 +179,7 @@ export default function MapView({
         const popupContent = `
            <div class="text-sm" style="max-width: 200px;">
              <div class="font-semibold">${b.address || 'Recycling Bin'}</div>
-             <div class="text-xs text-gray-600 mb-2">Type: ${b.bin_type}</div>
+             <div class="text-xs mb-2" style="color: var(--color-text-secondary);">Type: ${b.bin_type}</div>
              <div class="flex gap-2">
                <a href="${googleMapsUrl}" target="_blank" style="color: #4285F4; text-decoration: none; font-size: 0.75rem;">Google Maps</a>
                <a href="${appleMapsUrl}" target="_blank" style="color: #555; text-decoration: none; font-size: 0.75rem;">Apple Maps</a>
@@ -203,7 +203,7 @@ export default function MapView({
         const popupContent = `
            <div class="text-sm" style="max-width: 200px;">
              <div class="font-semibold">${p.name}</div>
-             <div class="text-xs text-gray-600 mb-2">${p.address}</div>
+             <div class="text-xs mb-2" style="color: var(--color-text-secondary);">${p.address}</div>
              <div class="flex gap-2">
                <a href="${googleMapsUrl}" target="_blank" style="color: #4285F4; text-decoration: none; font-size: 0.75rem;">Google Maps</a>
                <a href="${appleMapsUrl}" target="_blank" style="color: #555; text-decoration: none; font-size: 0.75rem;">Apple Maps</a>
@@ -316,14 +316,14 @@ export default function MapView({
   }
 
   return (
-      <div className="rounded-2xl overflow-hidden relative bg-gray-100 dark:bg-zinc-900">
-        <div ref={mapRef} style={{ height: 480, width: "100%", background: "#f3f4f6" }} />
+      <div className="relative overflow-hidden rounded-2xl bg-(--color-bg-main)">
+        <div ref={mapRef} style={{ height: 480, width: "100%", background: "var(--color-bg-main)" }} />
 
         {/* Floating controls */}
         <div style={{ position: "absolute", left: 16, top: 16, zIndex: 1000 }}>
-          <div className="bg-white dark:bg-zinc-800 p-3 rounded-xl shadow-lg border border-gray-200 dark:border-zinc-700 flex gap-3 items-center text-sm">
+          <div className="flex items-center gap-3 rounded-xl border border-(--color-green-accent) bg-(--color-bg-card) p-3 text-sm shadow-lg">
             <button
-                className="px-3 py-1 rounded border text-gray-700 dark:text-gray-200 border-gray-300 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                className="rounded border border-(--color-green-accent) px-3 py-1 text-(--color-text-primary) transition-colors hover:bg-(--color-green-accent)"
                 onClick={() => requestCurrentLocation(true)}
                 disabled={locating}
             >
@@ -331,24 +331,24 @@ export default function MapView({
             </button>
 
             <button
-                className="px-2 py-1 border rounded text-sm border-gray-300 dark:border-zinc-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                className="rounded border border-(--color-green-accent) px-2 py-1 text-sm text-(--color-text-primary) transition-colors hover:bg-(--color-green-accent)"
                 onClick={() => requestCurrentLocation(false)}
                 title="Show current location"
             >
               {locating ? "Locating..." : "Show my location"}
             </button>
 
-            {statusMsg && <div className="ml-2 text-xs text-gray-600 dark:text-gray-400">{statusMsg}</div>}
+            {statusMsg && <div className="ml-2 text-xs text-(--color-text-secondary)">{statusMsg}</div>}
           </div>
         </div>
 
         {/* Add form panel */}
         {addingPos && (
-            <div className="absolute left-4 right-4 bottom-4 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-lg p-4" style={{ zIndex: 2000 }}>
-              <h4 className="font-semibold mb-2 text-gray-900 dark:text-white">Add bin at {addingPos.lat.toFixed(5)}, {addingPos.lng.toFixed(5)}</h4>
+            <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-(--color-green-accent) bg-(--color-bg-card) p-4 shadow-lg" style={{ zIndex: 2000 }}>
+              <h4 className="mb-2 font-semibold text-(--color-text-primary)">Add bin at {addingPos.lat.toFixed(5)}, {addingPos.lng.toFixed(5)}</h4>
               <form onSubmit={handleAddSubmit} className="flex gap-2 flex-wrap items-center">
                 <select
-                    className="border border-gray-300 dark:border-zinc-600 rounded px-2 py-1 bg-white dark:bg-zinc-700 text-gray-900 dark:text-white"
+                    className="rounded border border-(--color-green-accent) bg-(--color-bg-main) px-2 py-1 text-(--color-text-primary)"
                     value={addingType}
                     onChange={(e) => setAddingType(e.target.value)}
                 >
@@ -358,20 +358,20 @@ export default function MapView({
                   <option value="general">Household</option>
                 </select>
                 <input
-                    className="border border-gray-300 dark:border-zinc-600 rounded px-2 py-1 flex-1 min-w-50 bg-white dark:bg-zinc-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                    className="min-w-50 flex-1 rounded border border-(--color-green-accent) bg-(--color-bg-main) px-2 py-1 text-(--color-text-primary) placeholder:text-(--color-text-secondary)"
                     placeholder="Name (optional)"
                     value={addingAddr}
                     onChange={(e) => setAddingAddr(e.target.value)}
                 />
                 <button
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded transition-colors"
+                    className="rounded bg-(--color-green-primary) px-4 py-1 text-(--color-text-on-green) transition-colors hover:opacity-90"
                     disabled={loading}
                 >
                   {loading ? 'Adding...' : 'Add bin'}
                 </button>
                 <button
                     type="button"
-                    className="px-3 py-1 border border-gray-300 dark:border-zinc-600 rounded text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                    className="rounded border border-(--color-green-accent) px-3 py-1 text-(--color-text-primary) transition-colors hover:bg-(--color-green-accent)"
                     onClick={() => setAddingPos(null)}
                 >
                   Cancel

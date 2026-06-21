@@ -35,15 +35,15 @@ function BinSelect({
 }) {
   const icon =
       name === "All" ? (
-          <FiGrid className="text-2xl text-gray-600" />
+          <FiGrid className="text-2xl text-(--color-text-secondary)" />
       ) : name === "Plastic and Metal" ? (
-          <FontAwesomeIcon icon={faTrash} className="text-2xl text-yellow-400" />
+          <FontAwesomeIcon icon={faTrash} className="text-2xl text-amber-500" />
       ) : name === "Paper" ? (
-          <FontAwesomeIcon icon={faTrash} className="text-2xl text-blue-600" />
+          <FontAwesomeIcon icon={faTrash} className="text-2xl text-sky-600" />
       ) : name === "Glass" ? (
-          <FontAwesomeIcon icon={faTrash} className="text-2xl text-emerald-600" />
+          <FontAwesomeIcon icon={faTrash} className="text-2xl text-(--color-green-primary)" />
       ) : (
-          <FontAwesomeIcon icon={faTrashCan} className="text-2xl text-gray-700 dark:text-gray-200" />
+          <FontAwesomeIcon icon={faTrashCan} className="text-2xl text-(--color-text-primary)" />
       );
 
   return (
@@ -52,12 +52,12 @@ function BinSelect({
            className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-colors cursor-pointer ${
                active
                    ? "border-(--color-green-primary) bg-(--color-green-accent) text-(--color-text-primary) shadow-sm"
-                   : "border-(--color-text-secondary) bg-(--color-bg-card) text-(--color-text-primary) hover:bg-(--color-green-accent)"
-           }`}
-       >
-       <span className={`flex h-10 w-10 items-center justify-center rounded-full ${active ? "bg-(--color-green-accent)" : "bg-(--color-bg-main)"}`}>
-         {icon}
-       </span>
+                   : "border-(--color-green-accent) bg-(--color-bg-card) text-(--color-text-primary) hover:bg-(--color-green-accent)"
+            }`}
+        >
+       <span className={`flex h-10 w-10 items-center justify-center rounded-full ${active ? "bg-(--color-bg-card)" : "bg-(--color-bg-main)"}`}>
+          {icon}
+        </span>
          <span className="flex-1 font-medium font-(family-name:--font-header)">{name}</span>
          {active && <span className="text-xs font-semibold text-(--color-green-primary) font-(family-name:--font-body)">Selected</span>}
        </button>
@@ -158,13 +158,13 @@ function BinMap() {
 
   return (
       <div className="space-y-5">
-        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100 dark:bg-gray-900 dark:ring-gray-800">
+        <div className="rounded-2xl border border-(--color-green-accent) bg-(--color-bg-card) p-4 shadow-sm">
           <div className="mb-4 flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-green-700 dark:text-green-300">Map Filters</p>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Choose the bin category</h2>
+              <p className="text-sm font-medium text-(--color-green-primary)">Map Filters</p>
+              <h2 className="text-lg font-semibold text-(--color-text-primary)">Choose the bin category</h2>
             </div>
-            <div className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700 dark:bg-green-950/50 dark:text-green-200">
+            <div className="rounded-full bg-(--color-green-accent) px-3 py-1 text-xs font-semibold text-(--color-green-primary)">
               {bin}
             </div>
           </div>
@@ -184,13 +184,13 @@ function BinMap() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-3xl bg-linear-to-br from-green-50 via-white to-emerald-50 shadow-sm ring-1 ring-green-100 dark:from-gray-900 dark:via-gray-900 dark:to-green-950/30 dark:ring-gray-800">
+        <div className="overflow-hidden rounded-3xl bg-linear-to-br from-(--color-bg-card) via-(--color-bg-main) to-(--color-green-accent) shadow-sm ring-1 ring-(--color-green-accent)">
           <div className="flex items-center justify-between px-5 pt-5">
             <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Nearby collection points</p>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Live map preview</h3>
+              <p className="text-sm font-medium text-(--color-text-secondary)">Nearby collection points</p>
+              <h3 className="text-xl font-bold text-(--color-text-primary)">Live map preview</h3>
             </div>
-            <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-green-700 shadow-sm dark:bg-gray-800 dark:text-green-300">
+            <span className="rounded-full bg-(--color-bg-card) px-3 py-1 text-xs font-semibold text-(--color-green-primary) shadow-sm">
               {bins.length + places.length} points found
             </span>
           </div>
@@ -200,15 +200,15 @@ function BinMap() {
           </div>
 
           <div className="grid gap-3 px-5 pb-5 pt-5 sm:grid-cols-2">
-            <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Nearest bin</p>
-              <p className="mt-1 text-base font-bold text-gray-900 dark:text-white">{nearest?.nearest_bins?.[0]?.address || '—'}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">{nearest?.nearest_bins?.[0]?.distance_label || ''}</p>
+            <div className="rounded-2xl bg-(--color-bg-card) p-4 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-(--color-text-secondary)">Nearest bin</p>
+              <p className="mt-1 text-base font-bold text-(--color-text-primary)">{nearest?.nearest_bins?.[0]?.address || '—'}</p>
+              <p className="text-sm text-(--color-text-secondary)">{nearest?.nearest_bins?.[0]?.distance_label || ''}</p>
             </div>
-            <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-800">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Category</p>
-              <p className="mt-1 text-base font-bold text-gray-900 dark:text-white">{bin}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Filtered results update here</p>
+            <div className="rounded-2xl bg-(--color-bg-card) p-4 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-(--color-text-secondary)">Category</p>
+              <p className="mt-1 text-base font-bold text-(--color-text-primary)">{bin}</p>
+              <p className="text-sm text-(--color-text-secondary)">Filtered results update here</p>
             </div>
           </div>
         </div>
@@ -218,25 +218,25 @@ function BinMap() {
 
 function BottomNav() {
   return (
-    <div className="shrink-0 border-t border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-black">
+    <div className="shrink-0 border-t border-(--color-green-accent) bg-(--color-bg-card) px-6 py-4">
       <div className="flex justify-around">
-      <Link href="../HomePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+      <Link href="../HomePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
         <FontAwesomeIcon icon={faHome} className="text-xl" />
         <span className="text-xs font-medium">Home</span>
       </Link>
-      <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+      <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
         <FontAwesomeIcon icon={faClock} className="text-xl" />
         <span className="text-xs font-medium">Scanner</span>
       </Link>
-      <button className="flex flex-col items-center gap-1 text-green-700">
+      <button className="flex flex-col items-center gap-1 text-(--color-green-primary)">
         <FontAwesomeIcon icon={faMap} className="text-xl" />
         <span className="text-xs font-medium">Map</span>
       </button>
-      <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+      <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
         <FontAwesomeIcon icon={faComments} className="text-xl" />
         <span className="text-xs font-medium">SEB</span>
       </Link>
-      <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+      <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
         <FontAwesomeIcon icon={faUser} className="text-xl" />
         <span className="text-xs font-medium">Profile</span>
       </Link>

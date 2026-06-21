@@ -124,7 +124,7 @@ export default function LeaguesPage() {
       <div className="bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-4 rounded-b-3xl">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-semibold font-(family-name:--font-header)">Leagues</h1>
-          <Link href="../HomePage" className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium hover:bg-white/20 transition-colors">Back</Link>
+          <Link href="../HomePage" className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-sm font-medium transition-colors hover:bg-white/25">Back</Link>
         </div>
       </div>
 

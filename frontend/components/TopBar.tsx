@@ -14,7 +14,7 @@ import logo from "@/Logo/Transparent/color.png";
 export default function TopBar({ userData }: { userData: any }) {
   const points = userData?.nr_puncte ?? 0;
   return (
-    <div className="shrink-0 bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
+    <div className="shrink-0 rounded-b-3xl bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) px-6 pb-8 pt-6 text-(--color-text-on-green)">
       <div className="flex items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 relative">
@@ -33,7 +33,7 @@ export default function TopBar({ userData }: { userData: any }) {
             Recyvo
           </h1>
         </div>
-        <Link href="/SettingsPage" className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium hover:bg-white/20 transition-colors" aria-label="Settings">
+        <Link href="/SettingsPage" className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-sm font-medium transition-colors hover:bg-white/25" aria-label="Settings">
           <FontAwesomeIcon icon={faUserGear} className="text-sm" />
           <span>Settings</span>
         </Link>

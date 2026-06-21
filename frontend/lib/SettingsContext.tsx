@@ -310,17 +310,19 @@ export function SettingsProvider({
                      setSavedMessage("✓ All preferences saved successfully!");
                      setHasUnsavedChanges(false);
                      return true;
-                 } catch (backendErr) {
+                } catch (backendErr: unknown) {
                      // Handle 404 gracefully - user might not exist on backend yet
                      if (backendErr instanceof Error && backendErr.message.includes("404")) {
                          console.debug("User not found on backend (404) - saving to localStorage only");
                          setSavedMessage("✓ Preferences saved locally (user not synced to backend)");
                          setHasUnsavedChanges(false);
                          return true;
-                     } else {
-                         throw backendErr;
-                     }
-                 }
+                    }
+
+                    console.error("Failed to save preferences to backend:", backendErr);
+                    setSavedMessage("Error saving - please try again");
+                    return false;
+                }
              } else {
                  setSavedMessage("✓ Preferences saved locally");
                  setHasUnsavedChanges(false);
@@ -377,7 +379,7 @@ export function SettingsProvider({
                 : settings.textSize === "Large"
                     ? "text-lg"
                     : "text-base";
-        const themeClass = resolvedTheme === "Light" ? "bg-zinc-100 text-zinc-950" : "bg-zinc-900 text-white";
+        const themeClass = "bg-(--color-bg-main) text-(--color-text-primary)";
         const contrastClass = (settings as any).toggles?.["High contrast mode"] ? "contrast-125" : "";
 
         return `min-h-screen ${themeClass} ${textSizeClass} ${contrastClass}`;

@@ -560,25 +560,25 @@ function ScannerBody({
 
 function BottomNav() {
   return (
-    <div className="shrink-0 border-t border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-black">
+    <div className="shrink-0 border-t border-(--color-green-accent) bg-(--color-bg-card) px-6 py-4">
       <div className="flex justify-around">
-        <Link href="../HomePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <Link href="../HomePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
           <FontAwesomeIcon icon={faHome} className="text-xl" />
           <span className="text-xs font-medium">Home</span>
         </Link>
-        <button className="flex flex-col items-center gap-1 text-green-700">
+        <button className="flex flex-col items-center gap-1 text-(--color-green-primary)">
           <FontAwesomeIcon icon={faClock} className="text-xl" />
           <span className="text-xs font-medium">Scanner</span>
         </button>
-        <Link href="../MapPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <Link href="../MapPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
           <FontAwesomeIcon icon={faMap} className="text-xl" />
           <span className="text-xs font-medium">Map</span>
         </Link>
-        <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
           <FontAwesomeIcon icon={faComments} className="text-xl" />
           <span className="text-xs font-medium">SEB</span>
         </Link>
-        <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+        <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
           <FontAwesomeIcon icon={faUser} className="text-xl" />
           <span className="text-xs font-medium">Profile</span>
         </Link>

@@ -75,18 +75,18 @@ function ProfileAvatar({ image, isEditing, onImageChange }: { image: string | nu
 
   return (
     <div className="relative mx-auto h-32 w-32">
-      <div className={`flex h-32 w-32 items-center justify-center rounded-full border-4 border-emerald-200 bg-linear-to-br from-emerald-400 to-emerald-600 shadow-lg dark:border-emerald-300 ${isEditing ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}`} onClick={() => isEditing && fileInputRef.current?.click()}>
+      <div className={`flex h-32 w-32 items-center justify-center rounded-full border-4 border-(--color-green-accent) bg-linear-to-br from-(--color-green-primary) to-(--color-green-primary) shadow-lg ${isEditing ? "cursor-pointer transition-opacity hover:opacity-80" : ""}`} onClick={() => isEditing && fileInputRef.current?.click()}>
         {image ? (
           <img src={image} alt="Profile" className="h-28 w-28 rounded-full object-cover" />
         ) : (
-          <div className="flex h-28 w-28 items-center justify-center rounded-full bg-white text-6xl text-emerald-600">
+          <div className="flex h-28 w-28 items-center justify-center rounded-full bg-(--color-bg-card) text-6xl text-(--color-green-primary)">
             <FontAwesomeIcon icon={faUserCircle} />
           </div>
         )}
       </div>
       {isEditing && (
-        <div className="absolute inset-0 flex h-32 w-32 items-center justify-center rounded-full bg-black/40 opacity-0 hover:opacity-100 transition-opacity pointer-events-none">
-          <FontAwesomeIcon icon={faCamera} className="text-white text-2xl" />
+        <div className="pointer-events-none absolute inset-0 flex h-32 w-32 items-center justify-center rounded-full bg-black/35 opacity-0 transition-opacity hover:opacity-100">
+          <FontAwesomeIcon icon={faCamera} className="text-2xl text-white" />
         </div>
       )}
       {isEditing && (
@@ -122,20 +122,20 @@ function ProfileField({
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-semibold text-emerald-500">{label}</label>
+      <label className="text-sm font-semibold text-(--color-green-primary)">{label}</label>
       {isEditing ? (
         <div className="relative">
           <input
             value={value}
             onChange={(event) => onChange(event.target.value)}
             type={inputType}
-            className="w-full rounded-xl border-2 border-emerald-500 bg-emerald-100 px-4 py-3 text-center text-base font-medium text-slate-900 outline-none transition-all placeholder:text-slate-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30"
+            className="w-full rounded-xl border-2 border-(--color-green-primary) bg-(--color-bg-main) px-4 py-3 text-center text-base font-medium text-(--color-text-primary) outline-none transition-all placeholder:text-(--color-text-secondary) focus:ring-2 focus:ring-(--color-green-primary)/30"
           />
           {isPasswordField && (
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-900 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} className="text-lg" />
@@ -143,7 +143,7 @@ function ProfileField({
           )}
         </div>
       ) : (
-        <div className="rounded-xl border border-emerald-800/60 bg-emerald-950/40 px-4 py-3 text-base font-medium text-emerald-100 transition-colors">
+        <div className="rounded-xl border border-(--color-green-accent) bg-(--color-bg-main) px-4 py-3 text-base font-medium text-(--color-text-primary) transition-colors">
           {value}
         </div>
       )}
@@ -163,7 +163,7 @@ function ActionButton({
   const styles =
     variant === "danger"
       ? "bg-linear-to-r from-red-500 to-red-600 text-white shadow-red-500/20"
-      : "bg-linear-to-r from-emerald-500 to-green-600 text-white shadow-green-500/20";
+      : "bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) shadow-green-500/20";
 
   return (
     <button
@@ -178,25 +178,25 @@ function ActionButton({
 
 function BottomNav() {
   return (
-    <div className="shrink-0 border-t border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-black">
+    <div className="shrink-0 border-t border-(--color-green-accent) bg-(--color-bg-card) px-6 py-4">
       <div className="flex justify-around">
-      <Link href="../HomePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+      <Link href="../HomePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
         <FontAwesomeIcon icon={faHome} className="text-xl" />
         <span className="text-xs font-medium">Home</span>
       </Link>
-      <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+      <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
         <FontAwesomeIcon icon={faClock} className="text-xl" />
         <span className="text-xs font-medium">Scanner</span>
       </Link>
-      <Link href="../MapPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+      <Link href="../MapPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
         <FontAwesomeIcon icon={faMap} className="text-xl" />
         <span className="text-xs font-medium">Map</span>
       </Link>
-      <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
+      <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) transition-colors hover:text-(--color-text-primary)">
         <FontAwesomeIcon icon={faComments} className="text-xl" />
         <span className="text-xs font-medium">SEB</span>
       </Link>
-      <button className="flex flex-col items-center gap-1 text-green-700">
+      <button className="flex flex-col items-center gap-1 text-(--color-green-primary)">
         <FontAwesomeIcon icon={faUser} className="text-xl" />
         <span className="text-xs font-medium">Profile</span>
       </button>
