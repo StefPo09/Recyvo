@@ -11,8 +11,9 @@ import {
   faUser, faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import {useState, type Dispatch, type KeyboardEvent, type ChangeEvent, type SetStateAction, useEffect} from "react";
+import {useState, type Dispatch, type KeyboardEvent, type ChangeEvent, type SetStateAction, useEffect, useMemo} from "react";
 import {useRouter} from "next/navigation";
+import { useSettings } from "@/lib/SettingsContext";
 
 type ChatSender = "user" | "robot";
 
@@ -21,47 +22,6 @@ type ChatEntry = {
   message: string;
   sender: ChatSender;
 };
-
-function TopBar({userData}  : {userData: any}) {
-  return(
-    <div className="shrink-0 bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
-      <div className="flex items-center justify-between gap-2 mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-(--color-text-on-green) rounded-full flex items-center justify-center text-(--color-green-primary) font-bold text-sm">
-            🤖
-          </div>
-          <h1 className="text-lg font-semibold font-(family-name:--font-header)">SEB: Eco Assistant</h1>
-        </div>
-        <Link
-          href="../SettingsPage"
-          className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium hover:bg-white/20 transition-colors"
-          aria-label="Settings"
-        >
-          <FontAwesomeIcon icon={faUserGear} className="text-sm" />
-          <span>Settings</span>
-        </Link>
-      </div>
-
-
-      <div className="bg-(--color-bg-card) rounded-xl p-4 shadow-sm">
-        <div className="flex justify-between items-start mb-3">
-          <div>
-            <p className="text-(--color-text-secondary) text-sm font-medium font-(family-name:--font-body)">{userData?.nume || "User"}</p>
-            <p className="text-2xl font-bold text-(--color-text-primary) mt-1 font-(family-name:--font-header)">Points: <span className="text-(--color-green-primary)">{userData?.nr_puncte || 0}</span></p>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-2xl">🏅</span>
-            <span className="text-xs text-(--color-text-secondary) mt-1">Level 7</span>
-          </div>
-        </div>
-
-        <div className="w-full bg-(--color-green-accent) rounded-full h-2">
-          <div className="bg-(--color-green-primary) h-2 rounded-full" style={{ width: "70%" }}></div>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 function formatTime(date = new Date()) {
   return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
@@ -219,8 +179,7 @@ function ChatMessages({ chatMessages }: { chatMessages: ChatEntry[] }) {
 
 function BottomNav() {
   return (
-    <div className="shrink-0 border-t border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-black">
-      <div className="flex justify-around">
+    <div className="mt-auto flex justify-around border-t border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-black">
         <Link href="../HomePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
           <FontAwesomeIcon icon={faHome} className="text-xl" />
           <span className="text-xs font-medium">Home</span>
@@ -242,59 +201,76 @@ function BottomNav() {
           <span className="text-xs font-medium">Profile</span>
         </Link>
       </div>
-    </div>
   );
 }
 
 export default function Home() {
   const [chatMessages, setChatMessages] = useState<ChatEntry[]>([]);
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isDark, settings } = useSettings();
+
+  const mainClassName = useMemo(() => {
+    const textSizeClass =
+        settings.textSize === "Small"
+            ? "text-sm"
+            : settings.textSize === "Large"
+                ? "text-lg"
+                : "text-base";
+    const themeClass = isDark
+        ? "bg-zinc-900 text-white"
+        : "bg-zinc-100 text-zinc-950";
+    const contrastClass = (settings.toggles as Record<string, boolean>)["High contrast mode"]
+        ? "contrast-125"
+        : "";
+
+    return `${themeClass} ${textSizeClass} ${contrastClass}`;
+  }, [isDark, settings.textSize, settings.toggles]);
 
   useEffect(() => {
-    // Check if user is logged in
+    // simple redirect if no user in localStorage
     const userExists = localStorage.getItem("user");
-
-    if (userExists) {
-      try {
-        const user = JSON.parse(userExists);
-        setUserData(user);
-        setIsAuthenticated(true);
-      } catch (e) {
-        // Invalid user data, redirect to StartPage
-        router.push("/StartPage");
-      }
-    } else {
-      // No user logged in, redirect to StartPage
-      router.push("/StartPage");
-    }
-    setIsLoading(false);
+    if (!userExists) router.push("/StartPage");
   }, [router]);
-// Show loading while checking authentication
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-(--color-bg-card)">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-(--color-green-accent) border-t-(--color-green-primary) rounded-full animate-spin"></div>
-          <p className="text-(--color-text-secondary) font-(family-name:--font-body)">Loading...</p>
+  return (
+    <main className={`flex h-screen flex-col ${mainClassName}`}>
+      <div className={`bg-linear-to-r text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl ${isDark ? "from-green-900 to-green-800" : "from-green-600 to-green-500"}`}>
+        <div className="flex items-center justify-between gap-2 mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-(--color-text-on-green) rounded-full flex items-center justify-center text-(--color-green-primary) font-bold text-sm">
+              🤖
+            </div>
+            <h1 className="text-lg font-semibold font-(family-name:--font-header)">SEB: Eco Assistant</h1>
+          </div>
+          <Link
+            href="./" // Add settingsPage
+            className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium hover:bg-white/20 transition-colors"
+            aria-label="Settings"
+          >
+            <FontAwesomeIcon icon={faUserGear} className="text-sm" />
+            <span>Settings</span>
+          </Link>
+        </div>
+
+
+        <div className="rounded-xl bg-(--color-bg-card) p-4 shadow-sm">
+          <div className="mb-3 flex items-start justify-between">
+            <div>
+              <p className="text-(--color-text-secondary) text-sm font-medium font-(family-name:--font-body)">Eco Legend in Training</p>
+              <p className="mt-1 text-2xl font-bold text-(--color-text-primary) font-(family-name:--font-header)">Points: <span className="text-(--color-green-primary)">12,450</span></p>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-2xl">🏅</span>
+              <span className="text-xs text-(--color-text-secondary) mt-1">Level 7</span>
+            </div>
+          </div>
+
+          <div className="h-2 w-full rounded-full bg-(--color-green-accent)">
+            <div className="h-2 rounded-full bg-(--color-green-primary)" style={{ width: "70%" }}></div>
+          </div>
         </div>
       </div>
-    );
-  }
 
-  // Don't render if not authenticated (router will handle redirect)
-  if (!isAuthenticated) {
-    return null;
-  }
-  return (
-    <main className="flex h-screen flex-col overflow-hidden bg-(--color-bg-main) text-(--color-text-primary)">
-      <TopBar
-        userData={userData}
-      />
-
-      <section className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+      <section className="flex-1 overflow-y-auto px-4 py-4">
         <div className="mx-auto flex max-w-md flex-col gap-3">
           <ChatMessages
             chatMessages={chatMessages}
@@ -302,11 +278,9 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="shrink-0">
-        <ChatInput
-          setChatMessages={setChatMessages}
-        />
-      </div>
+      <ChatInput
+        setChatMessages={setChatMessages}
+      />
 
       <BottomNav />
     </main>

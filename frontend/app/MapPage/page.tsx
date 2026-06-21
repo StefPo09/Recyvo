@@ -13,55 +13,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { FiGrid } from 'react-icons/fi';
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { listBins, findNearest, fetchRecyclingPlaces } from "@/lib/api";
-import {useRouter} from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
+import { useSettings } from "@/lib/SettingsContext";
 
 // dynamic import of client-side MapView; typed as any to avoid SSR/type checks
 // @ts-ignore
 const MapViewAny: any = dynamic(() => import("../../components/MapView"), { ssr: false });
-
-function TopBar({userData}  : {userData: any}) {
-  return(
-    <div className="shrink-0 bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl">
-      <div className="flex items-center justify-between gap-2 mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-(--color-text-on-green) rounded-full flex items-center justify-center text-(--color-green-primary) font-bold text-sm">
-            🤖
-          </div>
-          <h1 className="text-lg font-semibold font-(family-name:--font-header)">SEB: Eco Assistant</h1>
-        </div>
-        <Link
-          href="../SettingsPage"
-          className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium hover:bg-white/20 transition-colors"
-          aria-label="Settings"
-        >
-          <FontAwesomeIcon icon={faUserGear} className="text-sm" />
-          <span>Settings</span>
-        </Link>
-      </div>
-
-
-      <div className="bg-(--color-bg-card) rounded-xl p-4 shadow-sm">
-        <div className="flex justify-between items-start mb-3">
-          <div>
-            <p className="text-(--color-text-secondary) text-sm font-medium font-(family-name:--font-body)">{userData?.nume || "User"}</p>
-            <p className="text-2xl font-bold text-(--color-text-primary) mt-1 font-(family-name:--font-header)">Points: <span className="text-(--color-green-primary)">{userData?.nr_puncte || 0}</span></p>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-2xl">🏅</span>
-            <span className="text-xs text-(--color-text-secondary) mt-1">Level 7</span>
-          </div>
-        </div>
-
-        <div className="w-full bg-(--color-green-accent) rounded-full h-2">
-          <div className="bg-(--color-green-primary) h-2 rounded-full" style={{ width: "70%" }}></div>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 function BinSelect({
                      name,
@@ -104,10 +64,27 @@ function BinSelect({
 }
 
 function BinMap() {
-  const [bin, setBin] = useState("All");
-  const [bins, setBins] = useState<any[]>([]);
-  const [places, setPlaces] = useState<any[]>([]);
-  const [nearest, setNearest] = useState<any | null>(null);
+   const searchParams = useSearchParams();
+   const categoryParam = searchParams.get("category");
+
+   // Map backend waste_category to UI bin type
+   const mapCategoryToBin = (category: string | null): string => {
+     if (!category) return "All";
+     const lowerCat = category.toLowerCase();
+     if (lowerCat === "plastic") return "Plastic and Metal";
+     if (lowerCat === "hartie_carton" || lowerCat === "hartie") return "Paper";
+     if (lowerCat === "sticla" || lowerCat === "glass") return "Glass";
+     if (lowerCat === "metal") return "Plastic and Metal";
+     if (lowerCat === "electronics" || lowerCat === "electronic") return "Household";
+     if (lowerCat === "batteries") return "Household";
+     if (lowerCat === "organic" || lowerCat === "hazardous") return "Household";
+     return "All";
+   };
+
+   const [bin, setBin] = useState(() => mapCategoryToBin(categoryParam));
+   const [bins, setBins] = useState<any[]>([]);
+   const [places, setPlaces] = useState<any[]>([]);
+   const [nearest, setNearest] = useState<any | null>(null);
 
   async function ShowTrashBins(selectedBin: string) {
     // map UI category to backend bin_type and place category
@@ -137,13 +114,26 @@ function BinMap() {
         } catch (err) {
           // ignore
         }
+      }, (err) => {
+        // Location permission denied
+        if (err.code === 1) { // PERMISSION_DENIED
+          alert("Location access is disabled. Please enable location permissions in your device settings to find nearby recycling bins.");
+        }
       });
     }
   }
 
-  const binOptions = ["All", "Plastic and Metal", "Paper", "Glass", "Household"];
+   const binOptions = ["All", "Plastic and Metal", "Paper", "Glass", "Household"];
 
-  useEffect(() => {
+    // Auto-trigger bin selection when category param is set
+    useEffect(() => {
+      if (categoryParam) {
+        const selectedBin = mapCategoryToBin(categoryParam);
+        setBin(selectedBin);
+      }
+    }, [categoryParam]);
+
+   useEffect(() => {
     let mounted = true;
 
     async function load() {
@@ -184,6 +174,11 @@ function BinMap() {
             }
           } catch (e) {
             // ignore
+          }
+        }, (err) => {
+          // Location permission denied
+          if (err.code === 1) { // PERMISSION_DENIED
+            alert("Location access is disabled. Please enable location permissions in your device settings to find nearby recycling bins.");
           }
         });
       }
@@ -255,81 +250,75 @@ function BinMap() {
   )
 }
 
-function BottomNav() {
-  return (
-    <div className="shrink-0 border-t border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-black">
-      <div className="flex justify-around">
-      <Link href="../HomePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
-        <FontAwesomeIcon icon={faHome} className="text-xl" />
-        <span className="text-xs font-medium">Home</span>
-      </Link>
-      <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
-        <FontAwesomeIcon icon={faClock} className="text-xl" />
-        <span className="text-xs font-medium">Scanner</span>
-      </Link>
-      <button className="flex flex-col items-center gap-1 text-green-700">
-        <FontAwesomeIcon icon={faMap} className="text-xl" />
-        <span className="text-xs font-medium">Map</span>
-      </button>
-      <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
-        <FontAwesomeIcon icon={faComments} className="text-xl" />
-        <span className="text-xs font-medium">SEB</span>
-      </Link>
-      <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-400 hover:text-gray-600">
-        <FontAwesomeIcon icon={faUser} className="text-xl" />
-        <span className="text-xs font-medium">Profile</span>
-      </Link>
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isDark, settings } = useSettings();
+
+  const mainClassName = useMemo(() => {
+    const textSizeClass =
+        settings.textSize === "Small"
+            ? "text-sm"
+            : settings.textSize === "Large"
+                ? "text-lg"
+                : "text-base";
+    const themeClass = isDark
+        ? "bg-zinc-900 text-white"
+        : "bg-zinc-100 text-zinc-950";
+    const contrastClass = (settings.toggles as Record<string, boolean>)["High contrast mode"]
+        ? "contrast-125"
+        : "";
+
+    return `${themeClass} ${textSizeClass} ${contrastClass}`;
+  }, [isDark, settings.textSize, settings.toggles]);
 
   useEffect(() => {
     // Check if user is logged in
     const userExists = localStorage.getItem("user");
 
-    if (userExists) {
-      try {
-        const user = JSON.parse(userExists);
-        setUserData(user);
-        setIsAuthenticated(true);
-      } catch (e) {
-        // Invalid user data, redirect to StartPage
-        router.push("/StartPage");
-      }
-    } else {
+    if (!userExists) {
       // No user logged in, redirect to StartPage
       router.push("/StartPage");
     }
-    setIsLoading(false);
   }, [router]);
-// Show loading while checking authentication
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-(--color-bg-card)">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-(--color-green-accent) border-t-(--color-green-primary) rounded-full animate-spin"></div>
-          <p className="text-(--color-text-secondary) font-(family-name:--font-body)">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
-  // Don't render if not authenticated (router will handle redirect)
-  if (!isAuthenticated) {
-    return null;
-  }
   return (
-      <main className="flex h-screen flex-col overflow-hidden bg-(--color-bg-main)">
-        <TopBar
-          userData={userData}
-        />
+      <main className={`flex min-h-screen flex-col ${mainClassName}`}>
+        <div className={`bg-linear-to-r text-(--color-text-on-green) px-6 pt-6 pb-8 rounded-b-3xl ${isDark ? "from-green-900 to-green-800" : "from-green-600 to-green-500"}`}>
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-(--color-text-on-green) rounded-full flex items-center justify-center text-(--color-green-primary) font-bold text-sm">
+                🤖
+              </div>
+              <h1 className="text-lg font-semibold font-(family-name:--font-header)">SEB: Eco Assistant</h1>
+            </div>
+            <Link
+              href="../SettingsPage"
+              className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium hover:bg-white/20 transition-colors"
+              aria-label="Settings"
+            >
+              <FontAwesomeIcon icon={faUserGear} className="text-sm" />
+              <span>Settings</span>
+            </Link>
+          </div>
+
+          <div className="bg-(--color-bg-card) rounded-xl p-4 shadow-sm">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <p className="text-(--color-text-secondary) text-sm font-medium font-(family-name:--font-body)">Eco Legend in Training</p>
+                <p className="text-2xl font-bold text-(--color-text-primary) mt-1 font-(family-name:--font-header)">Points: <span className="text-(--color-green-primary)">12,450</span></p>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-2xl">🏅</span>
+                <span className="text-xs text-(--color-text-secondary) mt-1">Level 7</span>
+              </div>
+            </div>
+
+            <div className="w-full bg-(--color-green-accent) rounded-full h-2">
+              <div className="bg-(--color-green-primary) h-2 rounded-full" style={{ width: "70%" }}></div>
+            </div>
+          </div>
+
+        </div>
 
         <div className="flex-1 px-6 py-6 overflow-y-auto">
           <div className="mb-6 flex items-end justify-between gap-4">
@@ -341,10 +330,33 @@ export default function Home() {
               Nearby bins
             </div>
           </div>
-          <BinMap />
+          <Suspense fallback={<div>Loading...</div>}>
+            <BinMap />
+          </Suspense>
         </div>
 
-        <BottomNav />
+        <div className="mt-auto border-t border-(--color-green-accent) bg-(--color-bg-card) px-6 py-4 flex justify-around">
+          <Link href="../HomePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
+            <FontAwesomeIcon icon={faHome} className="text-xl" />
+            <span className="text-xs font-medium font-(family-name:--font-body)">Home</span>
+          </Link>
+          <Link href="../ScannerPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
+            <FontAwesomeIcon icon={faClock} className="text-xl" />
+            <span className="text-xs font-medium font-(family-name:--font-body)">Scanner</span>
+          </Link>
+          <button className="flex cursor-pointer flex-col items-center gap-1 text-(--color-green-primary)">
+            <FontAwesomeIcon icon={faMap} className="text-xl" />
+            <span className="text-xs font-medium font-(family-name:--font-body)">Map</span>
+          </button>
+          <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
+            <FontAwesomeIcon icon={faComments} className="text-xl" />
+            <span className="text-xs font-medium font-(family-name:--font-body)">SEB</span>
+          </Link>
+          <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
+            <FontAwesomeIcon icon={faUser} className="text-xl" />
+            <span className="text-xs font-medium font-(family-name:--font-body)">Profile</span>
+          </Link>
+        </div>
       </main>
   );
 }
