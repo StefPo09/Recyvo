@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import logoSrc from "@/Logo/Transparent/color.png";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
@@ -18,8 +19,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SEB: Brašov Eco Assistant",
+  title: "Recyvo",
   description: "Eco waste scanning and recycling companion",
+  icons: {
+    icon: logoSrc.src,
+  },
 };
 
 export default async function RootLayout({
