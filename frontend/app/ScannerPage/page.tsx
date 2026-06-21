@@ -136,28 +136,28 @@ function ScannerHeader() {
 
 function ScannerFooter() {
   return (
-      <div className="border-t border-(--color-green-accent)] bg-(--color-bg-card)] px-6 py-4 flex justify-around">
-        <Link href="../HomePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary)] hover:text-(--color-text-primary)]">
-          <FontAwesomeIcon icon={faHome} className="text-xl" />
-          <span className="text-xs font-medium font-(family-name:--font-body)">Home</span>
-        </Link>
-        <button className="flex flex-col items-center gap-1 text-(--color-green-primary)]">
-          <FontAwesomeIcon icon={faClock} className="text-xl" />
-          <span className="text-xs font-medium font-(family-name:--font-body)">Scanner</span>
-        </button>
-        <Link href="../MapPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary)] hover:text-(--color-text-primary)]">
-          <FontAwesomeIcon icon={faMap} className="text-xl" />
-          <span className="text-xs font-medium font-(family-name:--font-body)">Map</span>
-        </Link>
-        <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary)] hover:text-(--color-text-primary)]">
-          <FontAwesomeIcon icon={faComments} className="text-xl" />
-          <span className="text-xs font-medium font-(family-name:--font-body)">SEB</span>
-        </Link>
-        <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary)] hover:text-(--color-text-primary)]">
-          <FontAwesomeIcon icon={faUser} className="text-xl" />
-          <span className="text-xs font-medium font-(family-name:--font-body)">Profile</span>
-        </Link>
-      </div>
+    <div className="mt-auto border-t border-(--color-green-accent) bg-(--color-bg-card) px-6 py-4 flex justify-around">
+      <Link href="../HomePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
+        <FontAwesomeIcon icon={faHome} className="text-xl" />
+        <span className="text-xs font-medium font-(family-name:--font-body)">Home</span>
+      </Link>
+      <button className="flex flex-col items-center gap-1 text-(--color-green-primary)">
+        <FontAwesomeIcon icon={faClock} className="text-xl" />
+        <span className="text-xs font-medium font-(family-name:--font-body)">Scanner</span>
+      </button>
+      <Link href="../MapPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
+        <FontAwesomeIcon icon={faMap} className="text-xl" />
+        <span className="text-xs font-medium font-(family-name:--font-body)">Map</span>
+      </Link>
+      <Link href="../AiChatPage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
+        <FontAwesomeIcon icon={faComments} className="text-xl" />
+        <span className="text-xs font-medium font-(family-name:--font-body)">SEB</span>
+      </Link>
+      <Link href="../ProfilePage" className="flex flex-col items-center gap-1 text-(--color-text-secondary) hover:text-(--color-text-primary)">
+        <FontAwesomeIcon icon={faUser} className="text-xl" />
+        <span className="text-xs font-medium font-(family-name:--font-body)">Profile</span>
+      </Link>
+    </div>
   );
 }
 

@@ -1,0 +1,192 @@
+WARNING: GOOGLE_API_KEY not set. Gemini/Places features will be disabled.
+INFO:     127.0.0.1:59623 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59624 - "GET /users/all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57706 - "OPTIONS /users/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57706 - "POST /users/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61047 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61047 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61047 - "GET /bins/nearest-simple/?lat=45.6587921130146&lng=25.519842525363742&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61047 - "GET /places/nearby/?lat=45.6587921130146&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:52591 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50102 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50102 - "GET /bins/nearest-simple/?lat=45.6587921130146&lng=25.519842525363742&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50102 - "GET /places/nearby/?lat=45.6587921130146&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:57224 - "GET /users/7f197673-3adc-46a5-826f-882199d38cab HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57224 - "GET /users/7f197673-3adc-46a5-826f-882199d38cab HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57224 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53563 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53563 - "GET /bins/nearest-simple/?lat=45.6587921130146&lng=25.519842525363742&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53563 - "GET /places/nearby/?lat=45.6587921130146&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:56873 - "GET /users/7f197673-3adc-46a5-826f-882199d38cab HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56873 - "GET /users/7f197673-3adc-46a5-826f-882199d38cab HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62160 - "GET /users/7f197673-3adc-46a5-826f-882199d38cab HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62160 - "GET /users/7f197673-3adc-46a5-826f-882199d38cab HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63412 - "OPTIONS /users/7f197673-3adc-46a5-826f-882199d38cab HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63412 - "DELETE /users/7f197673-3adc-46a5-826f-882199d38cab HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51309 - "OPTIONS /users/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51309 - "POST /users/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56900 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56900 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56900 - "GET /bins/nearest-simple/?lat=45.65877988242934&lng=25.519828904516537&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56900 - "GET /places/nearby/?lat=45.65877988242934&lng=25.519828904516537&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:56900 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49805 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59386 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59386 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59386 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59913 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59913 - "GET /bins/nearest-simple/?lat=45.6587921130146&lng=25.519842525363742&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59913 - "GET /places/nearby/?lat=45.6587921130146&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:58235 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58235 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58235 - "GET /bins/nearest-simple/?lat=45.658796967520516&lng=25.519840249737488&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58235 - "GET /places/nearby/?lat=45.658796967520516&lng=25.519840249737488&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:58235 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52961 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52961 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58235 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58235 - "GET /bins/nearest-simple/?lat=45.658796967520516&lng=25.519840249737488&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58235 - "GET /places/nearby/?lat=45.658796967520516&lng=25.519840249737488&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:51973 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51973 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51973 - "GET /bins/nearest-simple/?lat=45.65878825428824&lng=25.519840049961633&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51973 - "GET /places/nearby/?lat=45.65878825428824&lng=25.519840049961633&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:50520 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50520 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50520 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53370 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53370 - "GET /bins/nearest-simple/?lat=45.65878825428824&lng=25.519840049961633&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53370 - "GET /places/nearby/?lat=45.65878825428824&lng=25.519840049961633&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:63265 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63265 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63265 - "GET /bins/nearest-simple/?lat=45.65876343311131&lng=25.51963911709352&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63265 - "GET /places/nearby/?lat=45.65876343311131&lng=25.51963911709352&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:63265 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52680 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55722 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55722 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55722 - "GET /bins/nearest-simple/?lat=45.65876343311131&lng=25.51963911709352&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55722 - "GET /places/nearby/?lat=45.65876343311131&lng=25.51963911709352&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:58343 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58343 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54099 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54099 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54099 - "GET /bins/nearest-simple/?lat=45.658792113014606&lng=25.519842525363742&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54099 - "GET /places/nearby/?lat=45.658792113014606&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:54099 - "GET /bins/?bin_type=sticla HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62813 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62813 - "GET /places/nearby/?lat=45.658792113014606&lng=25.519842525363742&waste_category=sticla&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:54099 - "GET /bins/nearest-simple/?lat=45.658792113014606&lng=25.519842525363742&bin_type=sticla&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54099 - "GET /places/nearby/?lat=45.658792113014606&lng=25.519842525363742&waste_category=sticla&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:54099 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62813 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54099 - "GET /places/nearby/?lat=45.658792113014606&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:62813 - "GET /bins/nearest-simple/?lat=45.658792113014606&lng=25.519842525363742&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62813 - "GET /places/nearby/?lat=45.658792113014606&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:59798 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59798 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61440 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61440 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61440 - "GET /bins/nearest-simple/?lat=45.658792113014606&lng=25.519842525363742&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61440 - "GET /places/nearby/?lat=45.658792113014606&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:63639 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63639 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58054 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58054 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58054 - "GET /bins/nearest-simple/?lat=45.6587921130146&lng=25.519842525363742&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58054 - "GET /places/nearby/?lat=45.6587921130146&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:58054 - "GET /bins/?bin_type=general HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59572 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58054 - "GET /places/nearby/?lat=45.6587921130146&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:59572 - "GET /bins/nearest-simple/?lat=45.6587921130146&lng=25.519842525363742&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59572 - "GET /places/nearby/?lat=45.6587921130146&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:59572 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58054 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55670 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55670 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55670 - "GET /bins/nearest-simple/?lat=45.65876132919009&lng=25.51959310886987&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55670 - "GET /places/nearby/?lat=45.65876132919009&lng=25.51959310886987&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:55670 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51020 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51020 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55670 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55670 - "GET /bins/nearest-simple/?lat=45.65876132919009&lng=25.51959310886987&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55670 - "GET /places/nearby/?lat=45.65876132919009&lng=25.51959310886987&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:55670 - "GET /bins/?bin_type=plastic HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51020 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51020 - "GET /places/nearby/?lat=45.65876132919009&lng=25.51959310886987&waste_category=plastic&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:55670 - "GET /bins/nearest-simple/?lat=45.65876132919009&lng=25.51959310886987&bin_type=plastic&max_results=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55670 - "GET /places/nearby/?lat=45.65876132919009&lng=25.51959310886987&waste_category=plastic&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:55670 - "GET /bins/?bin_type=hartie HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51020 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55670 - "GET /places/nearby/?lat=45.65876132919009&lng=25.51959310886987&waste_category=hartie_carton&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:51020 - "GET /bins/nearest-simple/?lat=45.65876132919009&lng=25.51959310886987&bin_type=hartie&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51020 - "GET /places/nearby/?lat=45.65876132919009&lng=25.51959310886987&waste_category=hartie_carton&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:51020 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55670 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55670 - "GET /places/nearby/?lat=45.65876132919009&lng=25.51959310886987&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:51020 - "GET /bins/nearest-simple/?lat=45.65876132919009&lng=25.51959310886987&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51020 - "GET /places/nearby/?lat=45.65876132919009&lng=25.51959310886987&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:65178 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65178 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65178 - "GET /bins/nearest-simple/?lat=45.65876343311132&lng=25.51963911709352&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65178 - "GET /places/nearby/?lat=45.65876343311132&lng=25.51963911709352&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:65178 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50397 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58801 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58801 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58801 - "GET /bins/nearest-simple/?lat=45.658792113014606&lng=25.519842525363742&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58801 - "GET /places/nearby/?lat=45.658792113014606&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:58801 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52512 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49851 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49851 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49851 - "GET /bins/nearest-simple/?lat=45.658792113014606&lng=25.519842525363742&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49851 - "GET /places/nearby/?lat=45.658792113014606&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:49851 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60618 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58598 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58598 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58598 - "GET /bins/nearest-simple/?lat=45.658792113014606&lng=25.519842525363742&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58598 - "GET /places/nearby/?lat=45.658792113014606&lng=25.519842525363742&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:59514 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59514 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59514 - "GET /bins/nearest-simple/?lat=45.65879153502825&lng=25.519841912231875&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59514 - "GET /places/nearby/?lat=45.65879153502825&lng=25.519841912231875&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:56487 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61904 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61904 - "GET /bins/nearest-simple/?lat=45.65879153502825&lng=25.519841912231875&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61904 - "GET /places/nearby/?lat=45.65879153502825&lng=25.519841912231875&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:65419 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65419 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60609 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54205 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54205 - "GET /bins/nearest-simple/?lat=45.65879153502825&lng=25.519841912231875&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54205 - "GET /places/nearby/?lat=45.65879153502825&lng=25.519841912231875&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:54205 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60609 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63712 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63712 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63712 - "GET /bins/nearest-simple/?lat=45.65879153502825&lng=25.519841912231875&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63712 - "GET /places/nearby/?lat=45.65879153502825&lng=25.519841912231875&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:63712 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49345 - "GET /users/9861c060-b0b6-4906-97c8-2ddb4d5212bd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63193 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63193 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63193 - "GET /bins/nearest-simple/?lat=45.65879544172121&lng=25.51984242759535&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63193 - "GET /places/nearby/?lat=45.65879544172121&lng=25.51984242759535&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:65149 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59609 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59609 - "GET /bins/nearest-simple/?lat=45.65879544172121&lng=25.51984242759535&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59609 - "GET /places/nearby/?lat=45.65879544172121&lng=25.51984242759535&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:62351 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62351 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62351 - "GET /bins/nearest-simple/?lat=45.65876343311132&lng=25.51963911709352&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62351 - "GET /places/nearby/?lat=45.65876343311132&lng=25.51963911709352&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:62494 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62494 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62494 - "GET /bins/nearest-simple/?lat=45.65876343311132&lng=25.51963911709352&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62494 - "GET /places/nearby/?lat=45.65876343311132&lng=25.51963911709352&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:50300 - "GET /bins/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50300 - "GET /bins/nearest-simple/?lat=45.65876343311132&lng=25.51963911709352&bin_type=general&max_results=5 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50300 - "GET /places/nearby/?lat=45.65876343311132&lng=25.51963911709352&waste_category=altele&max_results=8 HTTP/1.1" 500 Internal Server Error
