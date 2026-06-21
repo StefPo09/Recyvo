@@ -1,14 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import {useState, useEffect} from "react";
-import logo from '../../Logo/Transparent/color.png';
 import { FiUser, FiMail, FiUserPlus, FiLock } from 'react-icons/fi';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
+import Link from "next/link";
 import { signupUser } from '@/lib/api';
+import { useSettings } from "@/lib/SettingsContext";
+import AuthShell from "@/components/AuthShell";
 
-function Input({ name, value, setValue, hasError, errorMessage }: { name: string, value: any, setValue: any, hasError: boolean, errorMessage?: string }){
+function Input({ name, value, setValue, hasError, errorMessage, isDark }: { name: string, value: any, setValue: any, hasError: boolean, errorMessage?: string; isDark: boolean }){
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(false);
 
@@ -20,7 +21,9 @@ function Input({ name, value, setValue, hasError, errorMessage }: { name: string
     <div className="w-full max-w-sm mx-auto mt-5">
       <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition duration-300 backdrop-blur-sm
         ${hasError 
-          ? 'bg-red-50 border-red-400' 
+          ? isDark
+            ? 'bg-red-950/40 border-red-800'
+            : 'bg-red-50 border-red-400'
           : focused 
           ? 'bg-(--color-bg-card) border-(--color-green-primary) shadow-(--color-green-accent)' 
           : 'bg-(--color-bg-card) border-(--color-green-accent)'}`}
@@ -50,7 +53,7 @@ function Input({ name, value, setValue, hasError, errorMessage }: { name: string
           placeholder={name}
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          className="w-full bg-transparent text-base font-medium ${hasError ? 'text-red-500' : 'text-(--color-text-primary)'} placeholder-(--color-text-secondary) outline-none font-(family-name:--font-body)"
+          className={`w-full bg-transparent text-base font-medium ${hasError ? 'text-red-500' : 'text-(--color-text-primary)'} placeholder-(--color-text-secondary) outline-none font-(family-name:--font-body)`}
         />
 
         {name === 'Password' || name === 'Confirm Password' ? (
@@ -66,7 +69,7 @@ function Input({ name, value, setValue, hasError, errorMessage }: { name: string
         ) : null}
       </div>
       {errorMessage ? (
-        <p className="mx-auto mt-2 max-w-sm text-sm text-red-500 font-(family-name:--font-body)">{errorMessage}</p>
+        <p className={`mx-auto mt-2 max-w-sm text-sm font-(family-name:--font-body) ${isDark ? 'text-red-300' : 'text-red-500'}`}>{errorMessage}</p>
       ) : null}
     </div>
   )
@@ -89,6 +92,8 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
   const [specialCharacterError, setSpecialCharacterError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { resolvedTheme } = useSettings();
+  const isDark = resolvedTheme === "Dark";
 
   // Derived checks (live)
   const hasLower = /[a-z]/.test(password);
@@ -149,6 +154,7 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
       // Store user data in localStorage
       localStorage.setItem('user', JSON.stringify(response));
       localStorage.setItem('userId', response.id);
+      window.dispatchEvent(new Event("recyvo-auth-changed"));
 
       // Also update local state
       setUser([
@@ -164,7 +170,7 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
 
       // navigate to home page after successful sign up
       try {
-        router.push('../HomePage');
+        router.push('/HomePage');
       } catch (e) {
         // ignore navigation errors during dev
       }
@@ -177,14 +183,11 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
 
   return (
     <>
-      <h1 className="mb-2 text-center text-[28px] font-bold leading-tight text-(--color-text-primary) font-(family-name:--font-logo)">
-        Create Account
-      </h1>
-      <p className="mb-6 text-center text-sm text-(--color-text-secondary) font-(family-name:--font-body)">Join our eco-friendly community</p>
-
       <div className={`mb-3 px-4 py-3 rounded-lg text-center text-sm font-medium transition duration-300 ${
         error 
-          ? 'bg-red-50 text-red-700 border border-red-300' 
+          ? isDark
+            ? 'bg-red-950/40 text-red-200 border border-red-800'
+            : 'bg-red-50 text-red-700 border border-red-300'
           : 'hidden'
       }`}>
         {error}
@@ -197,6 +200,7 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
          setValue={setUsername}
          hasError={usernameError}
          errorMessage={username.length === 0 ? 'Username is required' : username.includes('@') ? "Username cannot contain '@'" : ''}
+         isDark={isDark}
        />
        <Input
          name="Full Name"
@@ -204,6 +208,7 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
          setValue={setFullName}
          hasError={fullName.length === 0}
          errorMessage={fullName.length === 0 ? 'Full name is required' : ''}
+         isDark={isDark}
        />
        <Input
          name="Email Address"
@@ -211,6 +216,7 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
         setValue={setEmailAddress}
         hasError={emailAddressError}
         errorMessage={emailAddress.length === 0 ? 'Email is required' : !emailAddress.includes('@') ? "Email must contain '@'" : ''}
+        isDark={isDark}
       />
       <Input
         name="Password"
@@ -226,6 +232,7 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
           if (!hasSpecial) missing.push('one special character');
           return missing.length ? `Missing: ${missing.join(', ')}` : '';
         })()}
+        isDark={isDark}
       />
 
       <div className="mx-auto mt-6 max-w-sm rounded-xl border-l-4 border-(--color-green-primary) bg-(--color-bg-main) px-4 py-4">
@@ -280,6 +287,7 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
         setValue={setConfirmPassword}
         hasError={confirmPasswordError}
         errorMessage={confirmPassword.length === 0 ? 'Please confirm your password' : password !== confirmPassword ? 'Passwords do not match' : ''}
+        isDark={isDark}
       />
 
        {/* Submit button: disabled until form is valid */}
@@ -313,59 +321,29 @@ function SignUp({ user, setUser }: { user: any, setUser: any }) {
 export default function Home() {
   const [user, setUser] = useState([])
   return (
-    <main className="flex min-h-screen items-center justify-center bg-(--color-bg-main) px-5 py-6 text-(--color-text-primary)">
-      <section className="flex w-full max-w-md flex-col items-center overflow-hidden rounded-3xl bg-(--color-bg-card) shadow-lg">
-        <div className="w-full rounded-b-3xl bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) px-6 pb-8 pt-8 text-center text-(--color-text-on-green) shadow-lg">
-          <div className="mx-auto mb-5 flex h-36 w-36 items-center justify-center rounded-full bg-(--color-text-on-green) shadow-lg">
-            <Image
-              src={logo}
-              alt="Recyvo logo"
-              height={118}
-              width={118}
-              priority
-            />
-          </div>
-
-          <div className="mb-3 text-sm font-medium uppercase tracking-wider text-white/75 font-(family-name:--font-header)">
-            Smart city sorting
-          </div>
-          <h1 className="text-[28px] font-bold leading-tight font-(family-name:--font-logo)">
-            Create your account.
-          </h1>
-          <p className="mt-2 text-[20px] font-medium text-white/85 font-(family-name:--font-header)">
-            Scan. Sort. Share.
+    <AuthShell
+      title="Create your account."
+      subtitle="Scan. Sort. Share."
+      introTitle="Join the recycling flow"
+      introBody="Set up your profile to track progress, earn points, and use the sorting tools."
+      footer={
+        <div className="text-center text-sm text-(--color-text-secondary) font-(family-name:--font-body)">
+          <p>
+            Already have an account?{" "}
+            <Link
+              href="/LogInPage"
+              className="font-semibold text-(--color-green-primary) transition hover:opacity-90"
+            >
+              Log in
+            </Link>
           </p>
         </div>
-
-        <div className="w-full px-6 pb-7 pt-6">
-          <div className="mb-5 rounded-xl border-l-4 border-(--color-green-primary) bg-(--color-bg-main) p-4">
-            <p className="font-semibold text-(--color-text-primary) font-(family-name:--font-header)">
-              Join the recycling flow
-            </p>
-            <p className="mt-1 text-sm leading-6 text-(--color-text-secondary) font-(family-name:--font-body)">
-              Set up your profile to track progress, earn points, and use the
-              sorting tools.
-            </p>
-          </div>
-
-          <SignUp
-            user={user}
-            setUser={setUser}
-          />
-
-          <div className="mt-5 text-center text-sm text-(--color-text-secondary) font-(family-name:--font-body)">
-            <p>
-              Already have an account?{" "}
-              <a
-                href="../LogInPage"
-                className="font-semibold text-(--color-green-primary) transition hover:opacity-90"
-              >
-                Log in
-              </a>
-            </p>
-          </div>
-        </div>
-      </section>
-    </main>
+      }
+    >
+      <SignUp
+        user={user}
+        setUser={setUser}
+      />
+    </AuthShell>
   );
 }

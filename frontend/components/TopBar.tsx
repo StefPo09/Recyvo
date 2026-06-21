@@ -10,11 +10,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserGear } from "@fortawesome/free-solid-svg-icons";
 import RankProgress from "@/components/RankProgress";
 import logo from "@/Logo/Transparent/color.png";
+import { useSettings } from "@/lib/SettingsContext";
 
 export default function TopBar({ userData }: { userData: any }) {
   const points = userData?.nr_puncte ?? 0;
+  const { resolvedTheme } = useSettings();
+  const isDark = resolvedTheme === "Dark";
   return (
-    <div className="shrink-0 rounded-b-3xl bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) px-6 pb-8 pt-6 text-(--color-text-on-green)">
+    <div className={`shrink-0 rounded-b-3xl bg-linear-to-r px-6 pb-8 pt-6 text-(--color-text-on-green) ${isDark ? "from-green-900 to-green-800" : "from-green-700 to-green-600"}`}>
       <div className="flex items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 relative">

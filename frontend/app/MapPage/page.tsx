@@ -195,7 +195,7 @@ function BinMap() {
             </span>
           </div>
 
-          <div className="mt-4">
+          <div className="mt-4 w-26/27 justify-self-center">
             <MapViewAny bins={bins} places={places} />
           </div>
 

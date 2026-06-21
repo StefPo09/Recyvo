@@ -901,10 +901,11 @@ export default function SettingsPage() {
   }
 
   function logout() {
-    // Clear all localStorage
-    window.localStorage.removeItem("recyvo-settings");
+    // Clear auth state, but keep app preferences so the guest pages keep the chosen theme.
     window.localStorage.removeItem("userId");
     window.localStorage.removeItem("user");
+    document.cookie = "recyvo-theme=; path=/; max-age=0";
+    window.dispatchEvent(new Event("recyvo-auth-changed"));
     // Redirect to StartPage
     window.location.href = "/StartPage";
   }

@@ -1,14 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import {useState, useEffect} from "react";
-import logo from '../../Logo/Transparent/color.png';
 import { FiUser, FiLock } from 'react-icons/fi';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
+import Link from "next/link";
 import { loginUser } from '@/lib/api';
+import { useSettings } from "@/lib/SettingsContext";
+import AuthShell from "@/components/AuthShell";
 
-function Input({ name, value, setValue, hasError, errorMessage }: { name: string, value: any, setValue: any, hasError: boolean, errorMessage?: string }){
+function Input({ name, value, setValue, hasError, errorMessage, isDark }: { name: string, value: any, setValue: any, hasError: boolean, errorMessage?: string; isDark: boolean }){
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(false);
 
@@ -20,9 +21,11 @@ function Input({ name, value, setValue, hasError, errorMessage }: { name: string
     <div className="w-full max-w-sm mx-auto mt-5">
       <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition duration-300 backdrop-blur-sm
         ${hasError 
-          ? 'bg-red-50 border-red-400' 
+          ? isDark
+            ? 'bg-red-950/40 border-red-800'
+            : 'bg-red-50 border-red-400'
           : focused 
-          ? 'bg-(--color-bg-card) border-(--color-green-primary) shadow-md shadow-(--color-green-accent)' 
+          ? 'bg-(--color-bg-card) border-(--color-green-primary) shadow-(--color-green-accent)' 
           : 'bg-(--color-bg-card) border-(--color-green-accent)'}`}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
@@ -58,7 +61,7 @@ function Input({ name, value, setValue, hasError, errorMessage }: { name: string
         ) : null}
       </div>
       {errorMessage ? (
-        <p className="mx-auto mt-2 max-w-sm text-sm text-red-500 font-(family-name:--font-body)">{errorMessage}</p>
+        <p className={`mx-auto mt-2 max-w-sm text-sm font-(family-name:--font-body) ${isDark ? 'text-red-300' : 'text-red-500'}`}>{errorMessage}</p>
       ) : null}
     </div>
   )
@@ -72,6 +75,8 @@ function LogIn() {
   const [passwordError, setPasswordError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { resolvedTheme } = useSettings();
+  const isDark = resolvedTheme === "Dark";
 
   // Live validation: update error flags as the user types
   useEffect(() => {
@@ -104,10 +109,11 @@ function LogIn() {
       // Store user data in localStorage
       localStorage.setItem('user', JSON.stringify(response));
       localStorage.setItem('userId', response.id);
+      window.dispatchEvent(new Event("recyvo-auth-changed"));
 
       // navigate to home page after successful login
       try {
-        router.push('../HomePage');
+        router.push('/HomePage');
       } catch (e) {
         // ignore navigation errors during dev
       }
@@ -120,14 +126,11 @@ function LogIn() {
 
   return (
     <>
-      <h1 className="mb-2 text-center text-[28px] font-bold leading-tight text-(--color-text-primary) font-(family-name:--font-logo)">
-        Welcome Back
-      </h1>
-      <p className="mb-6 text-center text-sm text-(--color-text-secondary) font-(family-name:--font-body)">Log in to your account</p>
-
       <div className={`mb-3 px-4 py-3 rounded-lg text-center text-sm font-medium transition duration-300 ${
         error 
-          ? 'bg-red-50 text-red-700 border border-red-300' 
+          ? isDark
+            ? 'bg-red-950/40 text-red-200 border border-red-800'
+            : 'bg-red-50 text-red-700 border border-red-300'
           : 'hidden'
       }`}>
         {error}
@@ -139,6 +142,7 @@ function LogIn() {
         setValue={setUsernameEmail}
         hasError={usernameEmailError}
         errorMessage={usernameEmail.length === 0 ? 'Username or email is required' : ''}
+        isDark={isDark}
       />
       <Input
         name="Password"
@@ -146,6 +150,7 @@ function LogIn() {
         setValue={setPassword}
         hasError={passwordError}
         errorMessage={password.length === 0 ? 'Password is required' : ''}
+        isDark={isDark}
       />
 
        {(() => {
@@ -177,55 +182,26 @@ function LogIn() {
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-(--color-bg-main) px-5 py-6 text-(--color-text-primary)">
-      <section className="flex w-full max-w-md flex-col items-center overflow-hidden rounded-3xl bg-(--color-bg-card) shadow-lg">
-        <div className="w-full rounded-b-3xl bg-linear-to-r from-(--color-green-primary) to-(--color-green-primary) px-6 pb-8 pt-8 text-center text-(--color-text-on-green) shadow-lg">
-          <div className="mx-auto mb-5 flex h-36 w-36 items-center justify-center rounded-full bg-(--color-text-on-green) shadow-lg">
-            <Image
-              src={logo}
-              alt="Recyvo logo"
-              height={118}
-              width={118}
-              priority
-            />
-          </div>
-
-          <div className="mb-3 text-sm font-medium uppercase tracking-wider text-white/75 font-(family-name:--font-header)">
-            Smart city sorting
-          </div>
-          <h1 className="text-[28px] font-bold leading-tight font-(family-name:--font-logo)">
-            Welcome back.
-          </h1>
-          <p className="mt-2 text-[20px] font-medium text-white/85 font-(family-name:--font-header)">
-            Scan. Sort. Share.
+    <AuthShell
+      title="Welcome back."
+      subtitle="Scan. Sort. Share."
+      introTitle="Continue where you left off"
+      introBody="Log in to access the scanner, map, and your saved progress."
+      footer={
+        <div className="text-center text-sm text-(--color-text-secondary) font-(family-name:--font-body)">
+          <p>
+            Don&apos;t have an account?{" "}
+            <Link
+              href="/SignUpPage"
+              className="font-semibold text-(--color-green-primary) transition hover:opacity-90"
+            >
+              Sign up
+            </Link>
           </p>
         </div>
-
-        <div className="w-full px-6 pb-7 pt-6">
-          <div className="mb-5 rounded-xl border-l-4 border-(--color-green-primary) bg-(--color-bg-main) p-4">
-            <p className="font-semibold text-(--color-text-primary) font-(family-name:--font-header)">
-              Continue where you left off
-            </p>
-            <p className="mt-1 text-sm leading-6 text-(--color-text-secondary) font-(family-name:--font-body)">
-              Log in to access the scanner, map, and your saved progress.
-            </p>
-          </div>
-
-          <LogIn />
-
-          <div className="mt-5 text-center text-sm text-(--color-text-secondary) font-(family-name:--font-body)">
-            <p>
-              Don&apos;t have an account?{" "}
-              <a
-                href="../SignUpPage"
-                className="font-semibold text-(--color-green-primary) transition hover:opacity-90"
-              >
-                Sign up
-              </a>
-            </p>
-          </div>
-        </div>
-      </section>
-    </main>
+      }
+    >
+      <LogIn />
+    </AuthShell>
   );
 }

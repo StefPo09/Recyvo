@@ -38,7 +38,7 @@ export default async function RootLayout({
 
   // Add 'dark' class and data-theme attribute to html tag when the server knows the theme
   const htmlClass = `${geistSans.variable} ${geistMono.variable} h-full antialiased ${initialTheme === "Dark" ? "dark" : ""}`.trim();
-  const dataTheme = initialTheme === "Dark" ? "Dark" : "Light";
+  const dataTheme = initialTheme ?? undefined;
 
   return (
     <html

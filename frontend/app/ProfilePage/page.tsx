@@ -334,10 +334,11 @@ export default function Home() {
   }
 
   function logout() {
-    // Clear all localStorage
-    window.localStorage.removeItem("recyvo-settings");
+    // Clear auth state, but keep app preferences so guest pages keep the chosen theme.
     window.localStorage.removeItem("userId");
     window.localStorage.removeItem("user");
+    document.cookie = "recyvo-theme=; path=/; max-age=0";
+    window.dispatchEvent(new Event("recyvo-auth-changed"));
     // Redirect to StartPage
     window.location.href = "/StartPage";
   }
@@ -378,7 +379,6 @@ export default function Home() {
           <div className="rounded-4xl bg-(--color-bg-card) px-4 pb-6 pt-2">
             <div className="text-center">
               <div className="mb-3 flex items-center justify-center gap-2 text-(--color-green-primary) font-(family-name:--font-header)">
-                <FontAwesomeIcon icon={faUserCircle} className="text-2xl" />
                 <h2 className="text-4xl font-black tracking-tight">My Profile</h2>
               </div>
 
@@ -410,7 +410,6 @@ export default function Home() {
 
             <div className="mt-8 text-center">
               <div className="mb-4 flex justify-center items-center gap-3 text-2xl font-black text-(--color-green-primary) font-(family-name:--font-header)">
-                <span>📋</span>
                 <h3>Personal Information</h3>
               </div>
 

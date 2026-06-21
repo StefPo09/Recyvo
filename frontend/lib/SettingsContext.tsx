@@ -50,6 +50,7 @@ type SettingsContextValue = {
     browserTheme: "Light" | "Dark";
     resolvedTheme: "Light" | "Dark";
     isDark: boolean;
+    isAuthenticated: boolean;
     savedMessage: string;
     setSavedMessage: (m: string) => void;
     debugSettings: () => void;
@@ -78,6 +79,52 @@ export function SettingsProvider({
     const [savedMessage, setSavedMessage] = useState("Settings saved locally");
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const [isInitialLoad, setIsInitialLoad] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    function getCurrentUserId() {
+        const rawUserId = typeof window !== "undefined" ? window.localStorage.getItem("userId") : null;
+        return rawUserId && rawUserId !== "undefined" && rawUserId !== "null" ? rawUserId : null;
+    }
+
+    async function loadSettingsForCurrentUser() {
+        if (typeof window === "undefined") return;
+
+        setIsInitialLoad(true);
+        setHasUnsavedChanges(false);
+
+        const userId = getCurrentUserId();
+        setIsAuthenticated(Boolean(userId));
+        if (userId) {
+            try {
+                const backendSettings = await getUserPreferences(userId);
+                console.debug("Loaded preferences from backend:", backendSettings);
+                setSettings((current) => ({
+                    ...current,
+                    ...backendSettings,
+                    toggles: { ...defaultSettings.toggles, ...(backendSettings.toggles ?? {}) },
+                    materials: { ...defaultSettings.materials, ...(backendSettings.materials ?? {}) },
+                }));
+                return;
+            } catch (err) {
+                console.debug("Failed to load preferences from backend, falling back to localStorage", err);
+            }
+        }
+
+        try {
+            const saved = window.localStorage.getItem(storageKey);
+            if (saved) {
+                const parsed = JSON.parse(saved) as Partial<SettingsState>;
+                setSettings((current) => ({
+                    ...current,
+                    ...parsed,
+                    toggles: { ...defaultSettings.toggles, ...(parsed.toggles ?? {}) },
+                    materials: { ...defaultSettings.materials, ...(parsed.materials ?? {}) },
+                }));
+            }
+        } catch (err) {
+            window.localStorage.removeItem(storageKey);
+        }
+    }
 
     // detect browser theme
     useEffect(() => {
@@ -90,59 +137,18 @@ export function SettingsProvider({
 
     // load saved settings once (from localStorage or backend)
     useEffect(() => {
-        // First, try to load from backend if user is logged in
-        try {
-            // Read stored userId but guard against the literal strings 'undefined' or 'null'
-            const rawUserId = typeof window !== 'undefined' ? window.localStorage.getItem("userId") : null;
-            const userId = rawUserId && rawUserId !== 'undefined' && rawUserId !== 'null' ? rawUserId : null;
-            if (userId) {
-                // Async load from backend
-                getUserPreferences(userId)
-                    .then((backendSettings) => {
-                        console.debug("Loaded preferences from backend:", backendSettings);
-                        // Always merge, even if empty - backend is source of truth for logged-in users
-                        if (backendSettings) {
-                            setSettings((current) => ({
-                                ...current,
-                                ...backendSettings,
-                                toggles: { ...defaultSettings.toggles, ...(backendSettings.toggles ?? {}) },
-                                materials: { ...defaultSettings.materials, ...(backendSettings.materials ?? {}) },
-                            }));
-                        }
-                        // Done loading
-                        setIsInitialLoad(false);
-                    })
-                    .catch((err) => {
-                        console.debug("Failed to load preferences from backend, falling back to localStorage", err);
-                        // Fall back to localStorage only if backend fails
-                        loadFromLocalStorage();
-                        setIsInitialLoad(false);
-                    });
-                return;
-            }
-        } catch (err) {
-            console.debug("Error checking for user, falling back to localStorage", err);
-        }
-        
-        // Fall back to localStorage if no user ID
-        loadFromLocalStorage();
-        setIsInitialLoad(false);
-        
-        function loadFromLocalStorage() {
-            try {
-                const saved = window.localStorage.getItem(storageKey);
-                if (!saved) return;
-                const parsed = JSON.parse(saved) as Partial<SettingsState>;
-                setSettings((current) => ({
-                    ...current,
-                    ...parsed,
-                    toggles: { ...defaultSettings.toggles, ...(parsed.toggles ?? {}) },
-                    materials: { ...defaultSettings.materials, ...(parsed.materials ?? {}) },
-                }));
-            } catch (err) {
-                window.localStorage.removeItem(storageKey);
-            }
-        }
+        void loadSettingsForCurrentUser().finally(() => {
+            setIsInitialLoad(false);
+        });
+
+        const handleAuthChanged = () => {
+            void loadSettingsForCurrentUser().finally(() => {
+                setIsInitialLoad(false);
+            });
+        };
+
+        window.addEventListener("recyvo-auth-changed", handleAuthChanged);
+        return () => window.removeEventListener("recyvo-auth-changed", handleAuthChanged);
     }, []);
 
     // persist when settings change (save to both localStorage and backend)
@@ -194,7 +200,9 @@ export function SettingsProvider({
          }
     }, [settings, isInitialLoad]);
 
-    const resolvedTheme = settings.theme === "Device" ? browserTheme : (settings.theme as "Light" | "Dark");
+    const resolvedTheme = !isAuthenticated || settings.theme === "Device"
+        ? browserTheme
+        : (settings.theme as "Light" | "Dark");
     const isDark = resolvedTheme === "Dark";
 
     // Apply global attributes so theme and language persist at the root HTML element.
@@ -345,6 +353,7 @@ export function SettingsProvider({
             browserTheme,
             resolvedTheme,
             isDark,
+            isAuthenticated,
             savedMessage,
             setSavedMessage,
             hasUnsavedChanges,
@@ -369,7 +378,7 @@ export function SettingsProvider({
                 console.log("=== END DEBUG ===");
             }
         }),
-        [settings, browserTheme, resolvedTheme, isDark, savedMessage, hasUnsavedChanges, isInitialLoad],
+        [settings, browserTheme, resolvedTheme, isDark, isAuthenticated, savedMessage, hasUnsavedChanges, isInitialLoad],
     );
 
     const mainClassName = useMemo(() => {
