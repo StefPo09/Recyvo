@@ -93,32 +93,120 @@ function ChatInput({
     }
   }
 
+   // Remove markdown formatting (bold, italic, etc.) from text
+   function stripMarkdown(text: string): string {
+     return text
+       .replace(/\*\*(.*?)\*\*/g, "$1") // **bold** → bold
+       .replace(/\*(.*?)\*/g, "$1") // *italic* → italic
+       .replace(/__(.*?)__/g, "$1") // __bold__ → bold
+       .replace(/_(.*?)_/g, "$1") // _italic_ → italic
+       .replace(/~~(.*?)~~/g, "$1"); // ~~strikethrough~~ → strikethrough
+   }
+
   function sendMessage() {
     const trimmedMessage = inputText.trim();
 
     if (!trimmedMessage) {
       return;
     }
+    // add the user's message immediately to the UI
+    const userEntry = {
+      message: trimmedMessage,
+      sender: "user" as ChatSender,
+      id: crypto.randomUUID(),
+    };
 
-    // Add the response here and give it to the response const
-    const response = "Hello World!";
-
-    setChatMessages((previousMessages) => [
-      ...previousMessages,
-      {
-        message: trimmedMessage,
-        sender: "user",
-        id: crypto.randomUUID(),
-      },
-      {
-        message: response,
-        sender: "robot",
-        id: crypto.randomUUID(),
-      },
-    ]);
-
+    setChatMessages((previousMessages) => [...previousMessages, userEntry]);
     setInputText("");
-    console.log(response);
+
+    // Call the local AI endpoint once per message (stateless) and do NOT send prior conversation
+    // The AI is instructed via a system prompt to only discuss eco-friendly topics and be family-friendly.
+    (async () => {
+        try {
+        // use same-origin proxy to avoid CORS/mixed-content issues
+        const aiEndpoint = "/api/ai-proxy";
+        const payload = {
+          model: "minimaxai/minimax-m3",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are SEB, an eco-friendly assistant. Only talk about recycling, sustainable living, and environmental topics. Do not reference or continue any previous conversations or mention memory. If the user asks about unrelated topics, politely decline and steer the user to an eco-friendly subject. Always use family-friendly language suitable for all ages. Do NOT use bold, italic, or any markdown formatting. Use plain text only.",
+            },
+            { role: "user", content: trimmedMessage },
+          ],
+          temperature: 0.6,
+          max_tokens: 2048,
+        };
+
+        const res = await fetch(aiEndpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          // try to extract body text for better diagnostics
+          let bodyText = "";
+          try {
+            bodyText = await res.text();
+          } catch (e) {
+            bodyText = String(e);
+          }
+          throw new Error(`AI request failed: ${res.status} ${res.statusText} - ${bodyText}`);
+        }
+
+        const data = await res.json();
+
+        // Handle error objects returned by the proxy
+        if (data?.error) {
+          const errorMsg = data?.details ?? data?.body?.detail ?? JSON.stringify(data);
+          throw new Error(`API error: ${errorMsg}`);
+        }
+
+        // Support common OpenAI-compatible shape: choices[0].message.content
+        let aiText = "";
+        if (data?.choices && Array.isArray(data.choices) && data.choices[0]) {
+          aiText = data.choices[0].message?.content ?? data.choices[0].text ?? "";
+        } else if (typeof data === "string") {
+          aiText = data;
+        } else if (data?.choices && data.choices.length === 0) {
+          throw new Error("Model returned empty response. Please try again.");
+        } else {
+          aiText = JSON.stringify(data);
+        }
+
+        if (!aiText) {
+          throw new Error("Model returned empty message content.");
+        }
+
+        // Strip any markdown formatting as a safeguard
+        const cleanedText = stripMarkdown(aiText);
+
+        const botEntry = {
+          message: cleanedText,
+          sender: "robot" as ChatSender,
+          id: crypto.randomUUID(),
+        };
+
+        setChatMessages((previousMessages) => [...previousMessages, botEntry]);
+      } catch (err) {
+        const errMessage = `Sorry, I couldn't reach the assistant. Please try again later.`;
+        setChatMessages((previousMessages) => [
+          ...previousMessages,
+          {
+            message: errMessage,
+            sender: "robot" as ChatSender,
+            id: crypto.randomUUID(),
+          },
+        ]);
+        // Keep the error in console for debugging
+        // eslint-disable-next-line no-console
+        console.error(err);
+      }
+    })();
   }
 
   return (
@@ -127,7 +215,7 @@ function ChatInput({
         <input
           type="text"
           className="min-w-0 flex-1 bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-500 dark:text-gray-50 dark:placeholder:text-gray-400"
-          placeholder="Type your message to SEB..."
+          placeholder="Ask about recycling, eco-friendly tips, or sustainable living..."
           onChange={saveInputText}
           value={inputText}
           onKeyDown={enterPressed}
@@ -267,6 +355,9 @@ export default function Home() {
               🤖
             </div>
             <h1 className="text-lg font-semibold font-(family-name:--font-header)">SEB: Eco Assistant</h1>
+          </div>
+          <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+            <span className="font-medium">Privacy:</span> Conversations won't be saved. SEB does not retain or recall past discussions.
           </div>
           <Link
             href="./" // Add settingsPage
