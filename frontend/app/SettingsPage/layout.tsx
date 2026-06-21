@@ -3,7 +3,10 @@ import type { ReactNode } from "react";
 import SettingsProvider from "@/lib/SettingsContext";
 
 export const metadata: Metadata = {
-  title: "Settings | Recyvo"
+  title: "Settings | Recyvo",
+    icons: {
+        icon: "favicon.png",
+    },
 };
 
 export default function RootLayout({

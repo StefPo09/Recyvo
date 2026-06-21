@@ -945,47 +945,6 @@ export default function SettingsPage() {
                 {t("Home")}
               </Link>
             </div>
-
-            <div
-                className={`rounded-xl p-4 ${
-                    isDark ? "bg-gray-800 shadow-none" : "bg-white shadow-sm"
-                }`}
-            >
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <p
-                      className={`text-sm font-medium ${
-                          isDark ? "text-gray-300" : "text-gray-600"
-                      }`}
-                  >
-                    {t("Eco Legend in Training")}
-                  </p>
-                  <p
-                      className={`mt-1 text-2xl font-bold ${
-                          isDark ? "text-white" : "text-black"
-                      }`}
-                  >
-                    {t("Karma Points")}: <span className="text-green-700">12,450</span>
-                  </p>
-                </div>
-                <div className="flex flex-col items-center">
-                  <FontAwesomeIcon icon={faTrophy} className="w-6 text-amber-500" />
-                  <span className="text-xs text-gray-500 mt-1">{t("Level 7")}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-                <span>{t("Progress to Level 8")}</span>
-                <span>70%</span>
-              </div>
-              <div
-                  className={`h-2 w-full rounded-full ${
-                      isDark ? "bg-gray-700" : "bg-gray-200"
-                  }`}
-              >
-                <div className="bg-green-600 h-2 rounded-full w-[70%]" />
-              </div>
-            </div>
           </header>
 
           <div className="flex-1 space-y-4 px-4 py-5">

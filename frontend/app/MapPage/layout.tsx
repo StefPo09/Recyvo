@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "Map | Recyvo"
+  title: "Map | Recyvo",
+  icons: {
+    icon: "favicon.png",
+  },
 };
 
 export default function RootLayout({

@@ -293,9 +293,9 @@ function ScannerControls({
       <button
         type="button"
         onClick={onOpenCamera}
-        className="cursor-pointer flex items-center gap-3 rounded-2xl border border-(--color-green-accent) bg-(--color-bg-card) px-4 py-4 text-left shadow-sm transition-colors hover:bg-(--color-green-accent)"
+        className="cursor-pointer flex items-center gap-3 rounded-2xl border border-(--color-text-secondary) bg-(--color-bg-card) px-4 py-4 text-left shadow-sm transition-colors hover:bg-(--color-bg-main)"
       >
-        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-(--color-green-accent) text-(--color-green-primary)">
+        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-(--color-bg-main) text-(--color-text-secondary)">
           <FontAwesomeIcon icon={faCamera} className="text-lg" />
         </span>
         <span>

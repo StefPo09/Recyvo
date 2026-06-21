@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "Profile | Recyvo"
+  title: "Profile | Recyvo",
+  icons: {
+    icon: "favicon.png",
+  },
 };
 
 export default function RootLayout({
